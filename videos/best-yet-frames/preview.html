@@ -1,0 +1,46 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Quran Opening Preview</title>
+<style>
+  html, body { margin: 0; background: #1C1917; color: #eee; font: 13px system-ui, sans-serif; }
+  #scroll { height: 500vh; }
+  #stage { position: fixed; inset: 0; display: grid; place-items: center; overflow: hidden; }
+  canvas { width: min(100vw, 177.78vh); height: auto; will-change: transform; }
+  #hud { position: fixed; left: 12px; top: 10px; opacity: .7; font-variant-numeric: tabular-nums; }
+  label { position: fixed; right: 12px; top: 8px; opacity: .8; }
+</style>
+<div id="stage"><canvas id="c" width="1280" height="720"></canvas></div>
+<div id="hud">Loading frames…</div>
+<label><input type="checkbox" id="centre" checked> keep book centred</label>
+<div id="scroll"></div>
+<script>
+  const N = 89, START = 1.90, FPS = 24;
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const hud = document.getElementById('hud');
+  const centre = document.getElementById('centre');
+  const frames = [];
+  let loaded = 0;
+
+  for (let i = 0; i < N; i++) {
+    const img = new Image();
+    img.onload = () => { loaded++; if (loaded === N) draw(); else hud.textContent = `Loading frames… ${loaded}/${N}`; };
+    img.src = `f${String(i).padStart(3, '0')}.png`;
+    frames.push(img);
+  }
+
+  // Scroll position picks the frame. The closed book sits left of centre in the footage,
+  // so the canvas starts shifted right 15% and slides back to 0 as the book opens.
+  function draw() {
+    if (loaded < N) return;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+    const i = Math.round(p * (N - 1));
+    ctx.drawImage(frames[i], 0, 0, canvas.width, canvas.height);
+    canvas.style.transform = centre.checked ? `translateX(${15 * (1 - p)}%)` : 'none';
+    hud.textContent = `frame ${i + 1}/${N} · ${(START + i / FPS).toFixed(2)} s · scroll to open`;
+  }
+
+  addEventListener('scroll', () => requestAnimationFrame(draw), { passive: true });
+  centre.onchange = draw;
+</script>

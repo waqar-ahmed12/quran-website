@@ -1,0 +1,360 @@
+<title>Mushaf Opening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=Jost:wght@300;400;500&family=Amiri:wght@400;700&display=swap">
+
+<style>
+  /* Deliberately single-theme. PLAN.md locks the dark-mode hero first; the
+     light-mode asset pair comes after dark is signed off. Every colour is
+     painted explicitly so the page holds on either host ground. */
+  :root {
+    --ground:      #1C1917;
+    --ground-deep: #100E0C;
+    --gold:        #D4AF37;
+    --gold-dim:    #8A7328;
+    --cream:       #F2ECE0;
+    --muted:       #8A8178;
+    --hairline:    rgba(212, 175, 55, 0.22);
+
+    --book-h: clamp(300px, 62vh, 700px);
+    --book-w: calc(var(--book-h) * 0.67235);  /* 907 / 1349 */
+
+    --p: 0;      /* 0..1 scroll progress */
+    --a: 0deg;   /* leaf rotation */
+    --sx: 0.5;   /* spread horizontal scale */
+    --sway: 0deg;
+    --leafFade: 1;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--cream);
+    font-family: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- scroll rig ---------- */
+
+  .scroller { height: 340vh; position: relative; }
+
+  .stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 50% 45%, #221F1C 0%, var(--ground) 45%, var(--ground-deep) 100%);
+  }
+
+  /* ---------- the book ---------- */
+
+  .book {
+    position: relative;
+    width: var(--book-w);
+    height: var(--book-h);
+    perspective: 2600px;
+    transform: rotateY(var(--sway));
+    transform-style: preserve-3d;
+  }
+
+  .spread {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: calc(var(--book-w) * 2);
+    height: 100%;
+    transform: translateX(-50%) scaleX(var(--sx));
+    transform-origin: center center;
+    box-shadow: 0 40px 90px -30px rgba(0,0,0,0.85);
+  }
+  .spread img { display: block; width: 100%; height: 100%; }
+
+  .cover { position: absolute; inset: 0; transform-style: preserve-3d; }
+
+  .leaf {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform-style: preserve-3d;
+  }
+  .leaf-l { left: 0;  transform-origin: left center;  transform: rotateY(var(--a)); }
+  .leaf-r { right: 0; transform-origin: right center; transform: rotateY(calc(var(--a) * -1)); }
+
+  /* Opacity lives on the faces, not on .leaf — opacity on an element with
+     preserve-3d children flattens them and kills the backface flip. */
+  .face, .back {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    backface-visibility: hidden;
+    opacity: var(--leafFade);
+  }
+
+  /* the front face is the approved cover asset, split down the exact centre */
+  .face img {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: var(--book-w);
+    max-width: none;
+  }
+  .leaf-l .face img { left: 0; }
+  .leaf-r .face img { right: 0; }
+
+  /* The inside of each leaf is plain endpaper — never a mirrored copy of the
+     front calligraphy. This is the surface the generated video kept getting
+     wrong, and here we simply define it. */
+  .back {
+    transform: rotateY(180deg);
+    background:
+      linear-gradient(100deg, #191614 0%, #221E1A 50%, #171411 100%);
+    border: 1px solid rgba(0,0,0,0.6);
+  }
+  .back::after {
+    content: "";
+    position: absolute;
+    inset: 7% 9%;
+    border: 1px solid rgba(212,175,55,0.10);
+  }
+
+  /* shading that deepens as the leaf swings away from the light */
+  .face::after, .back::after { pointer-events: none; }
+  /* z-index is load-bearing: ::before is the first child, so without it the
+     <img> paints over the shading and the gradient never shows. */
+  .face::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%);
+    opacity: calc(var(--p) * 0.9);
+  }
+  .leaf-r .face::before { background: linear-gradient(270deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%); }
+
+  /* ---------- wordmark ---------- */
+
+  .wordmark {
+    position: absolute;
+    left: 50%;
+    bottom: 8vh;
+    transform: translateX(-50%);
+    text-align: center;
+    opacity: calc(1 - var(--p) * 3.2);
+    pointer-events: none;
+  }
+  .wordmark .ar {
+    font-family: "Amiri", "Times New Roman", serif;
+    font-size: clamp(20px, 2.4vh, 30px);
+    color: var(--gold);
+    letter-spacing: 0;
+    margin: 0 0 0.55rem;
+    line-height: 1;
+  }
+  .wordmark .lat {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-left: 0.42em;
+  }
+
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: 2.4vh;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: calc(1 - var(--p) * 4);
+  }
+
+  /* ---------- review panel ---------- */
+
+  .panel {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 11px 18px;
+    background: rgba(16,14,12,0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--hairline);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .panel label { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+  .panel input[type="range"] { width: 160px; accent-color: var(--gold); cursor: pointer; }
+  .panel input[type="checkbox"] { accent-color: var(--gold); cursor: pointer; }
+  .panel .val {
+    font-variant-numeric: tabular-nums;
+    color: var(--gold);
+    min-width: 3.4em;
+    text-align: right;
+  }
+  .panel :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .note {
+    max-width: 62ch;
+    margin: 0 auto;
+    padding: 16vh 24px 22vh;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .note h2 {
+    font-family: "Bodoni Moda", Georgia, serif;
+    font-weight: 400;
+    font-size: 26px;
+    color: var(--cream);
+    margin: 0 0 1.1rem;
+    text-wrap: balance;
+  }
+  .note p { margin: 0 0 1rem; }
+  .note strong { color: var(--cream); font-weight: 400; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroller { height: 100vh; }
+  }
+</style>
+
+<div class="scroller">
+  <section class="stage">
+    <div class="book" id="book">
+      <div class="spread">
+        <img src="spread-dark.jpg" alt="Open mushaf, two blank cream pages">
+      </div>
+      <div class="cover">
+        <div class="leaf leaf-l">
+          <div class="face"><img src="cover-dark.jpg" alt=""></div>
+          <div class="back"></div>
+        </div>
+        <div class="leaf leaf-r">
+          <div class="face"><img src="cover-dark.jpg" alt=""></div>
+          <div class="back"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wordmark">
+      <p class="ar">القرآن الكريم</p>
+      <p class="lat">Al-Qur'an al-Karim</p>
+    </div>
+
+    <div class="hint">Scroll</div>
+  </section>
+</div>
+
+<div class="note">
+  <h2>What to judge here</h2>
+  <p>
+    The cover parts from the centre and both leaves swing outward, pivoting on their
+    <strong>outer</strong> edges, so the opening reads from the middle. The spread widens
+    from one cover-width to two as they go, which is what makes it read as a book opening
+    rather than curtains parting.
+  </p>
+  <p>
+    The inside of each leaf is <strong>plain endpaper</strong> — no roundel, no reversed
+    script, nothing showing through. Scrub past about 70% to see it.
+  </p>
+  <p>
+    Open question: the gold roundel sits dead centre, so parting the cover divides
+    القرآن الكريم down the middle. <strong>Fade leaves</strong> in the panel dissolves
+    them as they swing, so it is never seen held apart. Off is the clean gatefold cut.
+    Tell me which you want.
+  </p>
+  <p>
+    Dark only for now — the light pair comes after this is signed off. The aayat layer is
+    Phase 5 and is not in here.
+  </p>
+</div>
+
+<div class="panel">
+  <label>
+    Scrub
+    <input type="range" id="scrub" min="0" max="100" value="0" aria-label="Scrub the opening">
+    <span class="val" id="pct">0%</span>
+  </label>
+  <label>
+    <input type="checkbox" id="fade" aria-label="Fade leaves as they open">
+    Fade leaves
+  </label>
+</div>
+
+<script>
+  const root   = document.documentElement;
+  const scrub  = document.getElementById('scrub');
+  const pct    = document.getElementById('pct');
+  const fadeEl = document.getElementById('fade');
+  const scroller = document.querySelector('.scroller');
+
+  const OPEN_FROM = 0.06;   // rest before the opening starts
+  const OPEN_TO   = 0.90;
+  const MAX_ANGLE = 116;    // degrees each leaf swings
+
+  let manual = null;
+
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+  function apply(p) {
+    const t = clamp((p - OPEN_FROM) / (OPEN_TO - OPEN_FROM), 0, 1);
+    const eased = t;  // linear on purpose — scroll position IS the timeline
+
+    root.style.setProperty('--p', t.toFixed(4));
+    root.style.setProperty('--a', (eased * MAX_ANGLE).toFixed(2) + 'deg');
+    root.style.setProperty('--sx', (0.5 + eased * 0.5).toFixed(4));
+    root.style.setProperty('--sway', (Math.sin(eased * Math.PI) * 2.6).toFixed(2) + 'deg');
+    root.style.setProperty('--leafFade',
+      fadeEl.checked ? clamp(1 - eased * 1.35, 0, 1).toFixed(3) : '1');
+
+    pct.textContent = Math.round(t * 100) + '%';
+    if (manual === null) scrub.value = Math.round(t * 100);
+  }
+
+  function fromScroll() {
+    const rect = scroller.getBoundingClientRect();
+    const total = scroller.offsetHeight - window.innerHeight;
+    apply(total > 0 ? clamp(-rect.top / total, 0, 1) : 0);
+  }
+
+  let ticking = false;
+  addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { manual = null; fromScroll(); ticking = false; });
+  }, { passive: true });
+  addEventListener('resize', fromScroll, { passive: true });
+
+  scrub.addEventListener('input', () => {
+    manual = +scrub.value / 100;
+    apply(OPEN_FROM + manual * (OPEN_TO - OPEN_FROM));
+  });
+  fadeEl.addEventListener('change', () => {
+    if (manual !== null) apply(OPEN_FROM + manual * (OPEN_TO - OPEN_FROM));
+    else fromScroll();
+  });
+
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    manual = 1;
+    scrub.value = 100;
+    apply(OPEN_TO);
+  } else {
+    fromScroll();
+  }
+</script>

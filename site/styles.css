@@ -1,0 +1,290 @@
+/* Phase 1: hero scroll animation. Phase 2: theme tokens, fonts and the headline. Phase 3: aayat on the pages. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Dark theme, from design-system/quran-landing/MASTER.md. The background is the footage's own #1F1A18
+   rather than MASTER's #1C1917 (three shades apart), so the frame's edges disappear without a blend.
+   Cinzel for the headline and the bright gold were chosen by the user from on-page options. */
+:root {
+  --color-background: #1F1A18;
+  --color-foreground: #FAFAF9;
+  --color-muted-foreground: #A8A29E;
+  --color-accent: #D4AF37;
+  --font-display: Cinzel, 'Trajan Pro', Georgia, serif;
+  --font-body: Jost, system-ui, sans-serif;
+  --font-arabic: 'Amiri Quran', 'Scheherazade New', serif;
+  color-scheme: dark;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+}
+
+/* No scroll bar: it broke the dark scene. Scrolling works the same without it. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+/* A tall section; the stage inside it stays pinned while it scrolls past. Its height is one screen
+   plus the timeline in main.js (4.1 screens): the rest, the opening, then one group of aayat, before
+   the page moves on. Phones scroll two thirds as far, because a finger moves further per swipe than
+   a mouse wheel per click. */
+.hero {
+  position: relative;
+  height: 510vh;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh; /* the book stays whole behind mobile browser bars */
+  overflow: hidden;
+}
+
+/* The book and its aayat sit together in .subject, which atmosphere.js moves slightly while nobody is
+   scrolling. The light in the air is a second canvas over everything, and never catches clicks. */
+.subject,
+.air {
+  position: absolute;
+  inset: 0;
+}
+
+.subject canvas,
+.air {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.air {
+  pointer-events: none;
+}
+
+/* The headline, centred in the space under the closed book. --book-h is the book's height on screen,
+   set by main.js, which also fades it out as the cover starts to open. */
+.wordmark {
+  position: absolute;
+  z-index: 1; /* over .subject: the frame's feathered bottom edge reaches the headline on some screens */
+  left: 0;
+  right: 0;
+  bottom: calc((50% - var(--book-h, 60svh) / 2) / 2);
+  transform: translateY(50%);
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.wordmark h1 {
+  margin: 0;
+  padding-left: 0.2em; /* balances the letter-spacing after the last letter, so the text sits truly centred */
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 0.9rem + 1vw, 1.625rem);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.wordmark p {
+  margin: 0.7em 0 0;
+  font-size: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--color-muted-foreground);
+}
+
+/* Aayat, laid over the open book's pages. The numbers are page positions in the 1280x720 footage:
+   left page x 262-636, right page x 645-1020, both y 80-640. main.js sets --s (the book's scale) and
+   --x0/--y0 (where the footage's corner sits once the book is open), and each group's opacity. */
+.aayat {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.group {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 600ms cubic-bezier(0.32, 0.72, 0, 1); /* main.js only switches opacity between 0 and 1 */
+  mix-blend-mode: multiply; /* the ink sits in the paper, so the paper's shading shows through it */
+}
+
+.page {
+  position: absolute;
+  top: calc(var(--y0, 0px) + 80px * var(--s, 1));
+  width: calc(375px * var(--s, 1));
+  height: calc(560px * var(--s, 1));
+  padding: calc(56px * var(--s, 1)) calc(40px * var(--s, 1));
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  gap: 1.25em;
+  overflow: hidden;
+  text-align: center;
+  color: #2B211B; /* dark ink, 14:1 on the cream page */
+}
+
+.page p {
+  margin: 0;
+}
+
+.page.right {
+  left: calc(var(--x0, 0px) + 645px * var(--s, 1));
+  font-size: calc(30px * var(--s, 1));
+}
+
+.page.left {
+  left: calc(var(--x0, 0px) + 262px * var(--s, 1));
+  font-size: calc(16px * var(--s, 1));
+}
+
+.arabic {
+  font-family: var(--font-arabic);
+  line-height: 2.2; /* room for the marks above and below the letters */
+}
+
+.marker {
+  color: #A16207; /* gold only for the small accents */
+}
+
+.surah {
+  padding-left: 0.15em;
+  font-family: var(--font-display);
+  font-size: 1.2em;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #8A6A1F;
+}
+
+.meaning {
+  display: none;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #3A302A;
+}
+
+.ref {
+  font-size: 0.85em;
+  letter-spacing: 0.08em;
+  color: #6B5E55;
+}
+
+@media (max-width: 767px) {
+  .hero {
+    height: 373vh; /* one screen plus two thirds of 4.1 */
+  }
+
+  /* The pages are too small for a second block of text, so the left page's text sits under the book. */
+  .group {
+    mix-blend-mode: normal;
+  }
+
+  .page.left {
+    left: 1.5rem;
+    right: 1.5rem;
+    width: auto;
+    top: calc(var(--y0, 0px) + 650px * var(--s, 1) + 1rem);
+    height: calc(var(--y0, 0px) + 70px * var(--s, 1) - 2rem);
+    padding: 0;
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
+  }
+
+  .page.left .surah {
+    color: var(--color-accent);
+  }
+
+  .page.left .meaning,
+  .page.left .ref {
+    color: var(--color-muted-foreground);
+  }
+}
+
+/* Reduced motion: no scrubbing, just the open book with a random group of aayat. */
+.still .hero {
+  height: auto;
+}
+
+.still .group {
+  transition: none;
+}
+
+/* TRYOUT: phase 3 options, set on <html> by main.js. Once the user picks, move the picks above and
+   delete everything below. */
+[data-arabic='scheherazade'] {
+  --font-arabic: 'Scheherazade New', 'Amiri Quran', serif;
+}
+
+[data-left='meaning'] .meaning {
+  display: block;
+}
+
+.tryout {
+  position: fixed;
+  right: 12px; /* bottom-right, clear of the headline picker (wordmark-options.js) in the bottom-left */
+  bottom: 12px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100svh - 24px); /* scrolls inside itself on a phone */
+  overflow-y: auto;
+  padding: 10px 12px;
+  border: 1px solid #3F3A37;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  font: 13px/1 system-ui, sans-serif;
+  color: #e7e0d8;
+}
+
+.tryout .readout {
+  max-width: 34em;
+  margin: 10px 0 2px;
+  line-height: 1.4;
+  color: #A8A29E;
+  font-variant-numeric: tabular-nums;
+}
+
+.tryout summary {
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.tryout div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.tryout span {
+  min-width: 10em;
+  color: #A8A29E;
+}
+
+.tryout button {
+  padding: 10px 14px;
+  border: 1px solid #5c5048;
+  border-radius: 999px;
+  background: transparent;
+  color: #e7e0d8;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tryout button[aria-pressed='true'] {
+  border-color: #d4af37;
+  color: #d4af37;
+}

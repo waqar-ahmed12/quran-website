@@ -1,0 +1,85 @@
+{
+  "source": "Quran.com API v4: Arabic text_uthmani; English translation 20 (Saheeh International)",
+  "fetched": "2026-09-13",
+  "groups": [
+    {
+      "ref": "96:1-5",
+      "surah": "Al-'Alaq",
+      "aayat": [
+        {
+          "key": "96:1",
+          "text": " ٱقْرَأْ بِٱسْمِ رَبِّكَ ٱلَّذِى خَلَقَ",
+          "translation": "Recite in the name of your Lord who created"
+        },
+        {
+          "key": "96:2",
+          "text": "خَلَقَ ٱلْإِنسَـٰنَ مِنْ عَلَقٍ",
+          "translation": "Created man from a clinging substance."
+        },
+        {
+          "key": "96:3",
+          "text": "ٱقْرَأْ وَرَبُّكَ ٱلْأَكْرَمُ",
+          "translation": "Recite, and your Lord is the most Generous -"
+        },
+        {
+          "key": "96:4",
+          "text": "ٱلَّذِى عَلَّمَ بِٱلْقَلَمِ",
+          "translation": "Who taught by the pen"
+        },
+        {
+          "key": "96:5",
+          "text": "عَلَّمَ ٱلْإِنسَـٰنَ مَا لَمْ يَعْلَمْ",
+          "translation": "Taught man that which he knew not."
+        }
+      ]
+    },
+    {
+      "ref": "55:1-4",
+      "surah": "Ar-Rahman",
+      "aayat": [
+        {
+          "key": "55:1",
+          "text": " ٱلرَّحْمَـٰنُ",
+          "translation": "The Most Merciful"
+        },
+        {
+          "key": "55:2",
+          "text": "عَلَّمَ ٱلْقُرْءَانَ",
+          "translation": "Taught the Qur’ān,"
+        },
+        {
+          "key": "55:3",
+          "text": "خَلَقَ ٱلْإِنسَـٰنَ",
+          "translation": "Created man,"
+        },
+        {
+          "key": "55:4",
+          "text": "عَلَّمَهُ ٱلْبَيَانَ",
+          "translation": "[And] taught him eloquence."
+        }
+      ]
+    },
+    {
+      "ref": "73:4",
+      "surah": "Al-Muzzammil",
+      "aayat": [
+        {
+          "key": "73:4",
+          "text": "أَوْ زِدْ عَلَيْهِ وَرَتِّلِ ٱلْقُرْءَانَ تَرْتِيلًا",
+          "translation": "Or add to it, and recite the Qur’ān with measured recitation."
+        }
+      ]
+    },
+    {
+      "ref": "54:17",
+      "surah": "Al-Qamar",
+      "aayat": [
+        {
+          "key": "54:17",
+          "text": "وَلَقَدْ يَسَّرْنَا ٱلْقُرْءَانَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ",
+          "translation": "And We have certainly made the Qur’ān easy for remembrance, so is there any who will remember?"
+        }
+      ]
+    }
+  ]
+}
