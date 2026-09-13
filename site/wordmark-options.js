@@ -51,16 +51,25 @@
   const h1 = document.querySelector('.wordmark h1');
   const p = document.querySelector('.wordmark p');
 
-  const panel = document.createElement('div');
+  // Collapsible, and closed to start with on phones, where it would cover the book.
+  const panel = document.createElement('details');
+  panel.open = !matchMedia('(max-width: 767px)').matches;
   panel.style.cssText = `
     position: fixed; left: 1rem; bottom: 1rem; z-index: 9999;
-    display: flex; flex-direction: column; gap: 0.4rem;
-    padding: 0.75rem; max-width: 220px;
+    padding: 0.5rem 0.75rem; max-width: 220px;
+    max-height: calc(100svh - 2rem); overflow-y: auto;
     background: rgba(20, 16, 15, 0.92);
     border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 10px;
-    font-family: system-ui, sans-serif;
+    font: 12px/1.3 system-ui, sans-serif;
+    color: #FAFAF9;
   `;
+  const summary = document.createElement('summary');
+  summary.textContent = 'Headline';
+  summary.style.cssText = 'cursor: pointer; padding: 0.25rem 0;';
+  const list = document.createElement('div');
+  list.style.cssText = 'display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.4rem;';
+  panel.append(summary, list);
 
   options.forEach((opt, i) => {
     const btn = document.createElement('button');
@@ -89,7 +98,7 @@
       btn.style.borderColor = '#D4AF37';
       btn.style.color = '#D4AF37';
     }
-    panel.appendChild(btn);
+    list.appendChild(btn);
   });
 
   document.body.appendChild(panel);

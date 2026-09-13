@@ -229,6 +229,35 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      · light in the air off / dust / glints / orbs / rays · amount · mouse light off / glow / spotlight · book when
      still off / float / breathe / drift · movement size. Whole-page atmosphere can only be tried once phase 5 adds
      page below the hero.
+   - **Third round, the user's feedback:** something dust-like, not orbs or rays; glints are good but not luxurious ·
+     the mouse glow is far too wide · **nothing on the Qur'an itself, no dust and no light** · design for light mode too
+     (an ivory Qur'an exists as a still photo, no video yet) · sliders for amount, smoothness and movement.
+   - **Third round, built:** styles are now **gold dust** (fine specks on a slow current, a few catching the light
+     now and then), **gold leaf** (flakes that fall slowly, turn over and flash as they face the light) and glints.
+     Dust, orbs and rays are gone. `main.js` reports where the book is each frame (`hero.book`), and `atmosphere.js`
+     erases that area, with a soft edge, from its layer every frame. Glow radius now starts at 90 px (was 240).
+     Colours have a dark set and a deeper-gold light set, rebuilt when `data-theme` on `<html>` changes. The options
+     panel's **Theme preview** sets `data-theme="light"`: MASTER.md's light tokens, and the hero draws
+     `assets/hero/quran-light.webp` (copied from `assets/hero/`) closed and still, at the dark book's size, with no
+     aayat. Sliders: opening glide (0–0.5 s), amount (0–250%), mouse glow (0–240 px), movement (0–300%).
+   - **Fourth round, the user's feedback:** small metal clasps show on the book's left edge as the cover starts to
+     lift (a Veo artifact, frames ~f009–f018) · stopping mid-opening looks blurred · a half-open book should open or
+     close by itself · no visible difference between the "aayat appear" choices · no movement once fully open, and
+     effects gone until a reload (the panel said "switched off" while showing 60 fps) · phones: too much scrolling,
+     the headline picker can't collapse, the surah name sits under the book instead of on the page.
+   - **Fourth round, built:** held still, the frame cross-fade settles onto the nearer whole frame over 0.25 s (the
+     blur was two frames mixed; the source footage also has some motion blur mid-opening). **Half-open book**
+     option: stays / nearer end / way you scrolled (default), 180 ms after scrolling stops, eased over 0.45–1.1 s,
+     and any wheel, key, click or touch takes over. "Aayat appear" removed; they fade in at 90% of the opening. The
+     switch-off was the bug behind both missing effects and missing movement: it counted scrolling and tab switches as
+     slow frames. It now judges only 2-second windows while the book is still and the tab is showing (below 45 fps,
+     three windows in a row), and choosing any effect option turns effects back on. Phones: both option panels start
+     closed and collapse; **Scroll length** long 373vh / medium 310vh / short 250vh (default); **Surah name** under
+     the book / on the page (English meaning hidden there, too long).
+   - **Clasps:** `videos/fix-clasp-frames.ps1` (PowerShell + System.Drawing, safe on this PC) finds pixels on the
+     book's left edge (x 224–268, y 330–520, frames f004–f022) clearly brighter than their column's clean leather and
+     replaces them with the leather 130 rows above. Originals kept in `videos/best-yet-frames/before-clasp-fix/`;
+     writes to both frame folders; makes `contact-sheet-clasps.png` for review.
 5. **Close section.**
 6. **Light mode.**
 7. **Audit and ship prep:** `web-design-guidelines` audit, MASTER.md checklist, responsive pass, frames → WebP.

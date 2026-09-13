@@ -233,6 +233,16 @@ html::-webkit-scrollbar {
   display: block;
 }
 
+.tryout input[type='range'] {
+  width: 10em;
+  accent-color: #d4af37;
+}
+
+.tryout output {
+  min-width: 7em;
+  font-variant-numeric: tabular-nums;
+}
+
 .tryout {
   position: fixed;
   right: 12px; /* bottom-right, clear of the headline picker (wordmark-options.js) in the bottom-left */
@@ -287,4 +297,38 @@ html::-webkit-scrollbar {
 .tryout button[aria-pressed='true'] {
   border-color: #d4af37;
   color: #d4af37;
+}
+
+/* TRYOUT, phones only: how far to scroll through the hero, and where the surah name goes. */
+@media (max-width: 767px) {
+  [data-phone-scroll='medium']:not(.still) .hero {
+    height: 310vh;
+  }
+
+  [data-phone-scroll='short']:not(.still) .hero {
+    height: 250vh;
+  }
+
+  [data-phone-left='page'] .page.left {
+    left: calc(var(--x0, 0px) + 262px * var(--s, 1));
+    right: auto;
+    top: calc(var(--y0, 0px) + 80px * var(--s, 1));
+    width: calc(375px * var(--s, 1));
+    height: calc(560px * var(--s, 1));
+    padding: calc(56px * var(--s, 1)) calc(16px * var(--s, 1));
+    font-size: max(9px, calc(16px * var(--s, 1)));
+    color: #2B211B;
+  }
+
+  [data-phone-left='page'] .page.left .surah {
+    color: #8A6A1F;
+  }
+
+  [data-phone-left='page'] .page.left .ref {
+    color: #6B5E55;
+  }
+
+  [data-phone-left='page'] .page.left .meaning {
+    display: none; /* too long for a page this small */
+  }
 }

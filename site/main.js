@@ -42,8 +42,16 @@
   // jumping to it, and the book cross-fades between frames. The user chose this "slow glide" by eye.
   let glide = 0.28; // roughly the seconds it takes to close two thirds of the gap; 0 jumps straight there
   let blend = true; // cross-fade neighbouring frames, rather than showing whole frames only
+  // Stopped between two frames, the cross-fade settles onto the nearer frame over this many seconds: held still, it looks blurred.
+  const SHARPEN = 0.25;
   // Once scrolling reaches this, the aayat fade in by themselves (the transition on .group), not with the scroll.
-  let appearAt = REST + OPEN;
+  const APPEAR = REST + OPEN * 0.9;
+
+  // A book left half open opens or closes by itself once scrolling stops: toward the nearer end, or the way the
+  // visitor was scrolling. 'off' leaves it where it stopped.
+  let finish = 'direction';
+  let finishTime = 1.1;    // seconds to finish across a whole screen of scrolling; shorter distances take less
+  const FINISH_WAIT = 180; // ms without scrolling before it finishes
 
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const hero = document.querySelector('.hero');
@@ -70,6 +78,12 @@
   let current = -1;   // the group of aayat last picked
   let previous = -1;  // the last group shown, so the next pass shows a different one
   let moving = false; // still gliding toward the scroll position; atmosphere.js keeps the book still meanwhile
+  let sharpen = 1;    // 0 while moving, 1 once settled onto a whole frame
+  let direction = 0;  // 1 when the visitor last scrolled down, -1 up
+  let lastY = scrollY;
+  let touching = false;
+  let finishTimer = 0;
+  let autoScroll = 0; // the animation frame of a scroll the page started itself, 0 when none
 
   // Loading -----------------------------------------------------------------------
 
@@ -205,7 +219,7 @@
   // the book is open and stays; scrolling back before that fades it out, so the next pass picks again.
   // Under reduced motion a random group is simply shown.
   function showAayat(s, still) {
-    const show = still || s >= appearAt;
+    const show = still || s >= APPEAR;
     if (show === showing || !groups.length) return;
     showing = show;
     if (show) current = pick();
@@ -237,7 +251,8 @@
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     // The book is centred by choosing which part of the frame is drawn, never by moving the canvas.
-    const centre = (BOOK_LEFT + rightEdge(a) + (rightEdge(b) - rightEdge(a)) * f) / 2;
+    const right = rightEdge(a) + (rightEdge(b) - rightEdge(a)) * f;
+    const centre = (BOOK_LEFT + right) / 2;
     const w = SRC_W * scale;
     const h = SRC_H * scale;
     const x = width / 2 - centre * scale;
@@ -251,15 +266,22 @@
       ctx.drawImage(frames[b], x, y, w, h);
       ctx.globalAlpha = 1;
     }
+    featherEdges(x, y, w, h);
 
-    // Fade the frame's rectangle out at its edges so it never shows against the stage.
+    // Where the book is on screen, so atmosphere.js keeps its dust and light off it.
+    const top = y + ((SRC_H - BOOK_H) / 2) * scale;
+    hero.book = { left: x + BOOK_LEFT * scale, right: x + right * scale, top, bottom: top + BOOK_H * scale, scale };
+    return true;
+  }
+
+  // Fades a drawn rectangle out at its edges so it never shows against the stage.
+  function featherEdges(x, y, w, h) {
     ctx.globalCompositeOperation = 'destination-in';
     ctx.fillStyle = feather(ctx.createLinearGradient(x, 0, x + w, 0), FEATHER_X / SRC_W);
     ctx.fillRect(x, y, w, h);
     ctx.fillStyle = feather(ctx.createLinearGradient(0, y, 0, y + h), FEATHER_Y / SRC_H);
     ctx.fillRect(x, y, w, h);
     ctx.globalCompositeOperation = 'source-over';
-    return true;
   }
 
   function feather(gradient, edge) {
@@ -295,8 +317,8 @@
     requestAnimationFrame(step);
   }
 
-  // Each animation frame, moves part of the way toward the scroll position and keeps going until it
-  // arrives. Uses elapsed time, so it feels the same on 60 Hz and 144 Hz screens.
+  // Each animation frame, moves part of the way toward the scroll position and keeps going until it arrives,
+  // then settles onto a whole frame. Uses elapsed time, so it feels the same on 60 Hz and 144 Hz screens.
   function step(now) {
     queued = false;
     if (!visible) {
@@ -304,31 +326,36 @@
       return;
     }
     const target = targetScroll();
+    const dt = last ? Math.min(now - last, 50) / 1000 : 1 / 60;
     if (pos === null || reduceMotion.matches || !glide) {
       pos = target;
     } else {
-      const dt = last ? Math.min(now - last, 50) / 1000 : 1 / 60;
       pos += (target - pos) * (1 - Math.exp(-dt / glide));
       if (Math.abs(target - pos) < 0.0005) pos = target;
     }
-    last = pos === target ? 0 : now;
+    sharpen = pos === target ? Math.min(1, sharpen + dt / SHARPEN) : Math.max(0, sharpen - (3 * dt) / SHARPEN);
+    last = pos === target && sharpen === 1 ? 0 : now;
     paint();
     if (moving !== (pos !== target)) {
       moving = pos !== target;
       hero.dispatchEvent(new Event(moving ? 'bookmove' : 'bookrest'));
     }
-    if (moving) schedule();
+    if (last) schedule();
   }
 
   // Updates the headline and aayat, and redraws the book only when its frame, the size or the loaded
   // frames have changed. Under reduced motion the book is shown open and the headline stays.
   function paint() {
-    if (pos === null || (pos === painted && !dirty)) return;
+    if (pos === null) return;
     const still = reduceMotion.matches;
-    const frame = still ? LAST : blend ? frameAt(pos) : Math.round(frameAt(pos));
-    wordmark.style.opacity = still ? 1 : 1 - clamp(frame / NAME_GONE);
-    showAayat(pos, still);
-    painted = pos;
+    const exact = frameAt(pos);
+    const whole = Math.round(exact);
+    const frame = still ? LAST : blend ? exact + (whole - exact) * smoothstep(sharpen) : whole;
+    if (pos !== painted || dirty) {
+      wordmark.style.opacity = still ? 1 : 1 - clamp(frame / NAME_GONE);
+      showAayat(pos, still);
+      painted = pos;
+    }
     if (frame !== drawn || dirty) {
       if (draw(frame)) {
         drawn = frame;
@@ -370,9 +397,10 @@
   // unused Arabic font in index.html.
 
   if (/^(localhost|[\d.]+)$/.test(location.hostname)) {
+    const narrow = matchMedia('(max-width: 767px)').matches;
     const panel = document.createElement('details');
     panel.className = 'tryout';
-    panel.open = true;
+    panel.open = !narrow; // closed to start with on phones, where it would cover the book
     panel.innerHTML = '<summary>Options</summary>';
     document.body.append(panel);
 
@@ -393,23 +421,117 @@
       panel.append(row);
     };
 
-    const retime = (set) => (value) => {
-      set(value);
+    // A slider with its value shown beside it, in the words `format` gives.
+    window.addSlider = (label, min, max, step, initial, format, pick) => {
+      const row = document.createElement('div');
+      const range = el('input', '');
+      Object.assign(range, { type: 'range', min, max, step, value: initial });
+      range.setAttribute('aria-label', label);
+      const shown = el('output', '', format(initial));
+      range.addEventListener('input', () => {
+        const value = Number(range.value);
+        shown.textContent = format(value);
+        pick(value);
+      });
+      row.append(el('span', '', label), range, shown);
+      panel.append(row);
+    };
+
+    const redraw = () => {
       dirty = true;
       schedule();
+    };
+    const retime = (set) => (value) => {
+      set(value);
+      redraw();
     };
     const setData = (key) => (value) => {
       document.documentElement.dataset[key] = value;
       fit();
     };
-    addOption('Opening glide', { Off: 0, Short: 0.07, Medium: 0.14, Long: 0.28 }, glide, retime((v) => (glide = v)));
+    const glideText = (v) => (v ? `${v.toFixed(2)} s${v === 0.28 ? ' (your pick)' : ''}` : 'Off');
+    addSlider('Opening glide', 0, 0.5, 0.01, glide, glideText, retime((v) => (glide = v)));
     addOption('Blend frames', { Off: false, On: true }, blend, retime((v) => (blend = v)));
-    addOption('Aayat appear', { 'As it opens': REST + OPEN * 0.85, 'Once open': REST + OPEN }, appearAt, retime((v) => (appearAt = v)));
+    addOption('Half-open book', { Stays: 'off', 'Nearer end': 'nearest', 'Way you scrolled': 'direction' }, finish, (v) => (finish = v));
+    addSlider('Auto-finish time', 0.3, 3, 0.05, finishTime, (v) => `${v.toFixed(2)} s`, (v) => (finishTime = v));
     addOption('Arabic lettering', { 'Amiri Quran': 'amiri', Scheherazade: 'scheherazade' }, 'amiri', setData('arabic'));
     addOption('Left page', { 'Surah name': 'name', 'English meaning': 'meaning' }, 'name', setData('left'));
+    if (narrow) {
+      const phoneScroll = setData('phoneScroll');
+      phoneScroll('short');
+      addOption('Scroll length', { Long: 'long', Medium: 'medium', Short: 'short' }, 'short', (v) => {
+        phoneScroll(v);
+        redraw();
+      });
+      addOption('Surah name', { 'Under the book': 'under', 'On the page': 'page' }, 'under', setData('phoneLeft'));
+    }
   }
 
-  addEventListener('scroll', schedule, { passive: true });
+  // Finishing the opening ------------------------------------------------------------
+
+  function onScroll() {
+    schedule();
+    if (autoScroll) return; // the page's own scrolling
+    direction = Math.sign(scrollY - lastY) || direction;
+    lastY = scrollY;
+    waitToFinish();
+  }
+
+  function waitToFinish() {
+    clearTimeout(finishTimer);
+    finishTimer = setTimeout(finishOpening, FINISH_WAIT);
+  }
+
+  function finishOpening() {
+    if (finish === 'off' || touching || autoScroll || reduceMotion.matches || !visible) return;
+    const progress = (targetScroll() - REST) / OPEN;
+    if (progress <= 0.002 || progress >= 0.998) return; // closed or open already
+    const open = finish === 'nearest' ? progress >= 0.5 : direction > 0;
+    scrollToScreens(open ? REST + OPEN : REST);
+  }
+
+  // Scrolls the page to a point on the hero's timeline, easing in and out.
+  function scrollToScreens(s) {
+    const range = hero.offsetHeight - stage.offsetHeight;
+    const from = scrollY;
+    const distance = hero.getBoundingClientRect().top + scrollY + (s / TOTAL) * range - from;
+    const duration = finishTime * 1000 * (0.4 + 0.6 * Math.min(1, Math.abs(distance) / innerHeight));
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - (2 - 2 * t) ** 3 / 2;
+      scrollTo(0, from + distance * eased);
+      autoScroll = t < 1 ? requestAnimationFrame(tick) : 0;
+      if (!autoScroll) lastY = scrollY;
+    };
+    autoScroll = requestAnimationFrame(tick);
+  }
+
+  // Any scrolling by the visitor takes over from the page's own.
+  function takeOver() {
+    cancelAnimationFrame(autoScroll);
+    autoScroll = 0;
+    lastY = scrollY;
+  }
+
+  addEventListener('scroll', onScroll, { passive: true });
+  for (const type of ['wheel', 'keydown', 'mousedown']) addEventListener(type, takeOver, { passive: true });
+  addEventListener(
+    'touchstart',
+    () => {
+      touching = true;
+      takeOver();
+    },
+    { passive: true },
+  );
+  addEventListener(
+    'touchend',
+    () => {
+      touching = false;
+      waitToFinish();
+    },
+    { passive: true },
+  );
   document.fonts.addEventListener('loadingdone', fit); // text changes size when its font arrives
   reduceMotion.addEventListener('change', applyMotion);
   new ResizeObserver(resize).observe(canvas);
