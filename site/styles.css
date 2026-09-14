@@ -81,6 +81,37 @@ html::-webkit-scrollbar {
   overflow: hidden;
 }
 
+/* Phones and tablets: a swipe stops at each section, and a hard one can't carry past it (the user, 2026-09-14): the
+   closed book, the open book, the ending, and the top of the footer, which then scrolls freely. The browser does the
+   stopping, so it feels like the phone's own scrolling. On computers main.js glides into place instead. Not under
+   reduced motion, or while main.js glides the page itself (.free-scroll). */
+@media (hover: none) and (pointer: coarse) {
+  html:not(.still, .free-scroll) {
+    scroll-snap-type: y mandatory;
+  }
+}
+
+/* The book's two stops, in .hero: closed, and open where its screen stops being pinned. */
+.snap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.snap.open {
+  top: calc(100% - 100vh);
+  top: calc(100% - 100svh);
+}
+
+.snap,
+.close,
+.footer {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 /* The book and its aayat sit together in .subject, which atmosphere.js moves slightly while nobody is
    scrolling, inside .book, which makes room for the ending in the "Under the book" option. The light in the
    air is a canvas over them (and a second one behind the ending), and never catches clicks. */
@@ -667,7 +698,11 @@ html::-webkit-scrollbar {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: min(96vmin, 52rem);
+  /* On a computer the star nearly fills the screen's height. An upright phone is narrower than it is tall, so there it
+     only filled the width and looked small (the user, 2026-09-14): it grows toward the same share of the height, up
+     to 125% of the width, so the outer ring runs past the sides while the star inside stays whole. */
+  width: min(52rem, max(96vmin, min(125vw, 78vh)));
+  width: min(52rem, max(96vmin, min(125vw, 78svh)));
   height: auto;
   translate: -50% -50%;
   overflow: visible;
@@ -845,29 +880,20 @@ html::-webkit-scrollbar {
     --pace: 0.666; /* two thirds as far */
   }
 
-  /* The pages are too small for a second block of text, so the left page's text sits under the book. */
+  /* Plain ink on phones. The tryout that puts the surah name under the book, off the page, needs it. */
   .group {
     mix-blend-mode: normal;
   }
 
+  /* The surah name and reference stay on the left page, as on a computer (the user, 2026-09-14). The English meaning is
+     too long for a page this small. */
   .page.left {
-    left: 1.5rem;
-    right: 1.5rem;
-    width: auto;
-    top: calc(var(--y0, 0px) + 650px * var(--s, 1) + 1rem);
-    height: calc(var(--y0, 0px) + 70px * var(--s, 1) - 2rem);
-    padding: 0;
-    font-size: 0.875rem;
-    color: var(--color-muted-foreground);
+    padding: calc(56px * var(--s, 1)) calc(16px * var(--s, 1));
+    font-size: max(9px, calc(16px * var(--s, 1)));
   }
 
-  .page.left .surah {
-    color: var(--color-accent);
-  }
-
-  .page.left .meaning,
-  .page.left .ref {
-    color: var(--color-muted-foreground);
+  .page.left .meaning {
+    display: none;
   }
 }
 
@@ -1369,7 +1395,8 @@ html::-webkit-scrollbar {
   color: #d4af37;
 }
 
-/* TRYOUT, phones only: how far to scroll through the hero, and where the surah name goes. */
+/* TRYOUT, phones only: how far to scroll through the hero, and where the surah name goes ("On the page" is the
+   default, above). */
 @media (max-width: 767px) {
   [data-phone-scroll='medium'] .hero {
     --pace: 0.512;
@@ -1379,28 +1406,36 @@ html::-webkit-scrollbar {
     --pace: 0.366;
   }
 
-  [data-phone-left='page'] .page.left {
-    left: calc(var(--x0, 0px) + 262px * var(--s, 1));
-    right: auto;
-    top: calc(var(--y0, 0px) + 80px * var(--s, 1));
-    width: calc(375px * var(--s, 1));
-    height: calc(560px * var(--s, 1));
-    padding: calc(56px * var(--s, 1)) calc(16px * var(--s, 1));
-    font-size: max(9px, calc(16px * var(--s, 1)));
-    color: #2B211B;
+  [data-phone-left='under'] .page.left {
+    left: 1.5rem;
+    right: 1.5rem;
+    width: auto;
+    top: calc(var(--y0, 0px) + 650px * var(--s, 1) + 1rem);
+    height: calc(var(--y0, 0px) + 70px * var(--s, 1) - 2rem);
+    padding: 0;
+    font-size: 0.875rem;
+    color: var(--color-muted-foreground);
   }
 
-  [data-phone-left='page'] .page.left .surah {
-    color: #8A6A1F;
+  [data-phone-left='under'] .page.left .surah {
+    color: var(--color-accent);
   }
 
-  [data-phone-left='page'] .page.left .ref {
-    color: #6B5E55;
+  [data-phone-left='under'] .page.left .ref,
+  [data-phone-left='under'] .page.left .meaning {
+    color: var(--color-muted-foreground);
   }
 
-  [data-phone-left='page'] .page.left .meaning {
-    display: none; /* too long for a page this small */
+  [data-phone-left='under'][data-left='meaning'] .page.left .meaning {
+    display: block;
   }
+}
+
+/* TRYOUT: no swipe stops with "Swipe stops at each section: No" (main.js, touch screens), or with "Under the book",
+   where the ending shares the book's screen. */
+html[data-swipe='free'],
+html[data-ending='under'] {
+  scroll-snap-type: none;
 }
 
 /* TRYOUT, phase 5: set on <html> by ending-options.js. Once the user picks, move the chosen rules up to the ending's

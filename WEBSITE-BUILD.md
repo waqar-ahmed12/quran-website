@@ -476,6 +476,29 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      going no longer stops it. TRYOUTS in **Ending**: **Wait before gliding** slider (0–400 ms), **Glide start** already
      moving / gently (before).
    - **The user is doing** the light-mode and real-phone testing themselves.
+   - **First real-phone test, the user's feedback (2026-09-14):** the black Qur'an appeared with its cover upright and
+     closed at a low frame rate, then all was smooth · the surah name sits under the book on the phone but on the left
+     page on a computer · a hard swipe from the book carries past the open book straight to the ending; it should stop
+     at each section and need another swipe · the gold star behind the ending looks small on the phone.
+   - **Built (2026-09-14):** (1) *Loading.* All 87 frames were asked for at once, and the open book's frames are a third
+     the size of the closed one's, so over wifi they arrived first and the book was drawn from the nearest that had:
+     open, then upright, then closing in steps as nearer frames came in. `loadAll` now waits for the frame on screen
+     before asking for the rest. Checked with a throttled copy of serve.js (~400 KB/s, a test script kept outside the
+     project): before, f088 arrived at 0.9 s and f000 at 1.9 s; after, f000 is the only frame asked for until it
+     arrives. (2) *Surah name:* on the page is now the phone default (styles.css); "Under the book" stays as a tryout.
+     (3) *Section stops on touch screens* (`hover: none` and `pointer: coarse` only): CSS scroll snapping at the closed
+     book, the open book (two `.snap` markers in `.hero`, the second where the book's screen stops being pinned), the
+     ending and the footer's top, all `scroll-snap-stop: always`, so a hard swipe can't pass one. The footer is taller
+     than the screen, so it scrolls freely inside. The browser does the stopping, so it feels like the phone's own
+     scrolling and catches the swipe's momentum, which main.js's lock-in could only correct after it had run out. On
+     those screens the half-open finish and the lock-in stand down (their options don't apply there), and snapping
+     pauses (`.free-scroll`) while main.js glides the page itself (Tab through the opening). Computers are unchanged.
+     Checked in Chromium at 375x812 with touch: one 1000 px scroll from the top stops at the open book (906 px), not
+     the ending; stopping a quarter or three quarters into the opening settles on the closed or open book; the footer
+     holds any position. **Not yet seen on a real phone.** TRYOUT **Swipe stops at each section:** yes / no (touch
+     screens only, under Ending). (4) *Star:* on an upright phone it grows toward the share of the screen's height it
+     has on a computer, up to 125% of the width (469 px on a 375 px phone, was 360): the outer ring runs past the sides
+     and the star inside stays whole.
    WebP conversion needs a tool; do it after the PC is cleaned (e.g. `sharp` in Node), aiming for a few MB total.
    **Before launch, check the free Qaida is live.** The line under the headline promises it. If it isn't ready, change
    the line so visitors aren't sent looking for something that doesn't exist yet. The site name also needs adding.

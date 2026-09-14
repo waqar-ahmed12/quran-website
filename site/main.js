@@ -99,9 +99,9 @@
 
   const frames = []; // decoded images by index, filled in as they arrive
   const rights = []; // measured right edge of the book in each frame
-  const started = new Set();
+  const started = new Map(); // frame index to the promise of its arrival
   const lightFrames = []; // the light-mode frames, decoded images by index
-  const startedLight = new Set();
+  const startedLight = new Map();
   const groups = []; // one element per group of aayat, filled in when aayat.json arrives
 
   let scale = 1;      // footage pixels to CSS pixels, set on resize
@@ -145,12 +145,12 @@
 
   // Loading -----------------------------------------------------------------------
 
+  // Returns a promise that settles once the frame has arrived, or failed to.
   function load(f, i) {
-    if (f.started.has(i)) return;
-    f.started.add(i);
+    if (f.started.has(i)) return f.started.get(i);
     const img = new Image();
     img.src = f.urls[i];
-    img.decode().then(
+    const arrived = img.decode().then(
       () => {
         f.frames[i] = img;
         if (f.measure) f.rights[i] = measureRight(img);
@@ -160,18 +160,24 @@
       },
       () => console.warn(`Frame missing: ${f.urls[i]}`), // the nearest loaded frame is drawn instead
     );
+    f.started.set(i, arrived);
+    return arrived;
   }
 
-  // The frame on screen first, then the two ends, then coarse to fine, so scrubbing works before everything
-  // arrives — and so switching theme part way through the opening shows the book where it already is, rather
-  // than the closed one until the rest turns up.
+  // The frame on screen first, and nothing else until it has arrived: asked for all at once, the open book's smaller
+  // frames arrived first, so on a phone the book appeared half open and closed in steps as nearer frames came in
+  // (the user, 2026-09-14). Then the two ends, then coarse to fine, so scrubbing works before everything arrives —
+  // and so switching theme part way through the opening shows the book where it already is, rather than the closed
+  // one until the rest turns up.
   function loadAll(f) {
-    load(f, Math.max(0, Math.min(f.last, Math.round(frameAt(pos === null ? targetScroll() : pos)))));
-    load(f, 0);
-    load(f, f.last);
-    for (const step of [8, 4, 2, 1]) {
-      for (let i = 0; i <= f.last; i += step) load(f, i);
-    }
+    const onScreen = Math.max(0, Math.min(f.last, Math.round(frameAt(pos === null ? targetScroll() : pos))));
+    load(f, onScreen).then(() => {
+      load(f, 0);
+      load(f, f.last);
+      for (const step of [8, 4, 2, 1]) {
+        for (let i = 0; i <= f.last; i += step) load(f, i);
+      }
+    });
   }
 
   // Once the cover passes upright its cream lining faces the camera, so the book's right
@@ -668,6 +674,9 @@
       redraw();
     });
     addOption('Ending locks into place', { Yes: true, No: false }, lockEnding, (v) => (lockEnding = v));
+    if (matchMedia('(hover: none) and (pointer: coarse)').matches) {
+      addOption('Swipe stops at each section', { Yes: '', No: 'free' }, '', setData('swipe'));
+    }
     addSlider('Wait before gliding', 0, 400, 10, finishWait, (v) => `${v} ms`, (v) => (finishWait = v));
     addOption('Glide start', { 'Already moving': 'moving', 'Gently (before)': 'gentle' }, glideStart, (v) => (glideStart = v));
     tryoutGroup('Opening and aayat');
@@ -685,7 +694,7 @@
         phoneScroll(v);
         redraw();
       });
-      addOption('Surah name', { 'Under the book': 'under', 'On the page': 'page' }, 'under', setData('phoneLeft'));
+      addOption('Surah name', { 'On the page': 'page', 'Under the book': 'under' }, 'page', setData('phoneLeft'));
     }
   }
 
@@ -705,8 +714,14 @@
     finishTimer = setTimeout(finishOpening, finishWait);
   }
 
+  // Phones and tablets stop at each part of the page by themselves (scroll snapping in styles.css), which also catches
+  // a hard swipe before it carries past a part (the user, 2026-09-14). The glides below are for mice, trackpads and keys.
+  function snapping() {
+    return getComputedStyle(document.documentElement).scrollSnapType !== 'none';
+  }
+
   function finishOpening() {
-    if (touching || autoScroll || reduceMotion.matches) return;
+    if (touching || autoScroll || reduceMotion.matches || snapping()) return;
     if (lockEnding && settleEnding()) return;
     if (finish === 'off' || !visible) return;
     const progress = (targetScroll() - REST) / OPEN;
@@ -745,10 +760,12 @@
     scrollToY(hero.getBoundingClientRect().top + scrollY + (s / total) * range);
   }
 
-  // Scrolls the page to y at `speed` screens a second, starting already moving, or gently from still.
+  // Scrolls the page to y at `speed` screens a second, starting already moving, or gently from still. Snapping pauses
+  // meanwhile, or it would pull each step of the glide back to a stop.
   let autoDir = 0; // which way the page's own scrolling is going
   function scrollToY(y, speed = finishSpeed, gentle = glideStart === 'gentle') {
     cancelAnimationFrame(autoScroll);
+    freeScroll(true);
     const from = scrollY;
     const distance = y - from;
     autoDir = Math.sign(distance);
@@ -759,15 +776,23 @@
       const eased = !gentle ? Math.sin((t * Math.PI) / 2) : t < 0.5 ? 4 * t * t * t : 1 - (2 - 2 * t) ** 3 / 2;
       scrollTo(0, from + distance * eased);
       autoScroll = t < 1 ? requestAnimationFrame(tick) : 0;
-      if (!autoScroll) lastY = scrollY;
+      if (!autoScroll) {
+        lastY = scrollY;
+        freeScroll(false);
+      }
     };
     autoScroll = requestAnimationFrame(tick);
+  }
+
+  function freeScroll(on) {
+    document.documentElement.classList.toggle('free-scroll', on);
   }
 
   // Any scrolling by the visitor takes over from the page's own.
   function takeOver() {
     cancelAnimationFrame(autoScroll);
     autoScroll = 0;
+    freeScroll(false);
     lastY = scrollY;
     tabFrom = null;
   }
@@ -789,6 +814,7 @@
       const end = hero.getBoundingClientRect().top + scrollY + hero.offsetHeight - stage.offsetHeight; // book fully open
       if (from >= end - 1 || scrollY <= end) return false; // already past the opening, or the jump didn't cross it
       const to = close.contains(e.target) ? scrollY + close.getBoundingClientRect().top : scrollY;
+      freeScroll(true); // before going back, or snapping would pull the page to a stop
       scrollTo(0, from);
       scrollToY(to, TAB_SPEED, true);
       return true;

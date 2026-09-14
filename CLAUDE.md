@@ -18,4 +18,6 @@
 
 - Build one phase at a time (order in `WEBSITE-BUILD.md`, §7) and get sign-off before the next.
 - The user prefers to run scripts themselves and paste the output: save the script, give one copy-paste command.
+- **Qaida work:** read `QAIDA-BUILD.md` (steps, skills, decisions) and `QAIDA-CONTENT.md`. End every reply about the
+  Qaida with one line: current step, its skills, next step (the user asked, 2026-09-14).
 - Preview with `node serve.js` → `http://localhost:8777/site/` (launch config "site"). Never `python -m http.server`.
