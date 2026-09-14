@@ -1,0 +1,87 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Video Frame Grid</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #111; color: #eee; font: 14px system-ui, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; padding: 8px 12px; }
+  label { display: flex; align-items: center; gap: 8px; }
+  input[type=range] { width: 240px; accent-color: #D4AF37; }
+  #count { min-width: 2ch; font-weight: 600; font-variant-numeric: tabular-nums; }
+  #grid { display: grid; gap: 4px; padding: 0 12px 12px; justify-content: center; }
+  figure { margin: 0; position: relative; background: #000; }
+  canvas { display: block; width: 100%; height: auto; }
+  figcaption { position: absolute; left: 4px; top: 4px; padding: 1px 5px; border-radius: 3px;
+               background: rgba(0,0,0,.75); font: 12px ui-monospace, Consolas, monospace; }
+</style>
+<header>
+  <input type="file" id="file" accept="video/*">
+  <label>Frames <input type="range" id="frames" min="4" max="64" step="1" value="16" disabled> <span id="count">16</span></label>
+  <span id="info">Choose the video file.</span>
+</header>
+<div id="grid"></div>
+<script>
+  const fileInput = document.getElementById('file');
+  const slider = document.getElementById('frames');
+  const count = document.getElementById('count');
+  const info = document.getElementById('info');
+  const grid = document.getElementById('grid');
+  const v = document.createElement('video');
+  v.muted = true;
+  v.preload = 'auto';
+  let name = '', run = 0, timer;
+
+  fileInput.onchange = async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    if (v.src) URL.revokeObjectURL(v.src);
+    name = file.name;
+    v.src = URL.createObjectURL(file);
+    try {
+      await new Promise((ok, bad) => { v.onloadeddata = ok; v.onerror = () => bad(new Error('This browser cannot play this video.')); });
+    } catch (e) { info.textContent = e.message; return; }
+    slider.disabled = false;
+    render();
+  };
+
+  // Update the number immediately; rebuild the grid once the slider stops moving.
+  const scheduleRender = () => { if (slider.disabled) return; clearTimeout(timer); timer = setTimeout(render, 300); };
+  slider.oninput = () => { count.textContent = slider.value; scheduleRender(); };
+  addEventListener('resize', scheduleRender);
+
+  async function render() {
+    const id = ++run;
+    const N = +slider.value;
+    const W = v.videoWidth, H = v.videoHeight, d = v.duration;
+    const summary = `${name} | ${d.toFixed(2)} s | ${W}×${H} | ${N} evenly spaced frames`;
+
+    // Pick the column count that makes frames largest while fitting the whole grid on screen.
+    const availW = innerWidth - 24;
+    const availH = innerHeight - document.querySelector('header').offsetHeight - 16;
+    let best = { cols: 1, w: 0 };
+    for (let cols = 1; cols <= N; cols++) {
+      const rows = Math.ceil(N / cols);
+      const w = Math.min((availW - (cols - 1) * 4) / cols, ((availH - (rows - 1) * 4) / rows) * W / H);
+      if (w > best.w) best = { cols, w };
+    }
+    grid.style.gridTemplateColumns = `repeat(${best.cols}, ${Math.floor(best.w)}px)`;
+    grid.innerHTML = '';
+
+    for (let i = 0; i < N; i++) {
+      const t = Math.min(Math.max(0.01, d * i / (N - 1)), Math.max(0, d - 0.05));
+      await new Promise(ok => { v.onseeked = ok; v.currentTime = t; });
+      if (id !== run) return; // the slider moved again; a newer grid is being built
+      const fig = document.createElement('figure');
+      const c = document.createElement('canvas');
+      const cap = document.createElement('figcaption');
+      c.width = Math.round(Math.min(best.w * devicePixelRatio, W));
+      c.height = Math.round(c.width * H / W);
+      c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+      cap.textContent = `#${i + 1}  ${t.toFixed(2)}s`;
+      fig.append(c, cap);
+      grid.append(fig);
+      info.textContent = `${summary} | rendering ${i + 1}/${N}`;
+    }
+    info.textContent = `${summary} | done, take the screenshot now`;
+  }
+</script>

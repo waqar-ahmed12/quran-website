@@ -8,6 +8,10 @@
 // The hadith line is a translation, not a Qur'an verse, kept separate from the aayat that appear
 // on the book's pages later in the scroll. Verify its exact wording against sunnah.com before
 // shipping it, the same rule the aayat text follows.
+//
+// The user asked for control over the actual wording, not only a choice between presets: two text fields at the
+// top now edit the headline and the sentence under it directly, as you type. The preset buttons below still work —
+// clicking one fills the fields in — so they're quick starting points, not the only way to set the words.
 
 (() => {
   const options = [
@@ -67,11 +71,51 @@
   const summary = document.createElement('summary');
   summary.textContent = 'Headline';
   summary.style.cssText = 'cursor: pointer; padding: 0.25rem 0;';
-  const list = document.createElement('div');
-  list.style.cssText = 'display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.4rem;';
-  panel.append(summary, list);
 
-  options.forEach((opt, i) => {
+  // Free-text fields: what you type replaces the words on the page as you go.
+  const fields = document.createElement('div');
+  fields.style.cssText = 'display: flex; flex-direction: column; gap: 0.3rem; margin: 0.4rem 0;';
+  const fieldStyle = `
+    box-sizing: border-box; width: 100%; padding: 0.4rem 0.5rem;
+    font: 12px/1.3 system-ui, sans-serif; color: #FAFAF9;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(250,250,249,0.3); border-radius: 6px;
+  `;
+  const fieldLabelStyle = 'color: #A8A29E; font: 11px/1.2 system-ui, sans-serif;';
+
+  function field(labelText, initial, onInput) {
+    const label = document.createElement('label');
+    label.style.cssText = fieldLabelStyle;
+    label.textContent = labelText;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = initial;
+    input.style.cssText = fieldStyle;
+    input.addEventListener('input', () => {
+      onInput(input.value);
+      unpress(); // typing means no preset below is "the" chosen one any more
+    });
+    fields.append(label, input);
+    return input;
+  }
+
+  const headlineField = field('Headline', h1.textContent, (v) => (h1.textContent = v));
+  const sublineField = field('Sentence below it', p.textContent, (v) => (p.textContent = v));
+
+  const list = document.createElement('div');
+  list.style.cssText = 'display: flex; flex-direction: column; gap: 0.4rem;';
+  const presetsLabel = document.createElement('p');
+  presetsLabel.textContent = 'Or start from one of these:';
+  presetsLabel.style.cssText = 'margin: 0.5rem 0 0.15rem; color: #A8A29E; font: 11px/1.2 system-ui, sans-serif;';
+  panel.append(summary, fields, presetsLabel, list);
+
+  function unpress() {
+    panel.querySelectorAll('button').forEach((b) => {
+      b.style.borderColor = 'rgba(250,250,249,0.25)';
+      b.style.color = '#FAFAF9';
+    });
+  }
+
+  options.forEach((opt) => {
     const btn = document.createElement('button');
     btn.textContent = opt.label;
     btn.style.cssText = `
@@ -85,19 +129,12 @@
       text-align: left;
     `;
     btn.addEventListener('click', () => {
-      h1.textContent = opt.h1;
-      p.textContent = opt.p;
-      panel.querySelectorAll('button').forEach((b) => {
-        b.style.borderColor = 'rgba(250,250,249,0.25)';
-        b.style.color = '#FAFAF9';
-      });
+      h1.textContent = headlineField.value = opt.h1;
+      p.textContent = sublineField.value = opt.p;
+      unpress();
       btn.style.borderColor = '#D4AF37';
       btn.style.color = '#D4AF37';
     });
-    if (i === 0) {
-      btn.style.borderColor = '#D4AF37';
-      btn.style.color = '#D4AF37';
-    }
     list.appendChild(btn);
   });
 

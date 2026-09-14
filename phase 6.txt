@@ -1,0 +1,11 @@
+taste-skill:redesign-skill: looks at the page as it is, finds what's missing, and adds to it without breaking the book animation. It's the best fit for "the site feels empty."
+ui-ux-pro-max: tried-and-tested patterns for top bars, footers and contact forms, and makes sure they work on phones and for people using a keyboard.
+taste-skill:minimalist-skill: keeps the new parts quiet and elegant, so the Qur'an stays the centre of attention.
+agent-skills:idea-refine: the words for the new parts.
+At the end, high-end-visual-design for a final polish of spacing and lettering.
+
+Three things only you can tell me:
+
+Your name as it should appear (e.g. "Ustadh Waqar Ahmed", or just "Waqar").
+How long you've taught, e.g. "10 years".
+Your WhatsApp number. You can skip this for now and I'll put in a stand-in.

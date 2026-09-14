@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Qur'an</title>
   <meta name="theme-color" content="#1F1A18">
+  <!-- Light or dark, set before the page draws so it never flashes the wrong one: the visitor's own choice if they made
+       one on this device, otherwise dark, the only theme with the book opening. -->
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      document.documentElement.dataset.theme = 'dark';
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- TRYOUT: Scheherazade New is only here for the phase 3 options; keep just the chosen Arabic font. -->
@@ -18,9 +27,47 @@
   <!-- TEMPORARY, local preview only: headline/subline picker. Delete this line and
        wordmark-options.js once a choice is locked in. -->
   <script src="wordmark-options.js" defer></script>
+  <!-- TEMPORARY, local preview only: options for the top of the page. Delete this line and top-options.js once the
+       top is chosen. -->
+  <script src="top-options.js" defer></script>
+  <script src="footer.js" defer></script>
+  <!-- TEMPORARY, local preview only: options and text fields for the bottom of the page. Delete this line and
+       footer-options.js once the bottom is chosen. -->
+  <script src="footer-options.js" defer></script>
 </head>
 <body>
-  <main>
+  <!-- The top bar. The name is a stand-in until the site name is chosen, and both links are stand-ins until their
+       pages exist, as in the ending. About the teacher and Contact go at the bottom of the page only. -->
+  <header class="topbar">
+    <a class="brand" href="#top">
+      <svg class="mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
+        <rect x="-8" y="-8" width="16" height="16" />
+        <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+        <circle r="2" />
+      </svg>
+      <span class="name">Alif to Ayah</span>
+    </a>
+    <nav aria-label="Main">
+      <a class="qaida" href="#qaida">Free Qaida</a>
+      <a class="lessons outlined" href="#lessons">One-to-one lessons</a>
+      <!-- Light and dark. main.js keeps the label saying what a click does. -->
+      <button class="theme" type="button" aria-label="Switch to light mode" data-to-light="Light" data-to-dark="Dark">
+        <svg class="half" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
+        </svg>
+        <svg class="sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2.5V5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8" />
+        </svg>
+        <svg class="moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" />
+        </svg>
+        <span class="words" aria-hidden="true">Light</span>
+      </button>
+    </nav>
+  </header>
+  <main id="top">
     <section class="hero">
       <div class="stage">
         <!-- Chosen by the user 2026-09-13. The site name comes later, from a separate chat.
@@ -28,7 +75,26 @@
         <header class="wordmark">
           <h1>From Alif to Ayah</h1>
           <p>A real teacher, one letter at a time, until the verses are yours.</p>
+          <div class="scroll-hint" aria-hidden="true"><span>Scroll to open</span></div>
         </header>
+        <!-- Either side of the closed book, on computers; they fade with the headline as it opens. What and how, not
+             who: the teacher's name and years go at the bottom of the page, with About (the user, 2026-09-13). -->
+        <div class="beside left">
+          <p class="label">What you learn</p>
+          <ul>
+            <li>Reading from zero</li>
+            <li>Tajweed</li>
+            <li>Hifz</li>
+          </ul>
+        </div>
+        <div class="beside right">
+          <p class="label">How you learn</p>
+          <ul>
+            <li>One-to-one</li>
+            <li>Online</li>
+            <li>Every age</li>
+          </ul>
+        </div>
         <!-- .book makes room for the ending in the "Under the book" option; atmosphere.js moves .subject while still. -->
         <div class="book">
           <div class="subject">
@@ -40,14 +106,130 @@
     <!-- Phase 5: the ending. Both links are stand-ins until the pages exist. At launch, point them at the real pages,
          and hide the Qaida button if the Qaida isn't live yet. -->
     <section class="close" aria-labelledby="close-line">
+      <!-- Decoration behind the words: a warm light, and a large gold star in thin lines that turns slowly. The
+           shapes nest: two squares in a circle, an eight-pointed star in the circle touching them, a small circle
+           touching that. -->
+      <div class="backdrop" aria-hidden="true">
+        <svg class="rosette" viewBox="-100 -100 200 200" focusable="false">
+          <defs>
+            <radialGradient id="rosette-fade" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="100">
+              <stop offset="0.2" stop-color="#D4AF37" stop-opacity="0" />
+              <stop offset="0.5" stop-color="#D4AF37" />
+              <stop offset="0.9" stop-color="#D4AF37" />
+              <stop offset="1" stop-color="#D4AF37" stop-opacity="0.2" />
+            </radialGradient>
+          </defs>
+          <g stroke="url(#rosette-fade)">
+            <circle r="96" />
+            <polygon points="0,-96 96,0 0,96 -96,0" />
+            <polygon points="67.9,-67.9 67.9,67.9 -67.9,67.9 -67.9,-67.9" />
+            <circle r="67.9" />
+            <polygon points="0,-67.9 48,48 -67.9,0 48,-48 0,67.9 -48,-48 67.9,0 -48,48" />
+            <circle r="26" />
+          </g>
+        </svg>
+      </div>
       <div class="inner">
+        <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
+          <line class="rule left" x1="-100" y1="0" x2="-24" y2="0" />
+          <line class="rule right" x1="24" y1="0" x2="100" y2="0" />
+          <g class="star">
+            <rect x="-8" y="-8" width="16" height="16" />
+            <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+            <circle r="2" />
+          </g>
+        </svg>
         <h2 id="close-line">Learn to read these pages for yourself.</h2>
         <div class="entry">
           <a class="button primary lessons" href="#lessons">One-to-one lessons</a>
           <a class="button qaida" href="#qaida">Free Qaida</a>
         </div>
       </div>
+      <!-- Stand-in: the headline, until the site name is chosen. -->
+      <p class="signoff" aria-hidden="true">From Alif to Ayah</p>
     </section>
   </main>
+  <!-- The bottom of the page: who teaches and how to get in touch, then the links. Every line is a stand-in written by
+       Claude until the teacher changes it, the name and years included. The WhatsApp link and the form aren't
+       connected yet (WEBSITE-BUILD.md, before launch). -->
+  <footer class="footer">
+    <svg class="footer-mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
+      <rect x="-8" y="-8" width="16" height="16" />
+      <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+      <circle r="2" />
+    </svg>
+    <div class="footer-inner">
+      <section class="about reveal" id="about" aria-labelledby="about-name">
+        <p class="label">Your teacher</p>
+        <h2 class="lead" id="about-name">Waqar Ahmed</h2>
+        <p class="years">12 years teaching the Qur’an</p>
+        <p class="bio">I teach children and adults one-to-one, online: reading from the very first letter, then Tajweed, and Hifz for those who want to memorise.</p>
+      </section>
+      <section class="contact reveal" id="contact" aria-labelledby="contact-title">
+        <p class="label">Contact</p>
+        <h2 class="lead" id="contact-title">Ask about lessons</h2>
+        <p class="intro">Tell me who the lessons are for and where you’d like to start.</p>
+        <div class="reach">
+          <a class="button whatsapp" href="#whatsapp">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4.5 19.5l1.2-3.6A8 8 0 1 1 8.3 18.4z" />
+            </svg>
+            <span>Message on WhatsApp</span>
+          </a>
+          <a class="email-page" href="#contact-page">Send an email</a>
+          <button class="button show-form" type="button" aria-controls="enquiry" aria-expanded="false">Send an email instead</button>
+        </div>
+        <p class="or">or send an email</p>
+        <!-- footer.js checks the fields and sends. The messages it shows are the data- attributes here. -->
+        <form class="enquiry" id="enquiry" novalidate
+              data-sending="Sending…"
+              data-sent="Thank you. Your message has been sent."
+              data-failed="Your message didn’t send. Please try again, or message me on WhatsApp."
+              data-standin="Stand-in form: it isn’t connected to email yet, so nothing was sent.">
+          <div class="field">
+            <label for="enquiry-name">Your name</label>
+            <input id="enquiry-name" name="name" type="text" autocomplete="name" required
+                   aria-describedby="enquiry-name-error" data-missing="Please add your name.">
+            <p class="error" id="enquiry-name-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="enquiry-email">Email</label>
+            <input id="enquiry-email" name="email" type="email" autocomplete="email" required
+                   aria-describedby="enquiry-email-error" data-missing="Please add your email, so I can reply."
+                   data-invalid="That email doesn’t look complete. Check it’s written like name@example.com.">
+            <p class="error" id="enquiry-email-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="enquiry-message">Message</label>
+            <textarea id="enquiry-message" name="message" rows="4" required
+                      aria-describedby="enquiry-message-error" data-missing="Please write a short message."></textarea>
+            <p class="error" id="enquiry-message-error" hidden></p>
+          </div>
+          <div class="send">
+            <button class="button primary" type="submit">Send message</button>
+            <p class="privacy">Your details are only used to reply to you.</p>
+          </div>
+          <p class="status" role="status"></p>
+        </form>
+      </section>
+    </div>
+    <div class="footer-base reveal">
+      <a class="brand" href="#top">
+        <svg class="mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
+          <rect x="-8" y="-8" width="16" height="16" />
+          <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+          <circle r="2" />
+        </svg>
+        <span class="name">Alif to Ayah</span>
+      </a>
+      <nav aria-label="Footer">
+        <a class="qaida" href="#qaida">Free Qaida</a>
+        <a class="lessons" href="#lessons">One-to-one lessons</a>
+        <a href="#about">About the teacher</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <p class="copyright">© 2026 Alif to Ayah</p>
+    </div>
+  </footer>
 </body>
 </html>

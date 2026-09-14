@@ -6,6 +6,7 @@
 (() => {
   const clamp = (v) => Math.min(1, Math.max(0, v));
   const smoothstep = (t) => t * t * (3 - 2 * t);
+  const light = () => document.documentElement.dataset.theme === 'light';
 
   // Frames --------------------------------------------------------------------
 
@@ -27,14 +28,19 @@
   const FEATHER_X = 180;   // how far the frame's rectangle fades into the stage
   const FEATHER_Y = 40;
 
+  // Light mode has no video of the book opening, only a photo of the ivory Qur'an, closed. It's drawn still, at the
+  // closed dark book's height. The book spans these fractions of the photo.
+  const IVORY = { src: 'assets/hero/quran-light.webp', left: 0.335, right: 0.664, top: 0.059, bottom: 0.928 };
+
   // Timeline, in screen heights of scrolling on a computer -----------------------
-  // Phones scroll two thirds as far for everything (the hero is shorter there, in styles.css).
+  // Phones scroll less far for everything (--pace in styles.css).
 
   const REST = 0.45;  // closed book with the headline
   const OPEN = 2.25;  // the cover opens (the same scrolling as when the user signed off phase 1)
-  const SETTLE = 0.4; // open pages
-  const AYAH = 1;     // time to read the aayat before the page moves on
-  const TOTAL = REST + OPEN + SETTLE + AYAH; // 4.1; .hero in styles.css is one screen taller than this
+  // Scrolling on the open book before the page moves on: the pages settle and the aayat can be read. It was 1.4
+  // screens (0.4 to settle, 1 for the aayat) until the user found it too long; TRYOUT "Scroll once it opens".
+  let hold = 0.35;
+  let total = REST + OPEN + hold; // .hero in styles.css is one screen taller than this, through --timeline
   const NAME_GONE = 8; // the headline has faded out by this frame, early in the opening
 
   // Smoothing ---------------------------------------------------------------------
@@ -53,8 +59,11 @@
   let finish = 'direction';
   let finishSpeed = 1;     // screens of scrolling a second; a half-open book is about one screen from either end
   const FINISH_WAIT = 180; // ms without scrolling before it finishes
+  // The same goes for the ending: the page never rests with it part way in (settleEnding). TRYOUT "Ending locks into place".
+  let lockEnding = true;
 
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const wide = matchMedia('(min-width: 768px)'); // "Under the book" is for computers only
   const hero = document.querySelector('.hero');
   const stage = hero.querySelector('.stage');
   const subject = stage.querySelector('.subject'); // the book and its aayat, moved together by atmosphere.js
@@ -63,6 +72,10 @@
   const ctx = canvas.getContext('2d');
   const close = document.querySelector('.close'); // the ending, after the book
   const closeInner = close.querySelector('.inner');
+  const topbar = document.querySelector('.topbar');
+  const resting = stage.querySelectorAll('.wordmark, .beside'); // shown with the closed book; they fade as it opens
+  const themeButton = topbar.querySelector('.theme');
+  const themeColor = document.querySelector('meta[name="theme-color"]');
 
   const frames = []; // decoded images by index, filled in as they arrive
   const rights = []; // measured right edge of the book in each frame
@@ -115,6 +128,23 @@
     for (const step of [8, 4, 2, 1]) {
       for (let i = 0; i <= LAST; i += step) load(i);
     }
+  }
+
+  // The ivory Qur'an for light mode, fetched only when the page first turns light.
+  const ivory = new Image();
+  let ivoryReady = false;
+
+  function loadIvory() {
+    if (ivory.getAttribute('src')) return;
+    ivory.src = IVORY.src;
+    ivory.decode().then(
+      () => {
+        ivoryReady = true;
+        dirty = true;
+        schedule();
+      },
+      () => console.warn(`Missing: ${IVORY.src}`),
+    );
   }
 
   // Once the cover passes upright its cream lining faces the camera, so the book's right
@@ -249,7 +279,7 @@
     close.classList.add('pending');
     const reveal = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
+        if (!entry.isIntersecting || under()) return; // under the book, the words wait for the book (endAt)
         close.classList.remove('pending');
         reveal.disconnect();
       },
@@ -261,8 +291,20 @@
   // TRYOUT "Under the book": when scrolling reaches the end, the open book rises and shrinks so the ending fits
   // under it (styles.css). Scrolling back a little undoes it; the gap between the two points stops it flickering.
   function endAt(s) {
-    const end = s >= TOTAL - 0.1 || (ended && s > TOTAL - 0.4);
-    if (end !== ended) hero.classList.toggle('ended', (ended = end));
+    const end = s >= total - 0.1 || (ended && s > total - 0.4);
+    if (end === ended) return;
+    hero.classList.toggle('ended', (ended = end));
+    if (under()) close.classList.toggle('pending', !end); // the words arrive in order once the book has made room
+  }
+
+  function under() {
+    return document.documentElement.dataset.ending === 'under' && wide.matches && !reduceMotion.matches && !light();
+  }
+
+  // Tells styles.css how long the timeline is, so the hero's height matches it.
+  function applyTimeline() {
+    total = REST + OPEN + hold;
+    hero.style.setProperty('--timeline', total);
   }
 
   // How far the book rises and shrinks for "Under the book", and where the ending goes: the book stays full size if
@@ -282,11 +324,32 @@
     vars.setProperty('--end-top', `${top + tall * k + gap}px`);
   }
 
+  // The top bar and the scroll hint --------------------------------------------------------
+
+  // The top bar slides away while the visitor scrolls down, so the opening has the screen to itself, and comes back as
+  // soon as they scroll up, and near the top. TRYOUT "Scrolling down: Bar stays" keeps it in place.
+  let barY = scrollY; // where the page was when the bar last moved
+  function placeTopbar() {
+    const dy = scrollY - barY;
+    if (Math.abs(dy) < 8 && scrollY > 80) return; // a finger's jitter doesn't count
+    barY = scrollY;
+    const stays = document.documentElement.dataset.topbarScroll === 'stays';
+    topbar.classList.toggle('away', !stays && dy > 0 && scrollY > 80);
+  }
+
+  // The scroll hint sits under the headline only where the space under the closed book holds both with room to spare.
+  function fitHint() {
+    const room = (canvas.clientHeight - BOOK_H * scale) / 2;
+    const words = wordmark.querySelector('h1').offsetHeight + wordmark.querySelector('p').offsetHeight;
+    stage.classList.toggle('roomy', room >= words + 130); // the hint takes about 78px, leaving 26px above and below
+  }
+
   // Drawing -----------------------------------------------------------------------
 
   // Cross-fades the two frames either side of a position, or while they are still loading, draws
   // the nearest frame that has arrived. Returns false while no frame has loaded yet.
   function draw(at) {
+    if (light()) return drawIvory();
     const a = Math.floor(at);
     const b = Math.min(a + 1, LAST);
     const f = at - a;
@@ -320,6 +383,24 @@
     return true;
   }
 
+  // Light mode: the ivory Qur'an, closed and still, the same height as the dark book and centred the same way.
+  function drawIvory() {
+    if (!ivoryReady) return false;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const k = (BOOK_H * scale) / ((IVORY.bottom - IVORY.top) * ivory.naturalHeight); // photo pixels to CSS pixels
+    const w = ivory.naturalWidth * k;
+    const h = ivory.naturalHeight * k;
+    const x = width / 2 - ((IVORY.left + IVORY.right) / 2) * w;
+    const y = height / 2 - ((IVORY.top + IVORY.bottom) / 2) * h;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(ivory, x, y, w, h);
+    featherEdges(x, y, w, h);
+    hero.book = { left: x + IVORY.left * w, right: x + IVORY.right * w, top: y + IVORY.top * h, bottom: y + IVORY.bottom * h, scale };
+    return true;
+  }
+
   // Fades a drawn rectangle out at its edges so it never shows against the stage.
   function featherEdges(x, y, w, h) {
     ctx.globalCompositeOperation = 'destination-in';
@@ -338,10 +419,10 @@
     return gradient;
   }
 
-  // How far the hero has been scrolled, in computer screen heights (0 to TOTAL).
+  // How far the hero has been scrolled, in computer screen heights (0 to total).
   function targetScroll() {
     const range = hero.offsetHeight - stage.offsetHeight;
-    return range > 0 ? clamp(-hero.getBoundingClientRect().top / range) * TOTAL : 0;
+    return range > 0 ? clamp(-hero.getBoundingClientRect().top / range) * total : 0;
   }
 
   // The book's frame at a scroll position; smoothstep eases into and out of the opening.
@@ -398,7 +479,8 @@
     const whole = Math.round(exact);
     const frame = still ? LAST : blend ? exact + (whole - exact) * smoothstep(sharpen) : whole;
     if (pos !== painted || dirty) {
-      wordmark.style.opacity = still ? 1 : 1 - clamp(frame / NAME_GONE);
+      const rest = still ? 1 : 1 - clamp(frame / NAME_GONE);
+      for (const part of resting) part.style.opacity = rest;
       showAayat(pos, still);
       endAt(pos);
       painted = pos;
@@ -423,6 +505,7 @@
     // never stretched past its own size.
     scale = Math.min((height * 0.8) / BOOK_H, (width * 0.88) / (OPEN_RIGHT - BOOK_LEFT), 1);
     place();
+    fitHint();
     fit();
     dirty = true;
     paint(); // draw now: resizing the canvas has just cleared it
@@ -432,11 +515,44 @@
   // Reduced motion: no scrubbing, just the open book, and only its frame is loaded.
   function applyMotion() {
     document.documentElement.classList.toggle('still', reduceMotion.matches);
-    if (reduceMotion.matches) load(LAST);
+    if (light()) loadIvory(); // the frames wait until the page turns dark
+    else if (reduceMotion.matches) load(LAST);
     else loadAll();
     dirty = true;
     schedule();
   }
+
+  // Light and dark ----------------------------------------------------------------------------
+  // The switch at the end of the top bar. The choice is remembered on this device (index.html applies it before the
+  // page draws). Where the browser can, the whole page cross-fades from one to the other.
+
+  function applyTheme() {
+    const isLight = light();
+    themeButton.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
+    themeButton.querySelector('.words').textContent = isLight ? themeButton.dataset.toDark : themeButton.dataset.toLight;
+    themeColor.content = isLight ? '#F5F4F1' : '#1F1A18';
+    applyMotion();
+  }
+
+  themeButton.addEventListener('click', () => {
+    const turn = () => {
+      const theme = light() ? 'dark' : 'light';
+      document.documentElement.dataset.theme = theme;
+      try {
+        localStorage.setItem('theme', theme);
+      } catch {
+        // a private window can refuse; the switch still works for this visit
+      }
+      applyTheme();
+      pos = targetScroll(); // the book's screen changes height, so jump to where the page now is
+      paint(); // draw now, so the cross-fade ends on the new book
+    };
+    // The cross-fade waits for the page to draw, so a page that isn't showing just changes. The browser can still cancel
+    // a cross-fade part way; the theme changes all the same, so its promises are allowed to fail quietly.
+    if (!document.startViewTransition || reduceMotion.matches || document.visibilityState !== 'visible') return turn();
+    const fade = document.startViewTransition(turn);
+    Promise.allSettled([fade.ready, fade.updateCallbackDone, fade.finished]);
+  });
 
   // TRYOUT --------------------------------------------------------------------------
   // Options shown only on this PC or a phone on the same wifi. Once the user picks: put the picks in the
@@ -498,6 +614,21 @@
       group.append(row);
     };
 
+    // A free-text field: typing updates the page as you go. wordmark-options.js and ending-options.js use this for
+    // the headline, the sentence under it, the closing line, the button words and the name at the very end, so any
+    // of them can be typed exactly as wanted, not only chosen from a preset. Returns the input, so a preset button
+    // can fill it in too and the field always shows what the page currently says.
+    window.addText = (label, initial, pick) => {
+      const row = document.createElement('div');
+      const field = el('input', '');
+      Object.assign(field, { type: 'text', value: initial });
+      field.setAttribute('aria-label', label);
+      field.addEventListener('input', () => pick(field.value));
+      row.append(el('span', '', label), field);
+      group.append(row);
+      return field;
+    };
+
     const redraw = () => {
       dirty = true;
       schedule();
@@ -510,6 +641,13 @@
       document.documentElement.dataset[key] = value;
       fit();
     };
+    tryoutGroup('Ending', { open: true, first: true });
+    addOption('Scroll once it opens', { 'As before': 1.4, Less: 0.7, Least: 0.35 }, hold, (v) => {
+      hold = v;
+      applyTimeline();
+      redraw();
+    });
+    addOption('Ending locks into place', { Yes: true, No: false }, lockEnding, (v) => (lockEnding = v));
     tryoutGroup('Opening and aayat');
     const glideText = (v) => (v ? `${v.toFixed(2)} s${v === 0.28 ? ' (your pick)' : ''}` : 'Off');
     addSlider('Opening glide', 0, 0.5, 0.01, glide, glideText, retime((v) => (glide = v)));
@@ -533,6 +671,7 @@
 
   function onScroll() {
     schedule();
+    placeTopbar();
     if (autoScroll) return; // the page's own scrolling
     direction = Math.sign(scrollY - lastY) || direction;
     lastY = scrollY;
@@ -545,18 +684,49 @@
   }
 
   function finishOpening() {
-    if (finish === 'off' || touching || autoScroll || reduceMotion.matches || !visible) return;
+    if (touching || autoScroll || reduceMotion.matches) return;
+    if (lockEnding && settleEnding()) return;
+    if (finish === 'off' || !visible || light()) return;
     const progress = (targetScroll() - REST) / OPEN;
     if (progress <= 0.002 || progress >= 0.998) return; // closed or open already
     const open = finish === 'nearest' ? progress >= 0.5 : direction > 0;
     scrollToScreens(open ? REST + OPEN : REST);
   }
 
-  // Scrolls the page to a point on the hero's timeline, easing in and out.
+  // Around the ending the page never rests part way (the user, 2026-09-14: it should "lock in", without a fight). It has
+  // three resting places, given as where the ending's top is in the window: under the open book's whole screen (that
+  // screen's height), filling the screen (0), and scrolled away with the footer's top at the top of the window (minus its
+  // own height). Stopped between two of them, the page carries on to the one the visitor was heading for ("Nearer end":
+  // the nearer one), so the book glides up and the ending settles into the screen. Past the last, the footer scrolls
+  // freely. Like the half-open book, it waits for scrolling to stop, and any wheel, key, click or touch takes over.
+  // Returns whether it moved.
+  function settleEnding() {
+    if (under()) return false; // there the ending shares the book's screen
+    const top = close.getBoundingClientRect().top;
+    const stops = [stage.offsetHeight, 0, -close.offsetHeight];
+    for (let k = 0; k < 2; k++) {
+      const above = stops[k];
+      const below = stops[k + 1];
+      if (top >= above - 1 || top <= below + 1) continue;
+      const down = finish === 'nearest' ? top - below < above - top : direction > 0;
+      const y = Math.min(scrollY + top - (down ? below : above), document.documentElement.scrollHeight - innerHeight);
+      if (Math.abs(y - scrollY) < 1) return false; // the page doesn't go any further
+      scrollToY(y);
+      return true;
+    }
+    return false;
+  }
+
+  // Scrolls the page to a point on the hero's timeline.
   function scrollToScreens(s) {
     const range = hero.offsetHeight - stage.offsetHeight;
+    scrollToY(hero.getBoundingClientRect().top + scrollY + (s / total) * range);
+  }
+
+  // Scrolls the page to y, easing in and out, at the auto open/close speed.
+  function scrollToY(y) {
     const from = scrollY;
-    const distance = hero.getBoundingClientRect().top + scrollY + (s / TOTAL) * range - from;
+    const distance = y - from;
     const duration = Math.max(300, (1000 * Math.abs(distance)) / innerHeight / finishSpeed); // a short finish still eases
     const start = performance.now();
     const tick = (now) => {
@@ -598,10 +768,12 @@
   reduceMotion.addEventListener('change', applyMotion);
   new ResizeObserver(resize).observe(canvas);
   new ResizeObserver(placeEnding).observe(closeInner); // the ending's height changes with its words and fonts
+  new ResizeObserver(fitHint).observe(wordmark); // so does the headline's
   new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
     dirty = true;
     schedule();
   }).observe(hero);
-  applyMotion();
+  applyTimeline();
+  applyTheme();
 })();

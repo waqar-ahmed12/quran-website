@@ -1,7 +1,7 @@
-// Phase 4: atmosphere, dark theme only for now (light mode is phase 6). Around the book: gold dust, gold leaf and
+// Phase 4: atmosphere, in bright gold on the dark page and deeper gold on the light one. Around the book: gold dust, gold leaf and
 // glints mixed by amount, drifting haze, a warm light behind the book, and a gold geometric pattern (faint, or shown
 // only under the mouse), with a soft glow that follows the mouse. The book (with its aayat) moves slightly while
-// nobody is scrolling. Phase 5: the air can carry on down the page, behind the ending.
+// nobody is scrolling. Phase 5: the air can carry on down the page, behind the ending and the footer.
 // Spec: WEBSITE-BUILD.md sections 5 and 7. Nothing is ever drawn over the Qur'an itself: the book's area, which
 // main.js reports as hero.book, is erased from this layer every frame. All of it is decoration: it stops offscreen
 // and under reduced motion, and lightens itself, then switches off, on devices that measurably can't keep up.
@@ -19,6 +19,7 @@
   const wrapper = stage.querySelector('.book');    // moves the book and its aayat to make room for the ending
   const subject = stage.querySelector('.subject'); // moves them slightly while nobody is scrolling
   const close = document.querySelector('.close');  // the ending, after the book
+  const footer = document.querySelector('.footer'); // the bottom of the page, after the ending
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const mouse = matchMedia('(hover: hover) and (pointer: fine)');
 
@@ -70,6 +71,7 @@
   let level = 'full';         // full, lite or off
   let heroSeen = true;        // some of the book's screen is in the window
   let closeSeen = false;      // some of the ending is in the window
+  let footerSeen = false;     // some of the footer is in the window
   let raf = 0;
   let last = 0;
   let windowStart = 0;
@@ -101,44 +103,64 @@
     [[4, 12], [18, 3], [29, 15], [20, 29], [8, 26]],
   ];
 
-  const S = {
-    speck: sprite(32, radial([[0, 'rgba(255,240,210,1)'], [0.3, 'rgba(240,210,150,0.5)'], [1, 'rgba(212,175,55,0)']])),
-    soft: sprite(64, radial([[0, 'rgba(255,240,210,1)'], [0.55, 'rgba(240,210,150,0.5)'], [1, 'rgba(212,175,55,0)']])),
-    glow: sprite(256, radial([[0, 'rgba(255,222,165,0.13)'], [0.4, 'rgba(255,215,150,0.05)'], [1, 'rgba(255,215,150,0)']])),
-    halo: sprite(256, radial([[0, 'rgba(212,175,55,0.45)'], [0.45, 'rgba(212,175,55,0.16)'], [1, 'rgba(212,175,55,0)']])),
-    fade: sprite(256, radial([[0, '#fff'], [0.5, 'rgba(255,255,255,0.6)'], [1, 'rgba(255,255,255,0)']])),
-    // A four-pointed sparkle: a bright core with thin flares across and down.
-    glint: sprite(48, (g, size) => {
-      radial([[0, 'rgba(255,250,235,1)'], [0.1, 'rgba(255,230,170,0.85)'], [0.3, 'rgba(212,175,55,0.15)'], [1, 'rgba(212,175,55,0)']])(g, size);
-      const c = size / 2;
-      for (const across of [true, false]) {
-        const flare = across ? g.createLinearGradient(0, 0, size, 0) : g.createLinearGradient(0, 0, 0, size);
-        flare.addColorStop(0, 'rgba(255,245,220,0)');
-        flare.addColorStop(0.5, 'rgba(255,245,220,0.9)');
-        flare.addColorStop(1, 'rgba(255,245,220,0)');
-        g.fillStyle = flare;
-        if (across) g.fillRect(0, c - 1, size, 2);
-        else g.fillRect(c - 1, 0, 2, size);
-      }
-    }),
-    leaves: LEAF_SHAPES.map((shape) =>
-      sprite(32, (g) => {
-        const metal = g.createLinearGradient(4, 4, 28, 28);
-        metal.addColorStop(0, '#7A5A12');
-        metal.addColorStop(0.45, '#F3DE9A');
-        metal.addColorStop(1, '#C9A962');
-        g.fillStyle = metal;
-        g.beginPath();
-        for (const [x, y] of shape) g.lineTo(x, y);
-        g.closePath();
-        g.fill();
-      }),
-    ),
-    haze: hazeTile(256),
+  // The colours of the air, as r,g,b: bright gold on the dark page, and deeper gold that still shows on the ivory one
+  // (phase 6). Rebuilt when the page changes theme.
+  const INKS = {
+    dark: {
+      core: '255,240,210', warm: '240,210,150', gold: '212,175,55', glowCore: '255,222,165', glow: '255,215,150',
+      spark: '255,250,235', sparkWarm: '255,230,170', flare: '255,245,220',
+      leaf: ['#7A5A12', '#F3DE9A', '#C9A962'], haze: [222, 196, 150], line: '212,175,55',
+    },
+    light: {
+      core: '140,95,15', warm: '160,115,35', gold: '201,160,70', glowCore: '201,160,70', glow: '201,160,70',
+      spark: '150,100,20', sparkWarm: '180,130,40', flare: '160,115,35',
+      leaf: ['#6B4E0E', '#D9B44A', '#A67C1E'], haze: [190, 150, 85], line: '154,95,7',
+    },
   };
+  const inkNow = () => INKS[root.dataset.theme === 'light' ? 'light' : 'dark'];
+
+  function sprites(ink) {
+    return {
+      speck: sprite(32, radial([[0, `rgba(${ink.core},1)`], [0.3, `rgba(${ink.warm},0.5)`], [1, `rgba(${ink.gold},0)`]])),
+      soft: sprite(64, radial([[0, `rgba(${ink.core},1)`], [0.55, `rgba(${ink.warm},0.5)`], [1, `rgba(${ink.gold},0)`]])),
+      glow: sprite(256, radial([[0, `rgba(${ink.glowCore},0.13)`], [0.4, `rgba(${ink.glow},0.05)`], [1, `rgba(${ink.glow},0)`]])),
+      halo: sprite(256, radial([[0, `rgba(${ink.gold},0.45)`], [0.45, `rgba(${ink.gold},0.16)`], [1, `rgba(${ink.gold},0)`]])),
+      fade: sprite(256, radial([[0, '#fff'], [0.5, 'rgba(255,255,255,0.6)'], [1, 'rgba(255,255,255,0)']])),
+      // A four-pointed sparkle: a bright core with thin flares across and down.
+      glint: sprite(48, (g, size) => {
+        radial([[0, `rgba(${ink.spark},1)`], [0.1, `rgba(${ink.sparkWarm},0.85)`], [0.3, `rgba(${ink.gold},0.15)`], [1, `rgba(${ink.gold},0)`]])(g, size);
+        const c = size / 2;
+        for (const across of [true, false]) {
+          const flare = across ? g.createLinearGradient(0, 0, size, 0) : g.createLinearGradient(0, 0, 0, size);
+          flare.addColorStop(0, `rgba(${ink.flare},0)`);
+          flare.addColorStop(0.5, `rgba(${ink.flare},0.9)`);
+          flare.addColorStop(1, `rgba(${ink.flare},0)`);
+          g.fillStyle = flare;
+          if (across) g.fillRect(0, c - 1, size, 2);
+          else g.fillRect(c - 1, 0, 2, size);
+        }
+      }),
+      leaves: LEAF_SHAPES.map((shape) =>
+        sprite(32, (g) => {
+          const metal = g.createLinearGradient(4, 4, 28, 28);
+          metal.addColorStop(0, ink.leaf[0]);
+          metal.addColorStop(0.45, ink.leaf[1]);
+          metal.addColorStop(1, ink.leaf[2]);
+          g.fillStyle = metal;
+          g.beginPath();
+          for (const [x, y] of shape) g.lineTo(x, y);
+          g.closePath();
+          g.fill();
+        }),
+      ),
+      haze: hazeTile(256, ink.haze),
+    };
+  }
+
+  let S = sprites(inkNow());
 
   // Soft, tileable wisps: four octaves of smooth random noise, keeping only the brighter parts.
-  function hazeTile(size) {
+  function hazeTile(size, rgb) {
     const c = document.createElement('canvas');
     c.width = c.height = size;
     const g = c.getContext('2d');
@@ -167,9 +189,9 @@
           amp /= 2;
         }
         const k = (y * size + x) * 4;
-        img.data[k] = 222;
-        img.data[k + 1] = 196;
-        img.data[k + 2] = 150;
+        img.data[k] = rgb[0];
+        img.data[k + 1] = rgb[1];
+        img.data[k + 2] = rgb[2];
         img.data[k + 3] = 255 * Math.max(0, (sum / total - 0.42) / 0.58) ** 1.8;
       }
     }
@@ -190,7 +212,15 @@
 
   const onBook = layer(stage);
   const onEnding = layer(close);
-  const layers = [onBook, onEnding];
+  const onFooter = layer(footer); // the user found the footer bare without it (2026-09-14)
+  const layers = [onBook, onEnding, onFooter];
+
+  // Light and dark: the air takes the other set of colours as soon as the page changes theme.
+  new MutationObserver(() => {
+    S = sprites(inkNow());
+    for (const L of layers) L.haze = L.ctx.createPattern(S.haze, 'repeat');
+    buildPattern();
+  }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
   // An eight-pointed star in each tile, its points joined to the neighbouring stars by thin gold lines.
   function buildPattern() {
@@ -200,7 +230,7 @@
     tile.width = tile.height = px;
     const g = tile.getContext('2d');
     g.scale(px / size, px / size);
-    g.strokeStyle = 'rgba(212,175,55,1)';
+    g.strokeStyle = `rgb(${inkNow().line})`;
     g.lineWidth = 1;
     const c = size / 2;
     const r = size * 0.3;
@@ -349,12 +379,16 @@
 
   // The background ---------------------------------------------------------------------------------------
 
-  // A warm light behind the book. Its middle is erased with the book, so it shows as a glow around the edges.
+  // A warm light behind the book. Its middle is erased with the book, so it shows as a glow around the edges. b is in
+  // window pixels, and the light is drawn on both canvases, so it doesn't stop in a line where the book's screen ends
+  // as that scrolls away.
   function drawHalo(t, b) {
     if (!settings.halo || !b) return false;
     const r = Math.max(b.right - b.left, b.bottom - b.top) * (0.95 + 0.04 * wave(t, 11));
+    const x = (b.left + b.right) / 2 - sx - ox; // window pixels to drawing positions
+    const y = (b.top + b.bottom) / 2 - sy - oy;
     ctx.globalAlpha = (settings.halo / 100) * presence;
-    ctx.drawImage(S.halo, (b.left + b.right) / 2 - r, (b.top + b.bottom) / 2 - r, r * 2, r * 2);
+    ctx.drawImage(S.halo, x - r, y - r, r * 2, r * 2);
     return true;
   }
 
@@ -429,17 +463,17 @@
     return true;
   }
 
-  // Erases this layer over the book, with a soft edge, so nothing ever sits on the Qur'an.
+  // Erases this layer over the book, with a soft edge, so nothing ever sits on the Qur'an. b is in window pixels.
   function eraseBook(b) {
     const s = b.scale;
     const f = CLEAR.feather * s;
-    const l = b.left - CLEAR.side * s;
-    const r = b.right + CLEAR.side * s;
-    const t = b.top - CLEAR.top * s;
-    const bottom = b.bottom + CLEAR.bottom * s;
+    const l = b.left - sx - CLEAR.side * s;
+    const r = b.right - sx + CLEAR.side * s;
+    const t = b.top - sy - CLEAR.top * s;
+    const bottom = b.bottom - sy + CLEAR.bottom * s;
     const w = r - l;
     const h = bottom - t;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // the book's position is in this canvas's own pixels
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // in this canvas's own pixels
     ctx.globalCompositeOperation = 'destination-out';
     ctx.globalAlpha = 1;
     ctx.fillStyle = '#000';
@@ -485,22 +519,22 @@
     presence = ease(presence, 1, 0.8, dt);
     const lit = trackLamp(dt);
     const page = settings.reach === 'page';
+    const book = bookInWindow();
     let step = dt;
     for (const L of layers) {
       ctx = L.ctx;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       if (L.inked) ctx.clearRect(0, 0, L.w, L.h);
       L.inked = false;
-      if (L === onEnding && !page) continue;
+      if (L !== onBook && !page) continue;
       const rect = L.canvas.getBoundingClientRect();
       if (!rect.width || rect.bottom <= 0 || rect.top >= innerHeight) continue;
       sx = rect.left;
       sy = rect.top;
       ox = page ? -sx : 0;
       oy = page ? -sy : 0;
-      const b = L === onBook ? bookOnStage() : null;
-      let drew = drawHalo(t, b);
       ctx.setTransform(dpr, 0, 0, dpr, ox * dpr, oy * dpr);
+      let drew = drawHalo(t, book);
       drew = drawHaze(t, L) || drew;
       drew = drawPattern(L) || drew;
       for (const kind in KINDS) {
@@ -514,23 +548,20 @@
         drew = drawGlow() || drew;
       }
       ctx.globalAlpha = 1;
-      if (drew && b) eraseBook(b);
+      if (drew && book && L === onBook) eraseBook(book);
       if (drew && L === onBook && !page && sy < 0) fadeBottom(L, Math.min(1, -sy / (height * 0.25)));
       L.inked = drew;
     }
   }
 
-  // Where the book is on its screen: hero.book, moved and scaled with .book when the ending makes room for itself.
-  function bookOnStage() {
+  // Where the book is in the window: hero.book, which is on the book's canvas, moved with the page and, when the
+  // ending makes room for itself, with .book.
+  function bookInWindow() {
     const b = hero.book;
     if (!b) return null;
-    const w = wrapper.getBoundingClientRect();
-    const s = stage.getBoundingClientRect();
-    if (w.width === s.width && w.top === s.top) return b;
-    const k = w.width / s.width;
-    const x = w.left - s.left;
-    const y = w.top - s.top;
-    return { left: x + b.left * k, right: x + b.right * k, top: y + b.top * k, bottom: y + b.bottom * k, scale: b.scale * k };
+    const w = wrapper.getBoundingClientRect(); // the canvas's box, wherever .book has moved it
+    const k = w.width / (stage.clientWidth || 1);
+    return { left: w.left + b.left * k, right: w.left + b.right * k, top: w.top + b.top * k, bottom: w.top + b.bottom * k, scale: b.scale * k };
   }
 
   // The book ---------------------------------------------------------------------------------------------
@@ -589,7 +620,7 @@
   }
 
   function running() {
-    const seen = heroSeen || (closeSeen && settings.reach === 'page');
+    const seen = heroSeen || ((closeSeen || footerSeen) && settings.reach === 'page');
     const air = settings.dust || settings.leaf || settings.glints || settings.haze || settings.halo || settings.pattern === 'faint';
     const book = settings.idle !== 'off' && settings.move > 0;
     const pointed = (settings.glow > 0 || settings.pattern === 'mouse') && mouse.matches;
@@ -674,15 +705,18 @@
   reduceMotion.addEventListener('change', refresh);
   new ResizeObserver(resize).observe(onBook.canvas);
   new ResizeObserver(() => size(onEnding)).observe(onEnding.canvas);
+  new ResizeObserver(() => size(onFooter)).observe(onFooter.canvas);
   const watch = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (entry.target === hero) heroSeen = entry.isIntersecting;
-      else closeSeen = entry.isIntersecting;
+      else if (entry.target === close) closeSeen = entry.isIntersecting;
+      else footerSeen = entry.isIntersecting;
     }
     refresh();
   });
   watch.observe(hero);
   watch.observe(close);
+  watch.observe(footer);
 
   // TRYOUT ------------------------------------------------------------------------------------------------
   // Phase 4 options, and phase 5's "Dust in the ending", added to main.js's panel on this PC or a phone on the same
@@ -714,7 +748,7 @@
     addSlider('Movement', 0, 300, 5, settings.move, (v) => `${v}%`, choose('move'));
     addOption('Aayat while moving', { 'As before': 'before', 'Fix A': 'steady', 'Fix B': 'flat' }, settings.text, choose('text', (v) => (root.dataset.ink = v === 'flat' ? 'flat' : '')));
     tryoutGroup('Ending');
-    addOption('Dust in the ending', { 'Stays with the book': 'book', 'Carries on': 'page' }, settings.reach, choose('reach'));
+    addOption('Dust in the ending and footer', { 'Stays with the book': 'book', 'Carries on': 'page' }, settings.reach, choose('reach'));
 
     // How smoothly this device runs: frames a second while scrolling and while still, counted separately.
     const readout = document.createElement('p');

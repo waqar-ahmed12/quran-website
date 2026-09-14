@@ -1,0 +1,7 @@
+in the filling top and bottom of site
+okay now i made the preview window upright. what are the steps you are going to take. i have heard that you have to let people use the keyboard, like the tab to navigate, so when i do that, hte animation doesn't run, it jumps to the bottom section from the navigation, so be sure to add that to the problems too, light mode and phone test will be done, working on those, so did you mantain a document for hte fixes that are coming later?
+also when the option of automatic scroll was enabled, and when i scrolled from bottom up, the entire black quran was visible, but when i changed the theme, half of the quran was visible
+PLEASE DO IT IN LESS TOKENS, MY 3% LIMIT IS LEFT
+
+white quran vid analysis
+please add the video to the website, and my 3% limit is left

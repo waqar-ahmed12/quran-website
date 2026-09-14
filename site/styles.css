@@ -15,10 +15,34 @@
   --color-foreground: #FAFAF9;
   --color-muted-foreground: #A8A29E;
   --color-accent: #D4AF37;
+  --color-accent-hover: #E2C35C;
+  --color-error: #F28B82; /* 6.9:1 on the background */
+  /* The same colours as bare numbers, for see-through versions: rgb(var(--rgb-accent) / 0.1). */
+  --rgb-background: 31 26 24;
+  --rgb-foreground: 250 250 249;
+  --rgb-accent: 212 175 55;
   --font-display: Cinzel, 'Trajan Pro', Georgia, serif;
   --font-body: Jost, system-ui, sans-serif;
   --font-arabic: 'Amiri Quran', 'Scheherazade New', serif;
   color-scheme: dark;
+}
+
+/* Light theme (phase 6; the user asked for a switch 2026-09-13), from MASTER.md's light palette. The background is the
+   ivory Qur'an photo's own (#F4F5F2 at its edges, warmed a shade), as the dark one is the footage's. The gold is
+   deepened from MASTER's #A16207, which is 4.48:1 on this background, to #9A5F07 (4.8:1) so small gold text passes.
+   The muted grey is warm stone rather than MASTER's cool slate, so warm and cool greys don't mix
+   (taste-skill:redesign-skill). */
+:root[data-theme='light'] {
+  --color-background: #F5F4F1;
+  --color-foreground: #1C1917;
+  --color-muted-foreground: #57534E;
+  --color-accent: #9A5F07;
+  --color-accent-hover: #7C4A05;
+  --color-error: #B42318; /* 6:1 on the background */
+  --rgb-background: 245 244 241;
+  --rgb-foreground: 28 25 23;
+  --rgb-accent: 154 95 7;
+  color-scheme: light;
 }
 
 html,
@@ -38,13 +62,15 @@ html::-webkit-scrollbar {
   display: none;
 }
 
-/* A tall section; the stage inside it stays pinned while it scrolls past. Its height is one screen
-   plus the timeline in main.js (4.1 screens): the rest, the opening, then one group of aayat, before
-   the page moves on to the ending. Phones scroll two thirds as far, because a finger moves further per
-   swipe than a mouse wheel per click. */
+/* A tall section; the stage inside it stays pinned while it scrolls past. Its height is one screen plus the
+   timeline in main.js (--timeline, in screens, which main.js also sets): the rest, the opening, then a short
+   hold on the open book before the page moves on to the ending. Phones scroll less far (--pace), because a
+   finger moves further per swipe than a mouse wheel per click. */
 .hero {
+  --timeline: 3.05;
+  --pace: 1;
   position: relative;
-  height: 510vh;
+  height: calc(100vh + var(--timeline) * var(--pace) * 100vh);
 }
 
 .stage {
@@ -107,6 +133,388 @@ html::-webkit-scrollbar {
   font-weight: 300;
   letter-spacing: 0.06em;
   color: var(--color-muted-foreground);
+}
+
+/* The top of the page was "very empty" (the user, 2026-09-13). From taste-skill:redesign-skill's audit: no name or
+   navigation, nothing telling a visitor the page scrolls, and wide empty sides round the narrow closed book. Touch
+   targets and focus rings from ui-ux-pro-max. */
+
+/* A hint that the page scrolls, under the headline while the book is closed: two words and a fine gold line that runs
+   down, over and over (MASTER.md's scroll-story pattern asks for a cue). main.js shows it only where the space under
+   the book holds it (.roomy); it fades with the headline, and is left out under reduced motion. */
+.scroll-hint {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  padding-left: 0.24em; /* balances the letter-spacing after the last letter */
+  font-size: 0.6875rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+.roomy .scroll-hint {
+  display: flex;
+}
+
+.scroll-hint::after {
+  content: '';
+  width: 1px;
+  height: 2rem;
+  background: linear-gradient(var(--color-accent), rgb(var(--rgb-accent) / 0));
+  transform-origin: top;
+  animation: hint 2.6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes hint {
+  0% {
+    opacity: 1;
+    transform: scaleY(0);
+  }
+
+  55% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleY(1);
+  }
+}
+
+/* Either side of the closed book, on computers: a small gold heading and a few lines, set toward the book. --s is the
+   book's scale (main.js); the closed book is 385 footage pixels wide. They fade with the headline, long before the
+   opening cover reaches them. */
+.beside {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  display: none;
+  width: min(15rem, calc(50% - 192px * var(--s, 1) - 7rem));
+  translate: 0 -50%;
+}
+
+@media (min-width: 1024px) {
+  .beside {
+    display: block;
+  }
+}
+
+.beside.left {
+  right: calc(50% + 192px * var(--s, 1) + clamp(2.5rem, 5vw, 5rem));
+  text-align: right;
+}
+
+.beside.right {
+  left: calc(50% + 192px * var(--s, 1) + clamp(2.5rem, 5vw, 5rem));
+}
+
+.beside .label,
+.footer .label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.beside.left .label {
+  margin-right: -0.24em; /* the letter-spacing after the last letter would hold it off the edge */
+}
+
+.beside .label::after,
+.footer .label::after {
+  content: '';
+  display: block;
+  width: 1.5rem;
+  height: 1px;
+  margin: 0.9rem 0 0.75rem;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.beside.left .label::after {
+  margin-right: 0.24em;
+  margin-left: auto;
+}
+
+.beside ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.85;
+  letter-spacing: 0.02em;
+  color: rgb(var(--rgb-foreground) / 0.82);
+}
+
+/* The top bar: the name on the left, the two ways in on the right (the user's list; About and Contact go at the
+   bottom). It sits on the scene over a short fade of the background colour, so dust never runs through the words, with
+   no blur: blurring a moving canvas costs every frame on weak devices. main.js slides it away while the visitor scrolls
+   down and brings it back on the way up. */
+.topbar {
+  position: fixed;
+  z-index: 2; /* over the book's screen and the ending */
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 4.5rem;
+  padding: 0 clamp(1rem, 3vw, 2.5rem);
+  transition: transform 500ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.topbar::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(rgb(var(--rgb-background) / 0.85), rgb(var(--rgb-background) / 0));
+  pointer-events: none;
+}
+
+.topbar.away:not(:focus-within) {
+  transform: translateY(-100%); /* a keyboard user's focus brings it back */
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+/* The small star from the ending's ornament, like the gold tooling on the cover. It turns an eighth on hover. */
+.brand .mark {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  overflow: visible;
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1;
+  transition: rotate 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand .mark * {
+  vector-effect: non-scaling-stroke;
+}
+
+.brand .mark circle {
+  fill: var(--color-accent);
+  stroke: none;
+}
+
+.brand:hover .mark {
+  rotate: 45deg;
+}
+
+.topbar nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 2.5vw, 2.25rem);
+}
+
+.topbar nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  color: rgb(var(--rgb-foreground) / 0.78);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+/* A fine gold underline that draws out on hover. */
+.topbar nav a::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  left: 0;
+  height: 1px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.topbar nav a:hover {
+  color: var(--color-foreground);
+}
+
+.topbar nav a:hover::after,
+.topbar nav a:focus-visible::after {
+  transform: none;
+}
+
+/* The lessons link as a small gold outline, quieter than the ending's solid button. */
+.topbar .outlined {
+  min-height: 40px;
+  padding: 0 1.1rem;
+  border: 1px solid rgb(var(--rgb-accent) / 0.6);
+  border-radius: 4px;
+  color: var(--color-accent);
+}
+
+.topbar .outlined::after {
+  display: none;
+}
+
+.topbar .outlined:hover {
+  border-color: var(--color-accent);
+  background: rgb(var(--rgb-accent) / 0.1);
+  color: var(--color-accent);
+}
+
+.topbar .outlined:active {
+  transform: scale(0.98);
+}
+
+/* The light and dark switch, at the end of the bar: a half-filled circle that turns over when the page changes, rather
+   than the usual sun and moon (taste-skill:redesign-skill). The tryout also has sun and moon, and words. */
+.theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: -0.625rem; /* the icon lines up with the bar's edge; the rest is touch area */
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 0.875rem;
+  letter-spacing: 0.06em;
+  color: rgb(var(--rgb-foreground) / 0.78);
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.theme:hover {
+  color: var(--color-foreground);
+}
+
+.theme > * {
+  display: none;
+}
+
+.theme svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+}
+
+.theme .half {
+  display: block;
+  transition: rotate 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme .half path {
+  fill: currentColor;
+  stroke: none;
+}
+
+[data-theme='light'] .theme .half {
+  rotate: 180deg;
+}
+
+.brand:focus-visible,
+.topbar nav a:focus-visible,
+.theme:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+@media (pointer: coarse) {
+  .topbar .outlined {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 479px) {
+  .topbar {
+    height: 4rem;
+  }
+
+  .topbar nav {
+    gap: 1rem;
+  }
+
+  .topbar nav a {
+    font-size: 0.8125rem;
+  }
+
+  .topbar .outlined {
+    padding: 0 0.8rem;
+  }
+
+  /* Too narrow for the name beside both links: the star stands in for it, and screen readers still get the name. */
+  .topbar .brand .name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* The top bar and the words beside the book arrive a beat after the page loads, one after another. */
+@media (prefers-reduced-motion: no-preference) {
+  .topbar > *,
+  .beside > * {
+    animation: arrive 1000ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(250ms + var(--i, 0) * 120ms);
+  }
+
+  .topbar > * {
+    --from: -0.5rem;
+  }
+
+  .topbar nav {
+    --i: 1;
+  }
+
+  .beside .label {
+    --i: 2;
+  }
+
+  .beside ul {
+    --i: 3;
+  }
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    translate: 0 var(--from, 0.5rem);
+  }
 }
 
 /* Aayat, laid over the open book's pages. The numbers are page positions in the 1280x720 footage:
@@ -209,15 +617,151 @@ html::-webkit-scrollbar {
   width: 100%;
   max-width: 40rem;
   text-align: center;
-  transition:
-    opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Set by main.js until the ending first scrolls into view. */
-.close.pending .inner {
+/* The ending arrives in order: the star and its rules, the line, then the buttons, 120ms apart (ui-ux-pro-max
+   motion data, "Scroll Reveal": children a beat apart, a small rise). main.js sets .pending until it scrolls into
+   view. Leaving is quicker than arriving. */
+.close .inner > * {
+  transition:
+    opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--delay, 0ms) + var(--i, 0) * 120ms);
+}
+
+.close .inner > :nth-child(2) {
+  --i: 1;
+}
+
+.close .inner > :nth-child(3) {
+  --i: 2;
+}
+
+.close.pending .inner > * {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(16px);
+  transition-duration: 250ms;
+  transition-delay: 0s;
+}
+
+/* Behind the words, and never over the book: a warm light where the book's light was, and a large gold star in thin
+   lines that turns once every four minutes. From taste-skill:minimalist-skill: a section shouldn't be empty and flat
+   (soft light, fine geometric lines), and may have one very slow ambient movement. */
+.close .backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.close .backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 45% at 50% 50%, rgb(var(--rgb-accent) / 0.1), rgb(var(--rgb-accent) / 0.04) 50%, rgb(var(--rgb-accent) / 0));
+}
+
+.rosette {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(96vmin, 52rem);
+  height: auto;
+  translate: -50% -50%;
+  overflow: visible;
+  fill: none;
+  stroke-width: 1;
+  opacity: 0.16;
+  animation: turn 240s linear infinite;
+}
+
+@keyframes turn {
+  to {
+    rotate: 1turn;
+  }
+}
+
+/* A small gold star between two fine rules, like the gold tooling on the cover. The rules draw outward and the star
+   turns into place as the ending arrives. */
+.ornament {
+  width: 13rem;
+  height: auto;
+  margin-bottom: -0.75rem;
+  overflow: visible;
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1;
+}
+
+.rosette *,
+.ornament * {
+  vector-effect: non-scaling-stroke; /* hairlines at any size */
+}
+
+.ornament circle {
+  fill: var(--color-accent);
+  stroke: none;
+}
+
+.ornament .rule {
+  opacity: 0.6;
+  transform-box: fill-box;
+  transition: transform 1000ms cubic-bezier(0.16, 1, 0.3, 1) calc(var(--delay, 0ms) + 200ms);
+}
+
+.ornament .left {
+  transform-origin: right center;
+}
+
+.ornament .right {
+  transform-origin: left center;
+}
+
+.ornament .star {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 600ms ease var(--delay, 0ms),
+    transform 1000ms cubic-bezier(0.16, 1, 0.3, 1) var(--delay, 0ms);
+}
+
+.close.pending .ornament .rule {
+  transform: scaleX(0);
+  transition-duration: 250ms;
+  transition-delay: 0s;
+}
+
+.close.pending .ornament .star {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+  transition-duration: 250ms;
+  transition-delay: 0s;
+}
+
+/* A quiet name at the very bottom. The headline stands in until the site name is chosen. */
+.signoff {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 2rem;
+  left: 0;
+  margin: 0;
+  padding-left: 0.3em; /* balances the letter-spacing after the last letter */
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  opacity: 0.8; /* still over 5:1 on the background */
+  transition: opacity 700ms ease 600ms;
+}
+
+.close.pending .signoff {
+  opacity: 0;
+  transition-delay: 0s;
 }
 
 .close h2 {
@@ -263,12 +807,12 @@ html::-webkit-scrollbar {
 }
 
 .button:hover {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgb(var(--rgb-accent) / 0.1);
 }
 
 .button.primary:hover {
-  border-color: #E2C35C;
-  background: #E2C35C;
+  border-color: var(--color-accent-hover);
+  background: var(--color-accent-hover);
 }
 
 .button:active {
@@ -285,6 +829,10 @@ html::-webkit-scrollbar {
     padding: 4rem 1.5rem;
   }
 
+  .signoff {
+    bottom: 1.5rem;
+  }
+
   .entry {
     flex-direction: column;
     width: 100%;
@@ -294,7 +842,7 @@ html::-webkit-scrollbar {
 
 @media (max-width: 767px) {
   .hero {
-    height: 373vh; /* one screen plus two thirds of 4.1 */
+    --pace: 0.666; /* two thirds as far */
   }
 
   /* The pages are too small for a second block of text, so the left page's text sits under the book. */
@@ -323,6 +871,346 @@ html::-webkit-scrollbar {
   }
 }
 
+/* The bottom of the page: who teaches and how to get in touch, then the links (the user's list: Free Qaida, One-to-one
+   lessons, About the teacher, Contact). From taste-skill:minimalist-skill: generous space, hairline dividers, no cards
+   or shadows, 4px corners, a quiet rise into view, in the page's own gold, Cinzel and Jost rather than the skill's fonts.
+   Form rules from ui-ux-pro-max: a visible label on every field, the reason under the field, 48px fields, autofill. */
+.footer {
+  position: relative;
+  isolation: isolate; /* keeps the words over the dust without lifting them over the options panels */
+  padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem) 2rem;
+  border-top: 1px solid rgb(var(--rgb-foreground) / 0.1);
+}
+
+/* The small star from the cover's tooling, sitting on the line. */
+.footer-mark {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  width: 3.25rem;
+  height: 1.25rem;
+  padding: 0 1rem;
+  translate: -50% -50%;
+  overflow: visible;
+  background: var(--color-background);
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1;
+}
+
+.footer-mark * {
+  vector-effect: non-scaling-stroke;
+}
+
+.footer-mark circle {
+  fill: var(--color-accent);
+  stroke: none;
+}
+
+.footer-inner {
+  display: grid;
+  gap: 4.5rem;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 900px) {
+  .footer-inner {
+    grid-template-columns: 5fr 6fr;
+    gap: clamp(4rem, 8vw, 7rem);
+  }
+}
+
+/* Over the gold dust, which atmosphere.js draws on a canvas behind the footer. */
+.footer-inner,
+.footer-base {
+  position: relative;
+  z-index: 1;
+}
+
+.about,
+.contact {
+  scroll-margin-top: 6rem; /* clear of the top bar when a link jumps here */
+}
+
+.footer .lead {
+  margin: 0;
+  font-size: clamp(1.625rem, 1.3rem + 1.2vw, 2.25rem);
+  font-weight: 300;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.years,
+.intro {
+  margin: 0.75rem 0 0;
+  line-height: 1.6;
+  color: var(--color-muted-foreground);
+}
+
+.bio {
+  max-width: 34ch;
+  margin: 1.75rem 0 0;
+  font-size: 1.0625rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: rgb(var(--rgb-foreground) / 0.82);
+  text-wrap: pretty;
+}
+
+.reach {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 2rem;
+}
+
+.whatsapp {
+  gap: 0.625rem;
+}
+
+.whatsapp svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.show-form {
+  display: none; /* TRYOUT "Email form: Here, behind a button" shows it */
+  background: none;
+  font-family: inherit;
+}
+
+/* The way to the contact page, quieter than the WhatsApp button beside it: a link, not a second outlined button
+   (taste-skill:redesign-skill, "always one filled button and one ghost button"). TRYOUT "On its own page" shows it. */
+.email-page {
+  display: none;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 0.25rem;
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  color: rgb(var(--rgb-foreground) / 0.78);
+  text-decoration: underline;
+  text-decoration-color: rgb(var(--rgb-accent) / 0.5);
+  text-underline-offset: 0.35em;
+  transition:
+    color 200ms ease,
+    text-decoration-color 200ms ease;
+}
+
+.email-page:hover {
+  color: var(--color-foreground);
+  text-decoration-color: var(--color-accent);
+}
+
+.email-page:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+/* "or send an email", between two fine rules. */
+.or {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.5rem 0 0;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-foreground);
+}
+
+.or::before,
+.or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgb(var(--rgb-foreground) / 0.1);
+}
+
+.enquiry {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.field label {
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--color-muted-foreground);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid rgb(var(--rgb-foreground) / 0.16);
+  border-radius: 4px;
+  background: var(--color-background); /* solid, so the dust never drifts behind what's being typed */
+  font: inherit;
+  font-size: 1rem; /* 16px, so phones don't zoom in when a field is tapped */
+  font-weight: 300;
+  color: var(--color-foreground);
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.field textarea {
+  min-height: 7.5rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.field input:hover,
+.field textarea:hover {
+  border-color: rgb(var(--rgb-foreground) / 0.3);
+}
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  border-color: var(--color-accent);
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.field [aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.error {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-error);
+}
+
+.send {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.enquiry .button {
+  font-family: inherit;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.privacy {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground);
+}
+
+.status {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.status:empty {
+  display: none;
+}
+
+.status[data-state='failed'] {
+  color: var(--color-error);
+}
+
+/* The last row: the name, the four links, and the copyright line, above a fine rule. */
+.footer-base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2.5rem;
+  max-width: 64rem;
+  margin: clamp(4.5rem, 9vw, 7rem) auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(var(--rgb-foreground) / 0.1);
+}
+
+.footer-base nav {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1.75rem;
+}
+
+.footer-base nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  color: rgb(var(--rgb-foreground) / 0.78);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.35em;
+  transition:
+    color 200ms ease,
+    text-decoration-color 200ms ease;
+}
+
+.footer-base nav a:hover {
+  color: var(--color-foreground);
+  text-decoration-color: var(--color-accent);
+}
+
+.footer-base nav a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+.copyright {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground);
+}
+
+/* Each part rises gently into view the first time the bottom scrolls in, 80ms apart (footer.js sets .pending; not
+   under reduced motion). */
+.footer .reveal {
+  transition:
+    opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+
+.contact.reveal {
+  --i: 1;
+}
+
+.footer-base.reveal {
+  --i: 2;
+}
+
+.footer.pending .reveal {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+@media (max-width: 767px) {
+  .footer-base {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 /* Reduced motion: no scrubbing, just the open book with a random group of aayat. */
 .still .hero {
   height: auto;
@@ -332,9 +1220,47 @@ html::-webkit-scrollbar {
   transition: none;
 }
 
-.still .close.pending .inner {
+.still .close.pending .inner > *,
+.still .close.pending .signoff,
+.still .close.pending .ornament .star {
   opacity: 1;
   transform: none;
+}
+
+.still .close.pending .ornament .rule {
+  transform: none;
+}
+
+.still .rosette {
+  animation: none;
+}
+
+.still .scroll-hint {
+  display: none; /* the book is shown open, with nothing to scroll through */
+}
+
+.still .topbar {
+  transition: none;
+}
+
+/* Light mode: there's no light video of the book opening, only a photo of the ivory Qur'an, closed. So the book's
+   screen is a single screen with the book closed and still (main.js draws the photo): no aayat, and nothing to scroll
+   through. */
+[data-theme='light'] .hero {
+  height: auto;
+}
+
+[data-theme='light'] .aayat,
+[data-theme='light'] .scroll-hint {
+  display: none;
+}
+
+[data-theme='light'] .signoff {
+  opacity: 1; /* the deeper gold needs its full strength for text this small */
+}
+
+.rosette stop {
+  stop-color: var(--color-accent); /* over the gold written into the SVG, so it follows the theme */
 }
 
 /* TRYOUT: phase 3 options, set on <html> by main.js. Once the user picks, move the picks above and
@@ -362,8 +1288,26 @@ html::-webkit-scrollbar {
   font-variant-numeric: tabular-nums;
 }
 
+/* Free-text fields (window.addText in main.js), for typing a headline, sentence or label exactly as wanted. */
+.tryout input[type='text'] {
+  flex: 1;
+  min-width: 12em;
+  padding: 6px 8px;
+  border: 1px solid #5c5048;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+  color: #e7e0d8;
+}
+
+.tryout input[type='text']:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 1px;
+}
+
 .tryout {
   position: fixed;
+  z-index: 3; /* over the top bar when it's open tall */
   right: 12px; /* bottom-right, clear of the headline picker (wordmark-options.js) in the bottom-left */
   bottom: 12px;
   max-width: calc(100vw - 24px);
@@ -427,12 +1371,12 @@ html::-webkit-scrollbar {
 
 /* TRYOUT, phones only: how far to scroll through the hero, and where the surah name goes. */
 @media (max-width: 767px) {
-  [data-phone-scroll='medium']:not(.still) .hero {
-    height: 310vh;
+  [data-phone-scroll='medium'] .hero {
+    --pace: 0.512;
   }
 
-  [data-phone-scroll='short']:not(.still) .hero {
-    height: 250vh;
+  [data-phone-scroll='short'] .hero {
+    --pace: 0.366;
   }
 
   [data-phone-left='page'] .page.left {
@@ -470,12 +1414,12 @@ html::-webkit-scrollbar {
 }
 
 @media (min-width: 768px) {
-  [data-ending='under']:not(.still) .hero.ended .book {
+  [data-ending='under']:not(.still, [data-theme='light']) .hero.ended .book {
     transform: translateY(var(--end-y, 0px)) scale(var(--end-scale, 1));
     transition-duration: 1100ms;
   }
 
-  [data-ending='under']:not(.still) .close {
+  [data-ending='under']:not(.still, [data-theme='light']) .close {
     display: block;
     height: 100vh;
     height: 100svh;
@@ -486,64 +1430,60 @@ html::-webkit-scrollbar {
     pointer-events: none;
   }
 
-  [data-ending='under']:not(.still) .close .air {
-    display: none; /* the dust on the book's screen already covers it */
+  [data-ending='under']:not(.still, [data-theme='light']) .close .air,
+  [data-ending='under']:not(.still, [data-theme='light']) .close .backdrop,
+  [data-ending='under']:not(.still, [data-theme='light']) .close .signoff {
+    display: none; /* the open book and its own dust are the picture here */
   }
 
-  [data-ending='under']:not(.still) .close .inner {
+  [data-ending='under']:not(.still, [data-theme='light']) .close .inner {
+    --delay: 450ms; /* the words follow the book's move */
     position: absolute;
     top: var(--end-top, 75%);
     left: 0;
     right: 0;
     margin: 0 auto;
     padding: 0 1.5rem;
-    opacity: 0;
     visibility: hidden;
-    transform: none;
-    transition:
-      opacity 400ms ease,
-      visibility 0s 400ms;
+    transition: visibility 0s 300ms;
   }
 
-  [data-ending='under']:not(.still) .hero.ended + .close .inner {
-    opacity: 1;
+  [data-ending='under']:not(.still, [data-theme='light']) .hero.ended + .close .inner {
     visibility: visible;
     pointer-events: auto;
-    transition:
-      opacity 700ms ease 500ms,
-      visibility 0s 500ms;
+    transition: none;
   }
 }
 
 /* Button looks. "Gold and outline" is the default, above. */
-[data-buttons='outline'] .button.primary {
+[data-buttons='outline'] .entry .button.primary {
   background: transparent;
   color: var(--color-accent);
 }
 
-[data-buttons='outline'] .button.primary:hover {
+[data-buttons='outline'] .entry .button.primary:hover {
   border-color: var(--color-accent);
-  background: rgba(212, 175, 55, 0.12);
+  background: rgb(var(--rgb-accent) / 0.12);
 }
 
-[data-buttons='outline'] .button:not(.primary) {
-  border-color: rgba(250, 250, 249, 0.3);
+[data-buttons='outline'] .entry .button:not(.primary) {
+  border-color: rgb(var(--rgb-foreground) / 0.3);
   color: var(--color-foreground);
 }
 
-[data-buttons='outline'] .button:not(.primary):hover {
-  border-color: rgba(250, 250, 249, 0.6);
-  background: rgba(250, 250, 249, 0.06);
+[data-buttons='outline'] .entry .button:not(.primary):hover {
+  border-color: rgb(var(--rgb-foreground) / 0.6);
+  background: rgb(var(--rgb-foreground) / 0.06);
 }
 
 [data-buttons='text'] .entry {
   gap: 0.5rem 2.5rem;
 }
 
-[data-buttons='text'] .button,
-[data-buttons='text'] .button:hover,
-[data-buttons='text'] .button.primary,
-[data-buttons='text'] .button.primary:hover {
+[data-buttons='text'] .entry .button,
+[data-buttons='text'] .entry .button:hover,
+[data-buttons='text'] .entry .button.primary,
+[data-buttons='text'] .entry .button.primary:hover {
   position: relative;
   padding: 0 0.25rem;
   border-color: transparent;
@@ -551,12 +1491,12 @@ html::-webkit-scrollbar {
   color: var(--color-foreground);
 }
 
-[data-buttons='text'] .button.primary,
-[data-buttons='text'] .button.primary:hover {
+[data-buttons='text'] .entry .button.primary,
+[data-buttons='text'] .entry .button.primary:hover {
   color: var(--color-accent);
 }
 
-[data-buttons='text'] .button::after {
+[data-buttons='text'] .entry .button::after {
   content: '';
   position: absolute;
   left: 0.25rem;
@@ -571,8 +1511,71 @@ html::-webkit-scrollbar {
     transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-[data-buttons='text'] .button:hover::after,
-[data-buttons='text'] .button:focus-visible::after {
+[data-buttons='text'] .entry .button:hover::after,
+[data-buttons='text'] .entry .button:focus-visible::after {
   opacity: 1;
   transform: none;
+}
+
+/* What sits behind the words, and the name at the very end. "Light and star" and "Show" are the defaults, above. */
+[data-backdrop='plain'] .close .backdrop {
+  display: none;
+}
+
+[data-backdrop='light'] .rosette {
+  display: none;
+}
+
+[data-signoff='hide'] .signoff {
+  display: none;
+}
+
+/* TRYOUT, top of the page: set on <html> by top-options.js. Once the user picks, keep what's chosen and delete the
+   rest. "Lessons as a button", "Bar slides away", the scroll hint, "What and how" and the half-circle switch are the
+   defaults, above. */
+[data-topbar='off'] .topbar,
+[data-hint='hide'] .scroll-hint,
+[data-beside='none'] .beside,
+[data-toggle='sunmoon'] .theme .half,
+[data-toggle='words'] .theme .half {
+  display: none;
+}
+
+[data-toggle='sunmoon']:not([data-theme='light']) .theme .sun,
+[data-toggle='sunmoon'][data-theme='light'] .theme .moon,
+[data-toggle='words'] .theme .words {
+  display: block;
+}
+
+/* TRYOUT, bottom of the page: set on <html> by footer-options.js. "Side by side", "Open" and "Line and star" are the
+   defaults, above. */
+[data-footer='stacked'] .footer-inner {
+  grid-template-columns: 1fr;
+  max-width: 36rem;
+}
+
+[data-form='closed'] .footer:not(.form-open) .or,
+[data-form='closed'] .footer:not(.form-open) .enquiry,
+[data-edge='line'] .footer-mark,
+[data-edge='none'] .footer-mark {
+  display: none;
+}
+
+[data-form='closed'] .footer:not(.form-open) .show-form {
+  display: inline-flex;
+}
+
+[data-edge='none'] .footer {
+  border-top: 0;
+}
+
+/* "On its own page" (Claude's pick, set by footer-options.js): the form moves to a contact page of its own, and a link
+   to it sits beside the WhatsApp button. */
+[data-form='page'] .footer .or,
+[data-form='page'] .footer .enquiry {
+  display: none;
+}
+
+[data-form='page'] .email-page {
+  display: inline-flex;
 }

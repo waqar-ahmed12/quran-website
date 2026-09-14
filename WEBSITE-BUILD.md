@@ -307,9 +307,127 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      (four) · button words (three pairs) · button look: gold and outline / two outlines / underlined · which button
      stands out · **dust in the ending**: stays with the book / carries on (a second canvas behind the ending shows
      the same air, fixed to the screen while the page scrolls; still never drawn over the book).
-   - **Before launch:** point both links at the real pages, and hide the Qaida button if the Qaida isn't live.
+   - **Second round, the user's feedback (2026-09-13):** the ending looks dry, not enough to see (they asked whether a
+     later phase handles that: no, phases 6 and 7 add nothing to it) · too much scrolling once the Qur'an is fully
+     open · a visible line in the colour where the book's screen ends (screenshot).
+   - **Second round, built** (`ui-ux-pro-max` data read directly, `taste-skill:minimalist-skill`): the line was the
+     "light behind book" glow, cut off at the edge of the book's screen as it scrolled away. atmosphere.js now draws
+     that glow on both canvases, positioned in the window, so it carries on past the edge. **Scroll once it opens:**
+     as before 1.4 screens / less 0.7 / least 0.35 (default). The hero's height now comes from `--timeline` (set by
+     main.js) times `--pace` (1 on computers, 0.666 on phones, 0.512 or 0.366 for the phone scroll-length options), so
+     it always matches the timeline. **The ending:** a small gold star between two fine rules above the line (the rules
+     draw outward and the star turns into place), then the line, then the buttons, 120ms apart. **Behind the words:**
+     nothing / a warm light / the light and a large gold star in thin lines (the default: two squares in a circle, an
+     eight-pointed star inside, a small circle; 16% opacity, one turn every four minutes, still under reduced motion).
+     **Name at the very end:** show / hide (the headline in small gold Cinzel, standing in for the site name). Under
+     the book, the light, star and name are hidden and the words arrive after the book has moved.
+   - **Third round, the user's feedback (2026-09-13, screenshots):** the top (resting book) and the ending feel
+     empty; there should be some text, buttons or navigation. **This loosens §1's "near-zero copy / excluded" rule.**
+     Answers: a **top bar** with Free Qaida and One-to-one lessons; a **bottom** with Free Qaida, One-to-one lessons,
+     About the teacher and Contact (About and Contact at the bottom only). Contact is **WhatsApp and an email form**.
+     The page may show the teacher's **name** and **how long they've taught** (nothing else personal). How much more
+     to add is **Claude's call**, with the skills, shown as on-page options. Still needed: the name and years as
+     they should appear, the WhatsApp number (stand-ins until then).
+   - **Third round, the user's feedback:** everywhere Claude was choosing words, add a text field — they want control
+     over what it actually says, not only a choice between presets.
+   - **Third round, built:** a free-text field (`window.addText` in main.js, next to `addOption`/`addSlider`) beside
+     every place words are chosen: the headline and the sentence under it (wordmark-options.js), and the closing line,
+     both button labels and the name at the very end (ending-options.js). Typing updates the page as you go; the
+     preset buttons still work and now fill the matching field in, so they're starting points, not the only way in.
+     Left alone on purpose: the Arabic aayat and the surah name, which must stay the exact wording from Quran.com,
+     never freely typed (§4).
+   - **Fourth round, the user's request (2026-09-13):** work on the top of the page first ("very empty"); Claude
+     writes the name, years and contact details as stand-ins for now.
+   - **Fourth round, built** with `taste-skill:redesign-skill` (touch targets and focus from `ui-ux-pro-max`'s quick
+     reference). The audit of the top found no name or navigation, nothing telling a visitor the page scrolls, and wide
+     empty sides round the narrow closed book. Added: a **top bar** (`.topbar`, fixed): a small gold star and the name
+     (stand-in "Alif to Ayah") on the left, **Free Qaida** and **One-to-one lessons** (a small gold outline) on the
+     right, over a short fade of the background colour, with no blur (blurring the moving canvas costs every frame). It
+     slides away while scrolling down and comes back on scrolling up or near the top (`placeTopbar` in main.js); on
+     phones under 480px only the star shows beside the links. A **scroll hint** under the headline ("Scroll to open"
+     over a fine gold line running down), only where the space under the book holds it (`.roomy`, `fitHint`), not
+     under reduced motion. **Beside the book**, 1024px and wider: a small gold heading and a few lines either side,
+     "Your teacher: Waqar Ahmed, 12 years teaching" and "Lessons in: Reading from zero, Tajweed, Hifz". **The name and
+     years are stand-ins.** The sides and hint fade with the headline; the top bar and sides arrive a beat after load.
+     The top bar's stand-in links show the same "not built yet" note as the ending's.
+   - *Options to try,* in the new **Top of the page** group (`top-options.js`): top bar off / plain links / lessons as
+     a button · scrolling down: bar stays / slides away · scroll hint show / hide · beside the book (computers):
+     nothing / teacher and lessons / what and how · text fields for the name, both links, the hint words and each
+     side's heading and lines (commas between lines).
+   - **Fifth round, the user's feedback (2026-09-13):** the teacher's name and years belong at the bottom of the page,
+     not beside the book · add a light and dark switch (phase 6, below). **Built:** the sides say what and how instead,
+     "What you learn: Reading from zero, Tajweed, Hifz" and "How you learn: One-to-one, Online, Every age" (presets
+     What and how / Shorter). The name and years wait for the footer.
+   - **Standing rule from the user (2026-09-14):** every piece of wording Claude writes gets its own text field in the
+     options panel (they research what reads well), the form's messages included. Only the aayat and surah names don't.
+   - **Sixth round, the bottom of the page (2026-09-14),** with `taste-skill:minimalist-skill` (space, hairlines, no
+     cards or shadows, 4px corners, a 12px rise into view 80ms apart; the page's own fonts and gold kept) and
+     `ui-ux-pro-max`'s form rules. A `<footer>` after the ending, over a fine rule with the small gold star on it. Two
+     columns from 900px (stacked below): **Your teacher**, "Waqar Ahmed", "12 years teaching the Qur'an" and a
+     one-sentence about in the first person; **Contact**, "Ask about lessons", a line, a **Message on WhatsApp** button
+     (stand-in `#whatsapp`, which shows the "not added yet" note) and, after "or send an email", a **form**: name, email,
+     message, all with visible labels, 48px fields, autofill and the right keyboard. `footer.js` shows the reason under a
+     field (on leaving it with something typed, as it's fixed, and on sending, focusing the first wrong one), and posts
+     to the form's `action` with `fetch`. There's no action yet, so it says nothing was sent. Last row: the star and name,
+     the four links (Free Qaida, One-to-one lessons, About the teacher → `#about`, Contact → `#contact`) and "© 2026
+     Alif to Ayah". Error red `--color-error`: `#F28B82` dark, `#B42318` light. **Every line is a stand-in**, the name
+     and years included. The ending's "Button look" tryout now only restyles the ending's buttons.
+   - *Options to try,* in **Bottom of the page** (`footer-options.js`): layout side by side / stacked · email form open /
+     behind a button · top edge line and star / line / nothing · a text field for all 21 lines. **Bottom: form
+     messages** has fields for the four field errors and the sending / sent / didn't send / not connected messages. The
+     light/dark switch's two words got fields too, under Top of the page.
+   - **Seventh round, the user's feedback (2026-09-14):** should contact be on the landing page or a page of its own
+     (Claude to argue and decide) · the footer has no dust · after the Qur'an, the book should glide up and the "Learn to
+     read these pages" screen should lock into place, never rest half scrolled, without the visitor having to fight it.
+   - **Seventh round, built.** *Contact:* Claude's call is **a contact page of its own** for the form, reached from a
+     "Send an email" link beside the WhatsApp button (stand-in `#contact-page`). Reasons: the landing page is the hook and
+     its ending already asks for one decision; a form under it adds a third and fourth way to act; a useful tutoring
+     enquiry needs more than name, email and message (who the lessons are for, their level, their time zone), which would
+     bloat this page; and one click costs nothing to someone who has already decided to write. WhatsApp stays here as the
+     one-tap way. The form is kept on this page as options to compare (**Email form:** on its own page (default) / here,
+     open / here, behind a button); the contact page isn't built, and waits for the user's go-ahead. *Dust:* atmosphere.js
+     has a third canvas behind the footer (`onFooter`), drawn like the ending's when "Dust in the ending and footer" is
+     "Carries on"; form fields are now solid so dust never drifts behind typing. *Lock-in:* `settleEnding` in main.js.
+     The ending has three resting places (the open book's whole screen, the ending filling the screen, the footer's top
+     at the top of the window); stopped between two, the page carries on to the one the visitor was heading for, using the
+     half-open book's machinery: 180 ms after scrolling stops, eased at the **Auto open/close speed**, and any wheel, key,
+     click or touch takes over. Below the footer's top it scrolls freely. Not under reduced motion or "Under the book".
+     Works in light mode too (between the ivory book's screen and the ending). **Ending locks into place:** yes / no.
+   - **Before launch:** point both links at the real pages, and hide the Qaida button if the Qaida isn't live. Connect
+     the form to a form service (set `action` on `.enquiry`; Formspree, Web3Forms or the host's own forms, once the host
+     is chosen) and test that a message arrives. Put the real WhatsApp number in (`https://wa.me/<number>`). The form
+     collects names and emails from visitors abroad, so add a short privacy page and link it from the privacy line.
 6. **Light mode.**
+   - *Started 2026-09-13 at the user's request* (a light and dark switch in the top bar), during phase 5's fourth
+     round. There is still no light video of the book opening, so in light mode the book's screen is a single screen:
+     the ivory Qur'an photo (`site/assets/hero/quran-light.webp`, copied from `assets/hero/`) drawn closed and still at
+     the dark book's height (`drawIvory` in main.js), no aayat, no scroll hint, then the ending. The 87 frames only load
+     once the page is dark. "Under the book" is dark only. Tokens in `:root[data-theme='light']`: background `#F5F4F1`
+     (the photo's edges are `#F4F5F2`), text `#1C1917`, muted warm stone `#57534E` (MASTER's slate is a cool grey), gold
+     deepened to `#9A5F07` (4.8:1; MASTER's `#A16207` is 4.48:1 on this background). See-through colours now use
+     `--rgb-background` / `--rgb-foreground` / `--rgb-accent`. atmosphere.js rebuilds its sprites, haze and pattern in
+     deeper golds when `data-theme` changes (`INKS`). The choice is kept in `localStorage` and applied by a small script
+     in `<head>` before the page draws; **a first visit is dark**, not the device setting §5 suggested, because only dark
+     has the opening. The switch cross-fades the page with View Transitions where the browser has them.
+   - *Options to try:* the switch as a half circle that turns over (default) / sun and moon / the word "Light" or "Dark".
 7. **Audit and ship prep:** `web-design-guidelines` audit, MASTER.md checklist, responsive pass, frames → WebP.
+   - *Early audit run 2026-09-14 at the user's request* ("where does my landing page stand against $10k sites"). Ahead:
+     the opening, scrolling. On par: look and type, navigation, buttons, accessibility, contact. Behind: speed (25.5 MB of
+     PNG frames in 87 requests), trust content (photo, qualifications, testimonials, price or free first lesson, which the
+     plan puts on the lessons page), no fallback without JavaScript. Missing: search and sharing (title "Qur'an", no
+     description, favicon or og:image, so WhatsApp shares are a bare link), launch basics (domain, privacy page, 404,
+     analytics, the option panels still shipped). Guideline findings: no skip link (index.html:38), brand name needs
+     translate="no" (:48), email input spellcheck="false" (:197), scroll bar hidden (styles.css:58), h1 without
+     text-wrap: balance (:118), 11px labels (:152, :219), no safe-area padding on the fixed top bar (:261), no
+     touch-action / tap highlight (:48). Suggested order: frames → name/icon/preview → connect links → lessons page with
+     proof → remove panels → accessibility polish → still fallback → launch basics → real phones.
+   - **Bugs found by the user (2026-09-14), to fix:** (1) **Keyboard:** pressing Tab from the top bar jumps straight to
+     the ending's buttons, so the book animation is skipped. Fix: when focus lands in the ending from above, glide the
+     page through the opening (the auto-scroll, fast) instead of jumping; arrow keys, Space and Page Down must still
+     scrub it. (2) **Theme switch mid-page:** with the lock-in on, scrolled up so the whole black Qur'an shows, then
+     switching theme leaves half the book showing. The hero changes height (light is one screen) but the scroll position
+     stays. Fix: after the switch, keep the visitor on the same resting place (book or ending) and re-run the lock-in.
+   - **The user is doing** the light-mode and real-phone testing themselves.
    WebP conversion needs a tool; do it after the PC is cleaned (e.g. `sharp` in Node), aiming for a few MB total.
    **Before launch, check the free Qaida is live.** The line under the headline promises it. If it isn't ready, change
    the line so visitors aren't sent looking for something that doesn't exist yet. The site name also needs adding.
