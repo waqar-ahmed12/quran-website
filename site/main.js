@@ -28,9 +28,25 @@
   const FEATHER_X = 180;   // how far the frame's rectangle fades into the stage
   const FEATHER_Y = 40;
 
-  // Light mode has no video of the book opening, only a photo of the ivory Qur'an, closed. It's drawn still, at the
-  // closed dark book's height. The book spans these fractions of the photo.
-  const IVORY = { src: 'assets/hero/quran-light.webp', left: 0.335, right: 0.664, top: 0.059, bottom: 0.928 };
+  // Light frames: the ivory Qur'an opening, its own footage (not a recolour of the dark one) --------------
+  // Built by videos/make-light-frames.ps1, then videos/build-light-geom.js. The footage is framed almost
+  // exactly like the dark take — same size, book the same height and in the same place — so everything below
+  // is drawn, centred and laid out by the same code, off the same constants. Only the right edge differs.
+
+  const LIGHT_LEFT = 262; // left edge of the book, as BOOK_LEFT is for dark; read off the open frame
+
+  const LIGHT_OPEN_RIGHT = 995; // right edge fully open
+  // The book's right edge in each frame, measured by videos/make-light-frames.ps1. main.js smooths these the
+  // same way it smooths the dark frames' own measurements.
+  const rightsLight = [
+    653, 653, 653, 653, 653, 653, 653, 653, 654, 654, 654, 654, 654, 654, 655, 655, 655, 655, 646, 647, 647, 642,
+    642, 644, 645, 646, 643, 642, 643, 647, 642, 653, 645, 655, 656, 657, 651, 655, 660, 661, 646, 664, 683, 702,
+    721, 735, 754, 774, 793, 819, 838, 855, 872, 888, 903, 917, 931, 943, 959, 969, 979, 987, 995,
+  ];
+
+  // One frame file per measurement, so the two can't fall out of step.
+  const urlsLight = rightsLight.map((_, i) => `assets/hero/light-frames/f${String(i).padStart(3, '0')}.png`);
+  const LAST_LIGHT = urlsLight.length - 1;
 
   // Timeline, in screen heights of scrolling on a computer -----------------------
   // Phones scroll less far for everything (--pace in styles.css).
@@ -58,7 +74,11 @@
   // visitor was scrolling. 'off' leaves it where it stopped.
   let finish = 'direction';
   let finishSpeed = 1;     // screens of scrolling a second; a half-open book is about one screen from either end
-  const FINISH_WAIT = 180; // ms without scrolling before it finishes
+  let finishWait = 100;    // ms without scrolling before it finishes; 180 felt stuck (2026-09-14). TRYOUT "Wait before gliding"
+  // How the page's own scrolling starts: 'moving' carries on as the visitor's scrolling stops; 'gentle' eases in from
+  // still, as before 2026-09-14. TRYOUT "Glide start".
+  let glideStart = 'moving';
+  const TAB_SPEED = 3;     // screens a second when Tab glides through the opening
   // The same goes for the ending: the page never rests with it part way in (settleEnding). TRYOUT "Ending locks into place".
   let lockEnding = true;
 
@@ -80,6 +100,8 @@
   const frames = []; // decoded images by index, filled in as they arrive
   const rights = []; // measured right edge of the book in each frame
   const started = new Set();
+  const lightFrames = []; // the light-mode frames, decoded images by index
+  const startedLight = new Set();
   const groups = []; // one element per group of aayat, filled in when aayat.json arrives
 
   let scale = 1;      // footage pixels to CSS pixels, set on resize
@@ -102,49 +124,54 @@
   let autoScroll = 0; // the animation frame of a scroll the page started itself, 0 when none
   let ended = false;  // scrolling has reached the end of the book's screens
 
+  // The two takes -------------------------------------------------------------------
+  // Whichever is on screen. They are framed the same way, so everything below — loading, centring, drawing,
+  // where the pages are — is one piece of code working off whichever this returns. Anything that isn't the
+  // same for both is here, and only here: the dark frames' right edge can be measured in the browser, the
+  // light frames' can't (see videos/build-light-geom.js), so it arrives measured.
+
+  const darkFilm = { urls, frames, rights, started, left: BOOK_LEFT, openRight: OPEN_RIGHT, last: LAST, measure: true };
+  const lightFilm = {
+    urls: urlsLight,
+    frames: lightFrames,
+    rights: rightsLight,
+    started: startedLight,
+    left: LIGHT_LEFT,
+    openRight: LIGHT_OPEN_RIGHT,
+    last: LAST_LIGHT,
+    measure: false,
+  };
+  const film = () => (light() ? lightFilm : darkFilm);
+
   // Loading -----------------------------------------------------------------------
 
-  function load(i) {
-    if (started.has(i)) return;
-    started.add(i);
+  function load(f, i) {
+    if (f.started.has(i)) return;
+    f.started.add(i);
     const img = new Image();
-    img.src = urls[i];
+    img.src = f.urls[i];
     img.decode().then(
       () => {
-        frames[i] = img;
-        rights[i] = measureRight(img);
-        if (i >= LAST - 3) place(); // the open book's measured edge sets where the pages are
+        f.frames[i] = img;
+        if (f.measure) f.rights[i] = measureRight(img);
+        if (i >= f.last - 3) place(); // the open book's measured edge sets where the pages are
         dirty = true;
         schedule();
       },
-      () => console.warn(`Frame missing: ${urls[i]}`), // the nearest loaded frame is drawn instead
+      () => console.warn(`Frame missing: ${f.urls[i]}`), // the nearest loaded frame is drawn instead
     );
   }
 
-  // First and last frames, then coarse to fine, so scrubbing works before everything arrives.
-  function loadAll() {
-    load(0);
-    load(LAST);
+  // The frame on screen first, then the two ends, then coarse to fine, so scrubbing works before everything
+  // arrives — and so switching theme part way through the opening shows the book where it already is, rather
+  // than the closed one until the rest turns up.
+  function loadAll(f) {
+    load(f, Math.max(0, Math.min(f.last, Math.round(frameAt(pos === null ? targetScroll() : pos)))));
+    load(f, 0);
+    load(f, f.last);
     for (const step of [8, 4, 2, 1]) {
-      for (let i = 0; i <= LAST; i += step) load(i);
+      for (let i = 0; i <= f.last; i += step) load(f, i);
     }
-  }
-
-  // The ivory Qur'an for light mode, fetched only when the page first turns light.
-  const ivory = new Image();
-  let ivoryReady = false;
-
-  function loadIvory() {
-    if (ivory.getAttribute('src')) return;
-    ivory.src = IVORY.src;
-    ivory.decode().then(
-      () => {
-        ivoryReady = true;
-        dirty = true;
-        schedule();
-      },
-      () => console.warn(`Missing: ${IVORY.src}`),
-    );
   }
 
   // Once the cover passes upright its cream lining faces the camera, so the book's right
@@ -168,16 +195,16 @@
   }
 
   // Averaged over nearby frames so the centring glides instead of stepping.
-  function rightEdge(i) {
+  function rightEdge(f, i) {
     let sum = 0;
     let n = 0;
-    for (let j = Math.max(0, i - 3); j <= Math.min(LAST, i + 3); j++) {
-      if (rights[j] != null) {
-        sum += rights[j];
+    for (let j = Math.max(0, i - 3); j <= Math.min(f.last, i + 3); j++) {
+      if (f.rights[j] != null) {
+        sum += f.rights[j];
         n++;
       }
     }
-    return n ? sum / n : SPINE + ((OPEN_RIGHT - SPINE) * i) / LAST;
+    return n ? sum / n : SPINE + ((f.openRight - SPINE) * i) / f.last;
   }
 
   // Aayat -------------------------------------------------------------------------
@@ -228,9 +255,11 @@
     })
     .catch(() => console.warn('No aayat yet: run fetch-aayat.js'));
 
-  // Where the open book's pages are: CSS lays the text over them from these.
+  // Where the open book's pages are: CSS lays the text over them from these. The page positions in styles.css
+  // suit both takes, which put the book in the same part of the frame.
   function place() {
-    const open = (BOOK_LEFT + rightEdge(LAST)) / 2;
+    const f = film();
+    const open = (f.left + rightEdge(f, f.last)) / 2;
     stage.style.setProperty('--s', scale);
     stage.style.setProperty('--x0', `${canvas.clientWidth / 2 - open * scale}px`);
     stage.style.setProperty('--y0', `${(canvas.clientHeight - SRC_H * scale) / 2}px`);
@@ -298,7 +327,7 @@
   }
 
   function under() {
-    return document.documentElement.dataset.ending === 'under' && wide.matches && !reduceMotion.matches && !light();
+    return document.documentElement.dataset.ending === 'under' && wide.matches && !reduceMotion.matches;
   }
 
   // Tells styles.css how long the timeline is, so the hero's height matches it.
@@ -349,19 +378,20 @@
   // Cross-fades the two frames either side of a position, or while they are still loading, draws
   // the nearest frame that has arrived. Returns false while no frame has loaded yet.
   function draw(at) {
-    if (light()) return drawIvory();
+    const f = film();
     const a = Math.floor(at);
-    const b = Math.min(a + 1, LAST);
-    const f = at - a;
-    const fade = f > 0 && !!frames[a] && !!frames[b];
-    const base = fade ? a : nearestLoaded(Math.round(at));
+    const b = Math.min(a + 1, f.last);
+    const t = at - a;
+    const fade = t > 0 && !!f.frames[a] && !!f.frames[b];
+    const base = fade ? a : nearestLoaded(f, Math.round(at));
     if (base < 0) return false;
 
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
-    // The book is centred by choosing which part of the frame is drawn, never by moving the canvas.
-    const right = rightEdge(a) + (rightEdge(b) - rightEdge(a)) * f;
-    const centre = (BOOK_LEFT + right) / 2;
+    // The book is centred by choosing which part of the frame is drawn, never by moving the canvas. It follows
+    // the frame actually on screen, so a frame still on its way isn't put where a later one belongs.
+    const right = fade ? rightEdge(f, a) + (rightEdge(f, b) - rightEdge(f, a)) * t : rightEdge(f, base);
+    const centre = (f.left + right) / 2;
     const w = SRC_W * scale;
     const h = SRC_H * scale;
     const x = width / 2 - centre * scale;
@@ -369,35 +399,17 @@
 
     ctx.globalCompositeOperation = 'source-over';
     ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(frames[base], x, y, w, h);
+    ctx.drawImage(f.frames[base], x, y, w, h);
     if (fade) {
-      ctx.globalAlpha = f;
-      ctx.drawImage(frames[b], x, y, w, h);
+      ctx.globalAlpha = t;
+      ctx.drawImage(f.frames[b], x, y, w, h);
       ctx.globalAlpha = 1;
     }
     featherEdges(x, y, w, h);
 
     // Where the book is on screen, so atmosphere.js keeps its dust and light off it.
     const top = y + ((SRC_H - BOOK_H) / 2) * scale;
-    hero.book = { left: x + BOOK_LEFT * scale, right: x + right * scale, top, bottom: top + BOOK_H * scale, scale };
-    return true;
-  }
-
-  // Light mode: the ivory Qur'an, closed and still, the same height as the dark book and centred the same way.
-  function drawIvory() {
-    if (!ivoryReady) return false;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const k = (BOOK_H * scale) / ((IVORY.bottom - IVORY.top) * ivory.naturalHeight); // photo pixels to CSS pixels
-    const w = ivory.naturalWidth * k;
-    const h = ivory.naturalHeight * k;
-    const x = width / 2 - ((IVORY.left + IVORY.right) / 2) * w;
-    const y = height / 2 - ((IVORY.top + IVORY.bottom) / 2) * h;
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.clearRect(0, 0, width, height);
-    ctx.drawImage(ivory, x, y, w, h);
-    featherEdges(x, y, w, h);
-    hero.book = { left: x + IVORY.left * w, right: x + IVORY.right * w, top: y + IVORY.top * h, bottom: y + IVORY.bottom * h, scale };
+    hero.book = { left: x + f.left * scale, right: x + right * scale, top, bottom: top + BOOK_H * scale, scale };
     return true;
   }
 
@@ -425,15 +437,17 @@
     return range > 0 ? clamp(-hero.getBoundingClientRect().top / range) * total : 0;
   }
 
-  // The book's frame at a scroll position; smoothstep eases into and out of the opening.
+  // The book's frame at a scroll position; smoothstep eases into and out of the opening. The two takes have
+  // different numbers of frames, so this is a share of the opening, not a frame count: the book is exactly as
+  // far open at a given scroll position whichever is showing.
   function frameAt(s) {
-    return smoothstep(clamp((s - REST) / OPEN)) * LAST;
+    return smoothstep(clamp((s - REST) / OPEN)) * film().last;
   }
 
-  function nearestLoaded(i) {
-    for (let d = 0; d <= LAST; d++) {
-      if (frames[i - d]) return i - d;
-      if (frames[i + d]) return i + d;
+  function nearestLoaded(f, i) {
+    for (let d = 0; d <= f.last; d++) {
+      if (f.frames[i - d]) return i - d;
+      if (f.frames[i + d]) return i + d;
     }
     return -1;
   }
@@ -477,7 +491,7 @@
     const still = reduceMotion.matches;
     const exact = frameAt(pos);
     const whole = Math.round(exact);
-    const frame = still ? LAST : blend ? exact + (whole - exact) * smoothstep(sharpen) : whole;
+    const frame = still ? film().last : blend ? exact + (whole - exact) * smoothstep(sharpen) : whole;
     if (pos !== painted || dirty) {
       const rest = still ? 1 : 1 - clamp(frame / NAME_GONE);
       for (const part of resting) part.style.opacity = rest;
@@ -503,6 +517,7 @@
     ctx.imageSmoothingQuality = 'high';
     // One size for the whole opening: the open book always fits, and the 720p footage is
     // never stretched past its own size.
+    // One size for both takes, from the wider of the two, so the book doesn't change size with the theme.
     scale = Math.min((height * 0.8) / BOOK_H, (width * 0.88) / (OPEN_RIGHT - BOOK_LEFT), 1);
     place();
     fitHint();
@@ -515,9 +530,10 @@
   // Reduced motion: no scrubbing, just the open book, and only its frame is loaded.
   function applyMotion() {
     document.documentElement.classList.toggle('still', reduceMotion.matches);
-    if (light()) loadIvory(); // the frames wait until the page turns dark
-    else if (reduceMotion.matches) load(LAST);
-    else loadAll();
+    const f = film(); // the other take's frames are never fetched until the theme calls for them
+    if (reduceMotion.matches) load(f, f.last);
+    else loadAll(f);
+    place();
     dirty = true;
     schedule();
   }
@@ -535,6 +551,10 @@
   }
 
   themeButton.addEventListener('click', () => {
+    // Both takes run on the same timeline, down a page of the same height, so the scroll position and the eased
+    // position carry straight over: the book is left exactly as far open as it was, still gliding where it was
+    // gliding. Nothing here may reset `pos` — that was what made the book jump on a switch (the user, 2026-09-14:
+    // "if the Qur'an is closing in black and I change theme, the white Qur'an should be closing as well").
     const turn = () => {
       const theme = light() ? 'dark' : 'light';
       document.documentElement.dataset.theme = theme;
@@ -544,8 +564,8 @@
         // a private window can refuse; the switch still works for this visit
       }
       applyTheme();
-      pos = targetScroll(); // the book's screen changes height, so jump to where the page now is
       paint(); // draw now, so the cross-fade ends on the new book
+      waitToFinish(); // clicking stopped any glide the page had running; pick it up again
     };
     // The cross-fade waits for the page to draw, so a page that isn't showing just changes. The browser can still cancel
     // a cross-fade part way; the theme changes all the same, so its promises are allowed to fail quietly.
@@ -648,6 +668,8 @@
       redraw();
     });
     addOption('Ending locks into place', { Yes: true, No: false }, lockEnding, (v) => (lockEnding = v));
+    addSlider('Wait before gliding', 0, 400, 10, finishWait, (v) => `${v} ms`, (v) => (finishWait = v));
+    addOption('Glide start', { 'Already moving': 'moving', 'Gently (before)': 'gentle' }, glideStart, (v) => (glideStart = v));
     tryoutGroup('Opening and aayat');
     const glideText = (v) => (v ? `${v.toFixed(2)} s${v === 0.28 ? ' (your pick)' : ''}` : 'Off');
     addSlider('Opening glide', 0, 0.5, 0.01, glide, glideText, retime((v) => (glide = v)));
@@ -680,13 +702,13 @@
 
   function waitToFinish() {
     clearTimeout(finishTimer);
-    finishTimer = setTimeout(finishOpening, FINISH_WAIT);
+    finishTimer = setTimeout(finishOpening, finishWait);
   }
 
   function finishOpening() {
     if (touching || autoScroll || reduceMotion.matches) return;
     if (lockEnding && settleEnding()) return;
-    if (finish === 'off' || !visible || light()) return;
+    if (finish === 'off' || !visible) return;
     const progress = (targetScroll() - REST) / OPEN;
     if (progress <= 0.002 || progress >= 0.998) return; // closed or open already
     const open = finish === 'nearest' ? progress >= 0.5 : direction > 0;
@@ -723,15 +745,18 @@
     scrollToY(hero.getBoundingClientRect().top + scrollY + (s / total) * range);
   }
 
-  // Scrolls the page to y, easing in and out, at the auto open/close speed.
-  function scrollToY(y) {
+  // Scrolls the page to y at `speed` screens a second, starting already moving, or gently from still.
+  let autoDir = 0; // which way the page's own scrolling is going
+  function scrollToY(y, speed = finishSpeed, gentle = glideStart === 'gentle') {
+    cancelAnimationFrame(autoScroll);
     const from = scrollY;
     const distance = y - from;
-    const duration = Math.max(300, (1000 * Math.abs(distance)) / innerHeight / finishSpeed); // a short finish still eases
+    autoDir = Math.sign(distance);
+    const duration = Math.max(300, (1000 * Math.abs(distance)) / innerHeight / speed); // a short finish still eases
     const start = performance.now();
     const tick = (now) => {
       const t = Math.min(1, (now - start) / duration);
-      const eased = t < 0.5 ? 4 * t * t * t : 1 - (2 - 2 * t) ** 3 / 2;
+      const eased = !gentle ? Math.sin((t * Math.PI) / 2) : t < 0.5 ? 4 * t * t * t : 1 - (2 - 2 * t) ** 3 / 2;
       scrollTo(0, from + distance * eased);
       autoScroll = t < 1 ? requestAnimationFrame(tick) : 0;
       if (!autoScroll) lastY = scrollY;
@@ -744,10 +769,33 @@
     cancelAnimationFrame(autoScroll);
     autoScroll = 0;
     lastY = scrollY;
+    tabFrom = null;
   }
 
   addEventListener('scroll', onScroll, { passive: true });
-  for (const type of ['wheel', 'keydown', 'mousedown']) addEventListener(type, takeOver, { passive: true });
+  for (const type of ['keydown', 'mousedown']) addEventListener(type, takeOver, { passive: true });
+  // A wheel turned the way the page is already going doesn't stop it: stopping there felt stuck (the user, 2026-09-14).
+  addEventListener('wheel', (e) => (autoScroll && Math.sign(e.deltaY) === autoDir) || takeOver(), { passive: true });
+
+  // Tab from the top bar lands on the ending's buttons, and the browser jumps there past the opening (the user,
+  // 2026-09-14). Instead the page glides there through the book, quickly. Arrows, Space and Page Down scrub as always.
+  let tabFrom = null; // where the page was when Tab was pressed
+  addEventListener('keydown', (e) => e.key === 'Tab' && (tabFrom = scrollY));
+  addEventListener('focusin', (e) => {
+    const from = tabFrom;
+    tabFrom = null;
+    if (from === null || reduceMotion.matches) return;
+    const glide = () => {
+      const end = hero.getBoundingClientRect().top + scrollY + hero.offsetHeight - stage.offsetHeight; // book fully open
+      if (from >= end - 1 || scrollY <= end) return false; // already past the opening, or the jump didn't cross it
+      const to = close.contains(e.target) ? scrollY + close.getBoundingClientRect().top : scrollY;
+      scrollTo(0, from);
+      scrollToY(to, TAB_SPEED, true);
+      return true;
+    };
+    // Chrome has already jumped by now; a browser that jumps after this event is caught before the next frame is drawn.
+    if (!glide()) requestAnimationFrame(glide);
+  });
   addEventListener(
     'touchstart',
     () => {

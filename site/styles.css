@@ -880,6 +880,15 @@ html::-webkit-scrollbar {
   isolation: isolate; /* keeps the words over the dust without lifting them over the options panels */
   padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 5vw, 4rem) 2rem;
   border-top: 1px solid rgb(var(--rgb-foreground) / 0.1);
+  /* At least a screen tall, so at the very bottom the ending never shows above it (the user, 2026-09-14). */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+.footer > .footer-inner {
+  flex: 1 0 auto;
 }
 
 /* The small star from the cover's tooling, sitting on the line. */
@@ -1243,17 +1252,8 @@ html::-webkit-scrollbar {
   transition: none;
 }
 
-/* Light mode: there's no light video of the book opening, only a photo of the ivory Qur'an, closed. So the book's
-   screen is a single screen with the book closed and still (main.js draws the photo): no aayat, and nothing to scroll
-   through. */
-[data-theme='light'] .hero {
-  height: auto;
-}
-
-[data-theme='light'] .aayat,
-[data-theme='light'] .scroll-hint {
-  display: none;
-}
+/* Light mode runs the same hero as dark: its own footage of the ivory Qur'an opening, on the same timeline, with
+   the aayat on its pages. The page positions above suit both, which frame the book the same way. */
 
 [data-theme='light'] .signoff {
   opacity: 1; /* the deeper gold needs its full strength for text this small */
@@ -1414,12 +1414,12 @@ html::-webkit-scrollbar {
 }
 
 @media (min-width: 768px) {
-  [data-ending='under']:not(.still, [data-theme='light']) .hero.ended .book {
+  [data-ending='under']:not(.still) .hero.ended .book {
     transform: translateY(var(--end-y, 0px)) scale(var(--end-scale, 1));
     transition-duration: 1100ms;
   }
 
-  [data-ending='under']:not(.still, [data-theme='light']) .close {
+  [data-ending='under']:not(.still) .close {
     display: block;
     height: 100vh;
     height: 100svh;
@@ -1430,13 +1430,13 @@ html::-webkit-scrollbar {
     pointer-events: none;
   }
 
-  [data-ending='under']:not(.still, [data-theme='light']) .close .air,
-  [data-ending='under']:not(.still, [data-theme='light']) .close .backdrop,
-  [data-ending='under']:not(.still, [data-theme='light']) .close .signoff {
+  [data-ending='under']:not(.still) .close .air,
+  [data-ending='under']:not(.still) .close .backdrop,
+  [data-ending='under']:not(.still) .close .signoff {
     display: none; /* the open book and its own dust are the picture here */
   }
 
-  [data-ending='under']:not(.still, [data-theme='light']) .close .inner {
+  [data-ending='under']:not(.still) .close .inner {
     --delay: 450ms; /* the words follow the book's move */
     position: absolute;
     top: var(--end-top, 75%);
@@ -1448,7 +1448,7 @@ html::-webkit-scrollbar {
     transition: visibility 0s 300ms;
   }
 
-  [data-ending='under']:not(.still, [data-theme='light']) .hero.ended + .close .inner {
+  [data-ending='under']:not(.still) .hero.ended + .close .inner {
     visibility: visible;
     pointer-events: auto;
     transition: none;

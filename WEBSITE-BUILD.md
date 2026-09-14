@@ -410,6 +410,45 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      in `<head>` before the page draws; **a first visit is dark**, not the device setting §5 suggested, because only dark
      has the opening. The switch cross-fades the page with View Transitions where the browser has them.
    - *Options to try:* the switch as a half circle that turns over (default) / sun and moon / the word "Light" or "Dark".
+   - **The light video is in, 2026-09-14.** `whtie-quran-opening.mp4` (1920x1080, 192 frames) was exported to
+     `videos/light-frames/raw/` by `videos/export-light-frames.ps1`. The static ivory photo, `drawIvory` and the
+     "single screen, no aayat or scroll hint" CSS are gone: **light now runs the same hero as dark** — same timeline,
+     same page height, aayat on the pages, the same lock-in, half-open auto-finish and Tab-through-the-opening.
+   - **The two takes are one piece of code.** The light footage is framed almost exactly like the dark one: same
+     1280x720, book the same height, in the same place, fold in the middle. So main.js has no separate light drawing
+     path — `film()` returns whichever set of frames the theme calls for and one `draw`, `load`, `place` and
+     `rightEdge` work off it. All that differs is the files, the left edge (`LIGHT_LEFT` 262 against `BOOK_LEFT` 255)
+     and how the right edge is measured. The page positions in styles.css suit both, so **the aayat needed no new
+     numbers**: the Arabic text box lands at x 702-995 on screen against a book that runs 282-998.
+   - **Why the light right edge is measured offline.** `measureRight` finds the dark book by brightness, which can't
+     work here: the ivory book is about three levels darker than its backdrop and its drop shadow is darker still.
+     Threshold measurement (the first attempt, from `analyze-light-frames.js`'s `report.txt`) tracked the *shadow*,
+     which grows as the book opens — so the book drifted left and up as it went, and sat ~30px off centre. The book's
+     own edge is a sharp step where the shadow is a slow ramp, so `videos/make-light-frames.ps1` takes the strongest
+     step right of the fold. It reads 653 closed to 995 open, matching the frames by eye.
+   - **Build it with:** `powershell -File videos/make-light-frames.ps1` (picks the frames, resizes them into
+     `site/assets/hero/light-frames/`, measures each one into `light-frames/edges.json`), then
+     `node videos/build-light-geom.js` (writes `rightsLight` into main.js). Don't edit those numbers by hand.
+   - **Frames: 63, not 184 (2026-09-14, the user: "it is not smooth").** 184 frames of 1920x1080 is ~57 MB to fetch
+     and about **1.5 GB of decoded bitmaps** — four times the dark set, so the browser was throwing frames away and
+     decoding them again mid-scroll. Now: frames 0-131 only (the book is open and still by 131; the rest of the video
+     is just a light crossing the pages), every second one, at the dark footage's 1280x720 — **63 frames, 12.8 MB,
+     ~230 MB decoded**, under the dark set's 320 MB. The light take runs about twice as long as the dark one for the
+     same movement, so every second frame lands near the dark set's 87. If it ever reads as steppy, set `$every = 1`
+     in the PowerShell script and rebuild.
+   - *Two things that cost time, worth not repeating:* System.Drawing's PNG encoder writes files ~7x larger than
+     WPF's, and scaling through a WPF render surface leaves a pixel of rounding noise everywhere that PNG can't
+     compress — decode straight to the target size instead (`DecodePixelWidth`).
+   - **Switching theme keeps the book where it is (2026-09-14, the user: "if the Qur'an is closing in black and I
+     change theme, the white Qur'an should be closing as well").** Both takes now run down a page of the same height
+     on the same timeline, so the scroll position and the eased position carry straight over; the switch handler must
+     not reset `pos` (it used to, which is what made the book jump to a different point in the opening), and it calls
+     `waitToFinish` so an auto open/close the click interrupted picks up again. The old scroll-anchoring there is gone
+     with it — it only existed because light used to be one screen tall.
+   - **Not seen working end to end.** The geometry was checked number by number in the browser (book and page
+     rectangles, no console errors, dark unchanged), but the preview pane stops painting and freezes
+     `requestAnimationFrame` while the desktop window is minimised, so the light opening and the aayat on the ivory
+     pages still want a look on a real screen.
 7. **Audit and ship prep:** `web-design-guidelines` audit, MASTER.md checklist, responsive pass, frames → WebP.
    - *Early audit run 2026-09-14 at the user's request* ("where does my landing page stand against $10k sites"). Ahead:
      the opening, scrolling. On par: look and type, navigation, buttons, accessibility, contact. Behind: speed (25.5 MB of
@@ -427,6 +466,15 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      scrub it. (2) **Theme switch mid-page:** with the lock-in on, scrolled up so the whole black Qur'an shows, then
      switching theme leaves half the book showing. The hero changes height (light is one screen) but the scroll position
      stays. Fix: after the switch, keep the visitor on the same resting place (book or ending) and re-run the lock-in.
+     (3) **Very bottom:** the ending ("Learn to read these pages…") shows above the footer; the user doesn't want that.
+     (4) **Stuck:** moving between sections feels stuck; wants it smooth, with a slider.
+   - **Built (2026-09-14), all four:** (1) `focusin` after a Tab that crosses the opening puts the page back and glides
+     through the book at 3 screens/s (`TAB_SPEED`), ending with the ending filling the screen. (2) The theme switch keeps
+     the ending's top where it was in the window (no lower than under a whole book; the very top stays the top), then runs
+     the lock-in. (3) The footer is at least one screen tall. (4) The wait after scrolling stops is 100 ms (was 180), the
+     page's own scrolling starts already moving (sine ease-out, not ease-in-out), and a wheel turned the way it's already
+     going no longer stops it. TRYOUTS in **Ending**: **Wait before gliding** slider (0–400 ms), **Glide start** already
+     moving / gently (before).
    - **The user is doing** the light-mode and real-phone testing themselves.
    WebP conversion needs a tool; do it after the PC is cleaned (e.g. `sharp` in Node), aiming for a few MB total.
    **Before launch, check the free Qaida is live.** The line under the headline promises it. If it isn't ready, change
