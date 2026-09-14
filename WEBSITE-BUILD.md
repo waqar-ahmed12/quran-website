@@ -39,7 +39,8 @@ no framework.** Near-zero copy. Must support **dark and light mode** properly.
    The book stays centred. Nothing else happens during this.
 3. **Fully open** — book settles open, blank pages. No text yet.
 4. **Aayat** — 3–4 verses appear and cycle on the open pages as scrolling continues. Real text, never generated.
-5. **Close** — one short line saying what the site is, one restrained entry point.
+5. **Close** — one short line saying what the site is, and two buttons: the free Qaida and one-to-one lessons (the
+   user's call, 2026-09-13; this was one entry point).
 
 **Excluded:** feature grids, testimonials, stat counters, newsletter signup, FAQ, link-farm footer.
 
@@ -144,7 +145,8 @@ Keep it tunable.
   user which.
 - **Atmosphere:** very subtle floating dust/light particles (CSS or a small canvas), low density, off under reduced
   motion.
-- **Close section:** one line + one entry point. Copy and link come from the user.
+- **Close section:** one line + two buttons (free Qaida, one-to-one lessons). Where they link comes from the user;
+  see §7, phase 5.
 - Follow MASTER.md's anti-patterns and pre-delivery checklist: no emoji icons, visible focus states, 150–300 ms
   transitions, 4.5:1 contrast, responsive at 375 / 768 / 1024 / 1440, no horizontal scroll.
 
@@ -254,11 +256,58 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      three windows in a row), and choosing any effect option turns effects back on. Phones: both option panels start
      closed and collapse; **Scroll length** long 373vh / medium 310vh / short 250vh (default); **Surah name** under
      the book / on the page (English meaning hidden there, too long).
-   - **Clasps:** `videos/fix-clasp-frames.ps1` (PowerShell + System.Drawing, safe on this PC) finds pixels on the
-     book's left edge (x 224–268, y 330–520, frames f004–f022) clearly brighter than their column's clean leather and
-     replaces them with the leather 130 rows above. Originals kept in `videos/best-yet-frames/before-clasp-fix/`;
-     writes to both frame folders; makes `contact-sheet-clasps.png` for review.
+   - **Clasps:** `videos/fix-clasp-frames.ps1` (PowerShell + System.Drawing, safe on this PC). The first version
+     replaced bright pixels with the leather 130 rows above, which for the lower clasp is the upper clasp, so half of
+     it stayed. The rewrite finds the gold rule's left edge in each frame, then pixels 16–44 px left of it (rows
+     286–506) that differ from the average of the pixels 3 rows above and below: the edge there runs straight up and
+     down, so only the curly clasps do. (Comparing with each column's median down the book flagged plain leather in
+     every frame, because the edge lines drift a pixel and the light changes slowly.) Each clasp's padded box is
+     repainted column by column, blending from the rows above it to the rows below. The
+     clasps are in f009–f017 (faint grey outlines at first, bronze by f015, a third small one at the top from f013).
+     It always starts from `videos/best-yet-frames/before-clasp-fix/`, puts frames without clasps back byte for byte,
+     writes to both frame folders and saves `contact-sheet-clasps.png` (3x, before above, after below). `-DryRun` saves
+     only the sheet. **Run by the user 2026-09-14:** clasps repainted in f009–f017, every other frame restored from
+     the backups.
+   - **Fifth round, the user's feedback (2026-09-14):** mix dust and flakes, with sliders, and add more to the
+     background · a smoothness control for the auto-finish · **don't work on light mode yet** · no phone testing for now.
+   - **Fifth round, built:** separate 0–250% sliders for gold dust (starts at 100), gold leaf (40) and glints (0), so
+     they mix. New background layers, all erased over the book like everything else: **haze** (two layers of soft gold
+     wisps drifting different ways, 30%, left out at lite quality), **light behind book** (a warm gold glow round the
+     book, 40%) and **gold pattern** off / faint / under the mouse (eight-pointed stars joined by thin lines; "under the
+     mouse" shows it only in a soft circle round the pointer). **Auto-finish time** slider, 0.3–3 s (1.1 s for a whole
+     screen of scrolling; shorter distances take less).
+   - **Light preview removed** (Theme preview buttons, light tokens in `styles.css`, light colours in `atmosphere.js`,
+     `site/assets/hero/quran-light.webp`). For phase 6, how it worked: `assets/hero/quran-light.webp` drawn closed and
+     still at the dark book's height (the book spans x 33.5–66.4% and y 5.9–92.8% of that photo), MASTER.md's light
+     tokens, and deeper golds that show on ivory: speck `rgba(140,95,15)`, leaf `#6B4E0E` → `#D9B44A` → `#A67C1E`,
+     glow `rgba(201,160,70)`.
+   - **Sixth round, the user's feedback (2026-09-14):** a speed control for the automatic open/close · the aayat move
+     clunkily in Drift and Breathe once the book is open (not mentioned for Float, which only slides).
+   - **Sixth round, built:** **Auto open/close speed** slider, 25–300%, replacing "Auto-finish time": 100% scrolls one
+     screen a second, so a half-open book finishes in about a second, and a finish never takes less than 0.3 s.
+     **Aayat while moving**, not seen by Claude (the user previews): *As before* (`.subject` gets `will-change:
+     transform` only while moving) · *Fix A*, the default (it keeps it whenever the book may move, so the text should be
+     drawn once and moved whole instead of redrawn at each new size and tilt, the suspected cause) · *Fix B* (Fix A plus
+     plain ink with no multiply blend, as on phones).
 5. **Close section.**
+   - *Decided by the user 2026-09-13:* **two buttons**, one to the free Qaida and one to one-to-one lessons. They
+     didn't know how the lessons button should work. Claude recommended a simple lessons page of its own, ending in a
+     short enquiry form that emails the teacher (a WhatsApp button is the alternative). **Waiting on the user:** that
+     page yes or no, form or WhatsApp, and whether the first lesson is free. Claude proposed making the lessons page
+     the next phase; **the user said no**, so the order stays: light mode next, then the audit.
+   - *Built 2026-09-13* with `taste-skill:minimalist-skill`, `ui-ux-pro-max` (references and data read directly) and
+     `agent-skills:idea-refine` for the words (run by Claude without questions, per the user's standing preference).
+     `.close` is a screen after the hero: one line in Jost 300, then two links, 48px tall with 4px corners, no
+     shadow and a visible focus ring. One is solid gold and leads; the other is a gold outline. The ending rises 12px
+     into view over 600ms the first time it scrolls in (not under reduced motion). Both links are stand-ins
+     (`#lessons`, `#qaida`); on this PC a click says the page isn't built yet.
+   - *Options to try,* in the new **Ending** group at the top of the Options panel (the earlier options are folded
+     into **Opening and aayat** and **Atmosphere**): ending **after the book** / **under the book** (computers only:
+     at the end of scrolling the open book rises and shrinks, and the ending fades in beneath it) · closing line
+     (four) · button words (three pairs) · button look: gold and outline / two outlines / underlined · which button
+     stands out · **dust in the ending**: stays with the book / carries on (a second canvas behind the ending shows
+     the same air, fixed to the screen while the page scrolls; still never drawn over the book).
+   - **Before launch:** point both links at the real pages, and hide the Qaida button if the Qaida isn't live.
 6. **Light mode.**
 7. **Audit and ship prep:** `web-design-guidelines` audit, MASTER.md checklist, responsive pass, frames → WebP.
    WebP conversion needs a tool; do it after the PC is cleaned (e.g. `sharp` in Node), aiming for a few MB total.

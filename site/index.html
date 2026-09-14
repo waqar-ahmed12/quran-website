@@ -11,6 +11,9 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400&family=Scheherazade+New&display=swap">
   <link rel="stylesheet" href="styles.css">
   <script src="main.js" defer></script>
+  <!-- TEMPORARY, local preview only: phase 5 ending options. Delete this line and ending-options.js once the
+       ending is chosen. -->
+  <script src="ending-options.js" defer></script>
   <script src="atmosphere.js" defer></script>
   <!-- TEMPORARY, local preview only: headline/subline picker. Delete this line and
        wordmark-options.js once a choice is locked in. -->
@@ -26,8 +29,22 @@
           <h1>From Alif to Ayah</h1>
           <p>A real teacher, one letter at a time, until the verses are yours.</p>
         </header>
-        <div class="subject">
-          <canvas role="img" aria-label="A black leather Qur'an with a gold roundel on its cover, opening to two cream pages."></canvas>
+        <!-- .book makes room for the ending in the "Under the book" option; atmosphere.js moves .subject while still. -->
+        <div class="book">
+          <div class="subject">
+            <canvas role="img" aria-label="A black leather Qur'an with a gold roundel on its cover, opening to two cream pages."></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Phase 5: the ending. Both links are stand-ins until the pages exist. At launch, point them at the real pages,
+         and hide the Qaida button if the Qaida isn't live yet. -->
+    <section class="close" aria-labelledby="close-line">
+      <div class="inner">
+        <h2 id="close-line">Learn to read these pages for yourself.</h2>
+        <div class="entry">
+          <a class="button primary lessons" href="#lessons">One-to-one lessons</a>
+          <a class="button qaida" href="#qaida">Free Qaida</a>
         </div>
       </div>
     </section>

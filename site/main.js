@@ -1,4 +1,5 @@
 // Phase 1: the hero scroll animation. Phase 2: the headline with the closed book. Phase 3: aayat on the open pages.
+// Phase 5: the ending after the book, with its options.
 // Retouched video frames of the Qur'an opening, drawn to a canvas by scroll position.
 // Spec: WEBSITE-BUILD.md sections 2 to 4; the settings the user chose are under section 7.
 
@@ -50,7 +51,7 @@
   // A book left half open opens or closes by itself once scrolling stops: toward the nearer end, or the way the
   // visitor was scrolling. 'off' leaves it where it stopped.
   let finish = 'direction';
-  let finishTime = 1.1;    // seconds to finish across a whole screen of scrolling; shorter distances take less
+  let finishSpeed = 1;     // screens of scrolling a second; a half-open book is about one screen from either end
   const FINISH_WAIT = 180; // ms without scrolling before it finishes
 
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -60,6 +61,8 @@
   const canvas = subject.querySelector('canvas');
   const wordmark = stage.querySelector('.wordmark');
   const ctx = canvas.getContext('2d');
+  const close = document.querySelector('.close'); // the ending, after the book
+  const closeInner = close.querySelector('.inner');
 
   const frames = []; // decoded images by index, filled in as they arrive
   const rights = []; // measured right edge of the book in each frame
@@ -84,6 +87,7 @@
   let touching = false;
   let finishTimer = 0;
   let autoScroll = 0; // the animation frame of a scroll the page started itself, 0 when none
+  let ended = false;  // scrolling has reached the end of the book's screens
 
   // Loading -----------------------------------------------------------------------
 
@@ -201,6 +205,7 @@
     stage.style.setProperty('--x0', `${canvas.clientWidth / 2 - open * scale}px`);
     stage.style.setProperty('--y0', `${(canvas.clientHeight - SRC_H * scale) / 2}px`);
     stage.style.setProperty('--book-h', `${BOOK_H * scale}px`);
+    placeEnding();
   }
 
   // Shrinks a page's text until it fits, for aayat longer than the page holds at its normal size.
@@ -234,6 +239,47 @@
     do k = Math.floor(Math.random() * groups.length);
     while (groups.length > 1 && k === previous);
     return (previous = k);
+  }
+
+  // The ending ----------------------------------------------------------------------
+  // One line and two ways in, on the screen after the book. It rises gently into view the first time it scrolls in
+  // (styles.css), except under reduced motion.
+
+  if (!reduceMotion.matches) {
+    close.classList.add('pending');
+    const reveal = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        close.classList.remove('pending');
+        reveal.disconnect();
+      },
+      { rootMargin: '0px 0px -15% 0px' },
+    );
+    reveal.observe(closeInner);
+  }
+
+  // TRYOUT "Under the book": when scrolling reaches the end, the open book rises and shrinks so the ending fits
+  // under it (styles.css). Scrolling back a little undoes it; the gap between the two points stops it flickering.
+  function endAt(s) {
+    const end = s >= TOTAL - 0.1 || (ended && s > TOTAL - 0.4);
+    if (end !== ended) hero.classList.toggle('ended', (ended = end));
+  }
+
+  // How far the book rises and shrinks for "Under the book", and where the ending goes: the book stays full size if
+  // both fit, and the two sit centred on the screen together. In footage pixels the open book, with the page edges
+  // that reach past it, runs from 10 above its top to 44 below its bottom.
+  function placeEnding() {
+    const h = canvas.clientHeight;
+    const tall = (BOOK_H + 54) * scale;
+    const above = (BOOK_H / 2 + 10) * scale; // from the middle of the screen to the top of the book
+    const gap = Math.max(24, h * 0.05);
+    const text = closeInner.offsetHeight;
+    const k = Math.min(1, Math.max(0.55, (h - 3 * gap - text) / tall));
+    const top = Math.max(gap, (h - tall * k - gap - text) / 2);
+    const vars = document.documentElement.style;
+    vars.setProperty('--end-scale', k);
+    vars.setProperty('--end-y', `${top - h / 2 + above * k}px`);
+    vars.setProperty('--end-top', `${top + tall * k + gap}px`);
   }
 
   // Drawing -----------------------------------------------------------------------
@@ -354,6 +400,7 @@
     if (pos !== painted || dirty) {
       wordmark.style.opacity = still ? 1 : 1 - clamp(frame / NAME_GONE);
       showAayat(pos, still);
+      endAt(pos);
       painted = pos;
     }
     if (frame !== drawn || dirty) {
@@ -404,6 +451,20 @@
     panel.innerHTML = '<summary>Options</summary>';
     document.body.append(panel);
 
+    // Groups of rows, each under a heading that opens and closes. Rows go into the group named last, and naming a
+    // group again adds to it. atmosphere.js and ending-options.js use this too; `first` puts a new group at the top.
+    let group = panel;
+    window.tryoutGroup = (title, { open = false, first = false } = {}) => {
+      group = [...panel.querySelectorAll(':scope > details')].find((g) => g.dataset.title === title);
+      if (group) return;
+      group = document.createElement('details');
+      group.dataset.title = title;
+      group.open = open;
+      group.append(el('summary', '', title));
+      if (first) panel.querySelector('summary').after(group);
+      else panel.append(group);
+    };
+
     // A row of buttons; the one matching `initial` starts pressed. atmosphere.js adds its rows with this too.
     window.addOption = (label, choices, initial, pick) => {
       const row = document.createElement('div');
@@ -418,7 +479,7 @@
         });
         row.append(b);
       }
-      panel.append(row);
+      group.append(row);
     };
 
     // A slider with its value shown beside it, in the words `format` gives.
@@ -434,7 +495,7 @@
         pick(value);
       });
       row.append(el('span', '', label), range, shown);
-      panel.append(row);
+      group.append(row);
     };
 
     const redraw = () => {
@@ -449,11 +510,12 @@
       document.documentElement.dataset[key] = value;
       fit();
     };
+    tryoutGroup('Opening and aayat');
     const glideText = (v) => (v ? `${v.toFixed(2)} s${v === 0.28 ? ' (your pick)' : ''}` : 'Off');
     addSlider('Opening glide', 0, 0.5, 0.01, glide, glideText, retime((v) => (glide = v)));
     addOption('Blend frames', { Off: false, On: true }, blend, retime((v) => (blend = v)));
     addOption('Half-open book', { Stays: 'off', 'Nearer end': 'nearest', 'Way you scrolled': 'direction' }, finish, (v) => (finish = v));
-    addSlider('Auto-finish time', 0.3, 3, 0.05, finishTime, (v) => `${v.toFixed(2)} s`, (v) => (finishTime = v));
+    addSlider('Auto open/close speed', 25, 300, 5, finishSpeed * 100, (v) => `${v}%`, (v) => (finishSpeed = v / 100));
     addOption('Arabic lettering', { 'Amiri Quran': 'amiri', Scheherazade: 'scheherazade' }, 'amiri', setData('arabic'));
     addOption('Left page', { 'Surah name': 'name', 'English meaning': 'meaning' }, 'name', setData('left'));
     if (narrow) {
@@ -495,7 +557,7 @@
     const range = hero.offsetHeight - stage.offsetHeight;
     const from = scrollY;
     const distance = hero.getBoundingClientRect().top + scrollY + (s / TOTAL) * range - from;
-    const duration = finishTime * 1000 * (0.4 + 0.6 * Math.min(1, Math.abs(distance) / innerHeight));
+    const duration = Math.max(300, (1000 * Math.abs(distance)) / innerHeight / finishSpeed); // a short finish still eases
     const start = performance.now();
     const tick = (now) => {
       const t = Math.min(1, (now - start) / duration);
@@ -535,6 +597,7 @@
   document.fonts.addEventListener('loadingdone', fit); // text changes size when its font arrives
   reduceMotion.addEventListener('change', applyMotion);
   new ResizeObserver(resize).observe(canvas);
+  new ResizeObserver(placeEnding).observe(closeInner); // the ending's height changes with its words and fonts
   new IntersectionObserver(([entry]) => {
     visible = entry.isIntersecting;
     dirty = true;
