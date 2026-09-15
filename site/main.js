@@ -145,10 +145,14 @@
 
   // Loading -----------------------------------------------------------------------
 
-  // Returns a promise that settles once the frame has arrived, or failed to.
-  function load(f, i) {
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
+
+  // Returns a promise that settles once the frame has arrived, or failed to. `priority` is a network hint only
+  // ('high' | 'low'); browsers without fetchPriority just ignore the unknown property.
+  function load(f, i, priority) {
     if (f.started.has(i)) return f.started.get(i);
     const img = new Image();
+    if (priority) img.fetchPriority = priority;
     img.src = f.urls[i];
     const arrived = img.decode().then(
       () => {
@@ -164,20 +168,43 @@
     return arrived;
   }
 
-  // The frame on screen first, and nothing else until it has arrived: asked for all at once, the open book's smaller
-  // frames arrived first, so on a phone the book appeared half open and closed in steps as nearer frames came in
-  // (the user, 2026-09-14). Then the two ends, then coarse to fine, so scrubbing works before everything arrives —
-  // and so switching theme part way through the opening shows the book where it already is, rather than the closed
-  // one until the rest turns up.
+  // The frame on screen first, high priority and nothing else until it has arrived: asked for all at once, the
+  // open book's smaller frames arrived first, so on a phone the book appeared half open and closed in steps as
+  // nearer frames came in (the user, 2026-09-14). Then the two ends, then everything else (§ fillRest), so
+  // scrubbing works before everything arrives — and so switching theme part way through the opening shows the
+  // book where it already is, rather than the closed one until the rest turns up.
   function loadAll(f) {
     const onScreen = Math.max(0, Math.min(f.last, Math.round(frameAt(pos === null ? targetScroll() : pos))));
-    load(f, onScreen).then(() => {
+    load(f, onScreen, 'high').then(() => {
       load(f, 0);
       load(f, f.last);
-      for (const step of [8, 4, 2, 1]) {
-        for (let i = 0; i <= f.last; i += step) load(f, i);
-      }
+      idle(() => fillRest(f));
     });
+  }
+
+  // The rest of the set (up to ~87 frames, tens of MB): low network priority and a handful at a time, started
+  // once the browser is idle. Asked for all at once, a first-time visitor's connection was spending its
+  // bandwidth on frames nobody was looking at yet instead of the page's own first paint, which is what made the
+  // book feel slow to turn up (the user, 2026-09-15). This only changes *when* and *how eagerly* the rest
+  // arrives — it's still the same bytes, so scrubbing far ahead before they land can still show a coarser frame.
+  function fillRest(f) {
+    const order = [];
+    for (const step of [8, 4, 2, 1]) for (let i = 0; i <= f.last; i += step) order.push(i);
+    let cursor = 0;
+    let active = 0;
+    const FILL_CONCURRENCY = 4;
+    const next = () => {
+      while (active < FILL_CONCURRENCY && cursor < order.length) {
+        const i = order[cursor++];
+        if (f.started.has(i)) continue;
+        active++;
+        load(f, i, 'low').finally(() => {
+          active--;
+          next();
+        });
+      }
+    };
+    next();
   }
 
   // Once the cover passes upright its cream lining faces the camera, so the book's right

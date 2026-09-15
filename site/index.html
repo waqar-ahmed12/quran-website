@@ -8,8 +8,17 @@
   <!-- Light or dark, set before the page draws so it never flashes the wrong one: the visitor's own choice if they made
        one on this device, otherwise dark, the only theme with the book opening. -->
   <script>
+    // Also starts the very first hero frame downloading immediately, before main.js has even arrived, let alone
+    // parsed and run — the biggest single win for how soon a first-time visitor sees the book (2026-09-15).
     try {
-      document.documentElement.dataset.theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+      const isLight = localStorage.getItem('theme') === 'light';
+      document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
+      const preload = document.createElement('link');
+      preload.rel = 'preload';
+      preload.as = 'image';
+      preload.fetchPriority = 'high';
+      preload.href = isLight ? 'assets/hero/light-frames/f000.png' : 'assets/hero/frames/f000.png';
+      document.head.appendChild(preload);
     } catch {
       document.documentElement.dataset.theme = 'dark';
     }
