@@ -57,3 +57,11 @@ directly.
 ### Step 1 — the Qaida page and Lesson 1
 
 *Started 2026-09-14.*
+
+- **First draft, design only (2026-09-14, the user: "goal is the design, not the content… just the first lesson").**
+  Built with `ui-ux-pro-max` (references and data read directly) and `minimalist-ui`: `site/qaida/index.html`,
+  `qaida.css`, `qaida.js`, and the temporary `qaida-options.js`. Lesson 1 only: the 29 letters right to left in shape
+  families, tap to peek, a progress bar kept on this device, a first-visit choice of script and names, light and dark
+  shared with the home page, a locked Lesson 2 button. No recordings or whiteboard. The Qaida home with all 14 lessons
+  is not built yet. **The design is recorded in `design-system/quran-landing/pages/qaida.md`**, with the reasons,
+  tokens, every tryout and what's a stand-in. Preview: `http://localhost:8777/site/qaida/`. Not seen in a browser.
