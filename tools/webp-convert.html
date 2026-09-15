@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Frame → WebP converter (local only)</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; max-width: 40em; margin: 2em auto; padding: 0 1em; color: #1c1917; }
+  h1 { font-size: 1.2em; }
+  button { font: inherit; padding: 10px 16px; border-radius: 8px; border: 1px solid #5c5048; background: #fff; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  label { display: block; margin: 1em 0; }
+  input[type="range"] { width: 100%; }
+  pre { background: #f4f4f2; padding: 10px; border-radius: 8px; max-height: 16em; overflow: auto; white-space: pre-wrap; }
+  .row { display: flex; gap: 10px; margin: 1em 0; flex-wrap: wrap; }
+  .warn { color: #b42318; }
+</style>
+</head>
+<body>
+<h1>Hero frames → WebP</h1>
+<p>Runs entirely in this browser tab — nothing is installed, nothing leaves your PC. It reads each PNG in a folder
+you pick, re-encodes it as WebP, and writes the <code>.webp</code> file next to it. The original PNGs are left
+alone, so nothing breaks until the site's code is switched over to the new files.</p>
+<p id="support" class="warn" hidden>This browser doesn't support picking a folder to write into
+(<code>showDirectoryPicker</code>). Open this page in Opera GX or another Chromium browser instead.</p>
+
+<label>
+  Quality (82 is a good start — higher keeps more detail, lower makes smaller files)
+  <input id="quality" type="range" min="50" max="95" value="82">
+  <output id="qualityOut">82</output>
+</label>
+
+<label>
+  <input id="redo" type="checkbox"> Redo frames that already have a .webp next to them
+</label>
+
+<div class="row">
+  <button id="pick">Choose a frames folder…</button>
+</div>
+
+<p id="status"></p>
+<pre id="log"></pre>
+
+<script>
+  const quality = document.getElementById('quality');
+  const qualityOut = document.getElementById('qualityOut');
+  quality.addEventListener('input', () => (qualityOut.textContent = quality.value));
+
+  const pick = document.getElementById('pick');
+  const redo = document.getElementById('redo');
+  const status = document.getElementById('status');
+  const log = document.getElementById('log');
+
+  if (!window.showDirectoryPicker) {
+    document.getElementById('support').hidden = false;
+    pick.disabled = true;
+  }
+
+  function line(text) {
+    log.textContent += text + '\n';
+    log.scrollTop = log.scrollHeight;
+  }
+
+  pick.addEventListener('click', async () => {
+    let dir;
+    try {
+      dir = await window.showDirectoryPicker({ mode: 'readwrite' });
+    } catch {
+      return; // the user cancelled the picker
+    }
+    pick.disabled = true;
+    log.textContent = '';
+    const q = Number(quality.value) / 100;
+
+    // Collect names first — some browsers don't like changing a directory while iterating it.
+    const names = [];
+    for await (const [name, handle] of dir.entries()) {
+      if (handle.kind === 'file' && /\.png$/i.test(name)) names.push(name);
+    }
+    names.sort();
+
+    let done = 0;
+    let skipped = 0;
+    let failed = 0;
+    let beforeBytes = 0;
+    let afterBytes = 0;
+
+    for (const name of names) {
+      const webpName = name.replace(/\.png$/i, '.webp');
+      status.textContent = `${dir.name}: ${done + skipped + failed + 1} of ${names.length} — ${name}`;
+      try {
+        if (!redo.checked) {
+          const existing = await dir.getFileHandle(webpName).catch(() => null);
+          if (existing) {
+            const existingFile = await existing.getFile();
+            if (existingFile.size > 0) {
+              skipped++;
+              continue;
+            }
+          }
+        }
+        const pngHandle = await dir.getFileHandle(name);
+        const pngFile = await pngHandle.getFile();
+        const bitmap = await createImageBitmap(pngFile);
+        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(bitmap, 0, 0);
+        const blob = await canvas.convertToBlob({ type: 'image/webp', quality: q });
+
+        const outHandle = await dir.getFileHandle(webpName, { create: true });
+        const writable = await outHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+
+        beforeBytes += pngFile.size;
+        afterBytes += blob.size;
+        done++;
+        line(`${name} → ${webpName}  (${(pngFile.size / 1024).toFixed(0)} KB → ${(blob.size / 1024).toFixed(0)} KB)`);
+      } catch (err) {
+        failed++;
+        line(`FAILED  ${name}: ${err.message}`);
+      }
+    }
+
+    status.textContent = `Done. ${done} converted, ${skipped} already had a .webp, ${failed} failed.`;
+    if (done) {
+      line(`\nTotal: ${(beforeBytes / 1024 / 1024).toFixed(1)} MB → ${(afterBytes / 1024 / 1024).toFixed(1)} MB`);
+    }
+    pick.disabled = false;
+  });
+</script>
+</body>
+</html>

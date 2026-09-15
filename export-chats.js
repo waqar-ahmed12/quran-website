@@ -16,7 +16,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const project = path.join(os.homedir(), '.claude', 'projects', 'C--Users-ICONNECT-quran-website');
+const project = path.join(os.homedir(), '.claude', 'projects', 'C--Users-Waqar-Ahmed-Desktop-Claude-Planning');
 const out = path.join(__dirname, 'chats');
 const rawOut = path.join(out, 'raw');
 
