@@ -581,20 +581,80 @@
   });
 
   // TRYOUT --------------------------------------------------------------------------
-  // Options shown only on this PC or a phone on the same wifi. Once the user picks: put the picks in the
+  // Options shown everywhere for now, including once this is hosted on Netlify, so the user can send the link to
+  // friends and have them try things and Export their picks back. Once the user picks: put the picks in the
   // settings above and in styles.css, then delete this block, the TRYOUT part of styles.css and the
   // unused Arabic font in index.html.
 
-  if (/^(localhost|[\d.]+)$/.test(location.hostname)) {
+  {
     const narrow = matchMedia('(max-width: 767px)').matches;
     const panel = document.createElement('details');
     panel.className = 'tryout';
-    panel.open = !narrow; // closed to start with on phones, where it would cover the book
+    panel.open = false; // collapsed to start with; open "Options" to see or change anything
     panel.innerHTML = '<summary>Options</summary>';
     document.body.append(panel);
 
+    // Every control below registers itself here (key: "<group title> :: <label>") with a way to read and set its
+    // current value. Export settings turns the whole map into one block of text; Import settings reads that same
+    // block back and applies each value, so one person's choices (a title, an atmosphere mix, anything on the
+    // panel) can be checked on someone else's screen without them clicking through every option by hand.
+    const registry = new Map();
+    const registerControl = (label, control) => registry.set(`${group.dataset.title} :: ${label}`, control);
+
+    const io = document.createElement('div');
+    io.className = 'tryout-io';
+    const ioButtons = document.createElement('div');
+    const exportButton = el('button', '', 'Export settings');
+    exportButton.type = 'button';
+    const importButton = el('button', '', 'Import settings');
+    importButton.type = 'button';
+    ioButtons.append(exportButton, importButton);
+    const ioText = document.createElement('textarea');
+    ioText.rows = 3;
+    ioText.setAttribute('aria-label', 'Exported settings — copy this, or paste someone else’s here');
+    ioText.placeholder = 'Paste exported settings here, then Import settings';
+    const ioStatus = el('span', 'tryout-io-status', '');
+    io.append(ioButtons, ioText, ioStatus);
+    panel.querySelector('summary').after(io);
+
+    exportButton.addEventListener('click', () => {
+      const data = {};
+      for (const [key, control] of registry) data[key] = control.get();
+      ioText.value = JSON.stringify(data);
+      ioText.select();
+      const copied = navigator.clipboard?.writeText(ioText.value);
+      if (copied) {
+        copied.then(
+          () => (ioStatus.textContent = 'Copied — paste it to whoever should see this.'),
+          () => (ioStatus.textContent = 'Ready above — copy it (clipboard access was blocked).'),
+        );
+      } else {
+        ioStatus.textContent = 'Ready above — copy it (clipboard not available).';
+      }
+    });
+    importButton.addEventListener('click', () => {
+      let data;
+      try {
+        data = JSON.parse(ioText.value);
+      } catch {
+        ioStatus.textContent = 'That doesn’t look like exported settings — paste the text unchanged.';
+        return;
+      }
+      const keys = Object.keys(data);
+      let applied = 0;
+      for (const key of keys) {
+        const control = registry.get(key);
+        if (control) {
+          control.set(data[key]);
+          applied++;
+        }
+      }
+      ioStatus.textContent = `Applied ${applied} of ${keys.length} settings.`;
+    });
+
     // Groups of rows, each under a heading that opens and closes. Rows go into the group named last, and naming a
-    // group again adds to it. atmosphere.js and ending-options.js use this too; `first` puts a new group at the top.
+    // group again adds to it. atmosphere.js and ending-options.js use this too; `first` puts a new group right
+    // under the Export/Import row, which always stays the top of the panel.
     let group = panel;
     window.tryoutGroup = (title, { open = false, first = false } = {}) => {
       group = [...panel.querySelectorAll(':scope > details')].find((g) => g.dataset.title === title);
@@ -603,7 +663,7 @@
       group.dataset.title = title;
       group.open = open;
       group.append(el('summary', '', title));
-      if (first) panel.querySelector('summary').after(group);
+      if (first) io.after(group);
       else panel.append(group);
     };
 
@@ -611,17 +671,23 @@
     window.addOption = (label, choices, initial, pick) => {
       const row = document.createElement('div');
       row.append(el('span', '', label));
+      let current = initial;
+      const buttons = [];
+      const choose = (value, fire = true) => {
+        current = value;
+        for (const [b, v] of buttons) b.setAttribute('aria-pressed', v === value);
+        if (fire) pick(value);
+      };
       for (const [text, value] of Object.entries(choices)) {
         const b = el('button', '', text);
         b.type = 'button';
         b.setAttribute('aria-pressed', value === initial);
-        b.addEventListener('click', () => {
-          for (const other of row.querySelectorAll('button')) other.setAttribute('aria-pressed', other === b);
-          pick(value);
-        });
+        b.addEventListener('click', () => choose(value));
+        buttons.push([b, value]);
         row.append(b);
       }
       group.append(row);
+      registerControl(label, { get: () => current, set: choose });
     };
 
     // A slider with its value shown beside it, in the words `format` gives.
@@ -631,13 +697,15 @@
       Object.assign(range, { type: 'range', min, max, step, value: initial });
       range.setAttribute('aria-label', label);
       const shown = el('output', '', format(initial));
-      range.addEventListener('input', () => {
-        const value = Number(range.value);
+      const apply = (value, fire = true) => {
+        range.value = value;
         shown.textContent = format(value);
-        pick(value);
-      });
+        if (fire) pick(value);
+      };
+      range.addEventListener('input', () => apply(Number(range.value)));
       row.append(el('span', '', label), range, shown);
       group.append(row);
+      registerControl(label, { get: () => Number(range.value), set: apply });
     };
 
     // A free-text field: typing updates the page as you go. wordmark-options.js and ending-options.js use this for
@@ -649,9 +717,14 @@
       const field = el('input', '');
       Object.assign(field, { type: 'text', value: initial });
       field.setAttribute('aria-label', label);
-      field.addEventListener('input', () => pick(field.value));
+      const apply = (value, fire = true) => {
+        field.value = value;
+        if (fire) pick(value);
+      };
+      field.addEventListener('input', () => apply(field.value));
       row.append(el('span', '', label), field);
       group.append(row);
+      registerControl(label, { get: () => field.value, set: apply });
       return field;
     };
 

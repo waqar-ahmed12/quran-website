@@ -1,0 +1,12 @@
+[build]
+  publish = "site"
+
+[[headers]]
+  for = "/assets/hero/frames/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/hero/light-frames/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

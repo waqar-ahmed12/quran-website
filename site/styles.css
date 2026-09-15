@@ -1395,6 +1395,36 @@ html::-webkit-scrollbar {
   color: #d4af37;
 }
 
+/* Export/import row (window.addOption etc. register into main.js's registry) — always the top of the panel. */
+.tryout .tryout-io {
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 0;
+}
+
+.tryout textarea {
+  width: 100%;
+  min-height: 4.5em;
+  padding: 6px 8px;
+  border: 1px solid #5c5048;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  font: inherit;
+  color: #e7e0d8;
+  resize: vertical;
+}
+
+.tryout textarea:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 1px;
+}
+
+.tryout .tryout-io-status {
+  min-width: 0;
+  color: #A8A29E;
+  font-size: 12px;
+}
+
 /* TRYOUT, phones only: how far to scroll through the hero, and where the surah name goes ("On the page" is the
    default, above). */
 @media (max-width: 767px) {
