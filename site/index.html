@@ -17,7 +17,8 @@
       preload.rel = 'preload';
       preload.as = 'image';
       preload.fetchPriority = 'high';
-      preload.href = isLight ? 'assets/hero/light-frames/f000.png' : 'assets/hero/frames/f000.png';
+      const ext = new URLSearchParams(window.location.search).has('png') ? 'png' : 'webp';
+      preload.href = isLight ? `assets/hero/light-frames/f000.${ext}` : `assets/hero/frames/f000.${ext}`;
       document.head.appendChild(preload);
     } catch {
       document.documentElement.dataset.theme = 'dark';

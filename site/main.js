@@ -11,9 +11,10 @@
   // Frames --------------------------------------------------------------------
 
   const SKIP = [39, 40]; // identical to f038, a hold in the source video
+  const ext = new URLSearchParams(window.location.search).has('png') ? 'png' : 'webp';
   const urls = [];
   for (let i = 0; i <= 88; i++) {
-    if (!SKIP.includes(i)) urls.push(`assets/hero/frames/f${String(i).padStart(3, '0')}.png`);
+    if (!SKIP.includes(i)) urls.push(`assets/hero/frames/f${String(i).padStart(3, '0')}.${ext}`);
   }
   const LAST = urls.length - 1; // 87 frames, indices 0..86
 
@@ -45,7 +46,7 @@
   ];
 
   // One frame file per measurement, so the two can't fall out of step.
-  const urlsLight = rightsLight.map((_, i) => `assets/hero/light-frames/f${String(i).padStart(3, '0')}.png`);
+  const urlsLight = rightsLight.map((_, i) => `assets/hero/light-frames/f${String(i).padStart(3, '0')}.${ext}`);
   const LAST_LIGHT = urlsLight.length - 1;
 
   // Timeline, in screen heights of scrolling on a computer -----------------------
@@ -162,7 +163,24 @@
         dirty = true;
         schedule();
       },
-      () => console.warn(`Frame missing: ${f.urls[i]}`), // the nearest loaded frame is drawn instead
+      () => {
+        if (f.urls[i].endsWith('.webp')) {
+          const fallback = new Image();
+          if (priority) fallback.fetchPriority = priority;
+          fallback.src = f.urls[i].replace('.webp', '.png');
+          return fallback.decode().then(
+            () => {
+              f.frames[i] = fallback;
+              if (f.measure) f.rights[i] = measureRight(fallback);
+              if (i >= f.last - 3) place();
+              dirty = true;
+              schedule();
+            },
+            () => console.warn(`Frame missing: ${f.urls[i]}`),
+          );
+        }
+        console.warn(`Frame missing: ${f.urls[i]}`);
+      },
     );
     f.started.set(i, arrived);
     return arrived;
@@ -538,6 +556,8 @@
         dirty = false;
       }
     }
+    const f = film();
+    if (!f.started.has(whole)) load(f, whole, 'high');
   }
 
   function resize() {
