@@ -101,6 +101,23 @@
   const headlineField = field('Headline', h1.textContent, (v) => (h1.textContent = v));
   const sublineField = field('Sentence below it', p.textContent, (v) => (p.textContent = v));
 
+  if (window.registerControl) {
+    window.registerControl('Headline', 'Headline', {
+      get: () => headlineField.value,
+      set: (v) => {
+        h1.textContent = headlineField.value = v;
+        unpress();
+      },
+    });
+    window.registerControl('Headline', 'Sentence below it', {
+      get: () => sublineField.value,
+      set: (v) => {
+        p.textContent = sublineField.value = v;
+        unpress();
+      },
+    });
+  }
+
   const list = document.createElement('div');
   list.style.cssText = 'display: flex; flex-direction: column; gap: 0.4rem;';
   const presetsLabel = document.createElement('p');

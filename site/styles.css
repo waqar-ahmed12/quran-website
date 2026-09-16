@@ -1400,21 +1400,32 @@ html::-webkit-scrollbar {
 
 /* Export/import row (window.addOption etc. register into main.js's registry) — always the top of the panel. */
 .tryout .tryout-io {
+  display: flex;
   flex-direction: column;
-  align-items: stretch;
+  gap: 6px;
   margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.tryout .tryout-io > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .tryout textarea {
   width: 100%;
-  min-height: 4.5em;
+  min-height: 6em;
   padding: 6px 8px;
   border: 1px solid #5c5048;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.06);
-  font: inherit;
-  color: #e7e0d8;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #f3ede6;
   resize: vertical;
+  word-break: break-all;
 }
 
 .tryout textarea:focus-visible {
@@ -1424,8 +1435,9 @@ html::-webkit-scrollbar {
 
 .tryout .tryout-io-status {
   min-width: 0;
-  color: #A8A29E;
   font-size: 12px;
+  font-weight: 500;
+  min-height: 1.2em;
 }
 
 /* TRYOUT, phones only: how far to scroll through the hero, and where the surah name goes ("On the page" is the

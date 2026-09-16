@@ -699,58 +699,155 @@
     // current value. Export settings turns the whole map into one block of text; Import settings reads that same
     // block back and applies each value, so one person's choices (a title, an atmosphere mix, anything on the
     // panel) can be checked on someone else's screen without them clicking through every option by hand.
-    const registry = new Map();
-    const registerControl = (label, control) => registry.set(`${group.dataset.title} :: ${label}`, control);
+    const registry = (window.tryoutRegistry = new Map());
+    const registerControl = (label, control) => registry.set(`${group.dataset.title || 'General'} :: ${label}`, control);
+    window.registerControl = (groupTitle, label, control) => registry.set(`${groupTitle} :: ${label}`, control);
+
+    function extractSettings(raw) {
+      if (!raw || typeof raw !== 'string') return {};
+      raw = raw.trim();
+      try {
+        return JSON.parse(raw);
+      } catch {}
+
+      // Auto-repair missing leading/trailing braces or leading junk
+      try {
+        const firstQuote = raw.indexOf('"');
+        if (firstQuote !== -1) {
+          let candidate = raw.slice(firstQuote);
+          if (!candidate.startsWith('{')) candidate = '{' + candidate;
+          if (!candidate.endsWith('}')) candidate = candidate + '}';
+          return JSON.parse(candidate);
+        }
+      } catch {}
+
+      // Fault-tolerant regex parser for clipped strings
+      const data = {};
+      const regex = /"([^"\\]*(?:\\.[^"\\]*)*)"\s*:\s*("(?:[^"\\]*(?:\\.[^"\\]*)*)"|true|false|null|-?\d+(?:\.\d+)?)/g;
+      let m;
+      while ((m = regex.exec(raw)) !== null) {
+        try {
+          const key = JSON.parse('"' + m[1] + '"');
+          const val = JSON.parse(m[2]);
+          data[key] = val;
+        } catch {}
+      }
+      return data;
+    }
 
     const io = document.createElement('div');
     io.className = 'tryout-io';
     const ioButtons = document.createElement('div');
     const exportButton = el('button', '', 'Export settings');
     exportButton.type = 'button';
+    const copyButton = el('button', '', 'Copy');
+    copyButton.type = 'button';
     const importButton = el('button', '', 'Import settings');
     importButton.type = 'button';
-    ioButtons.append(exportButton, importButton);
+    const clearButton = el('button', '', 'Clear');
+    clearButton.type = 'button';
+    ioButtons.append(exportButton, copyButton, importButton, clearButton);
+
     const ioText = document.createElement('textarea');
-    ioText.rows = 3;
+    ioText.rows = 4;
     ioText.setAttribute('aria-label', 'Exported settings — copy this, or paste someone else’s here');
-    ioText.placeholder = 'Paste exported settings here, then Import settings';
+    ioText.placeholder = 'Click Export settings to copy, or paste settings here and click Import';
     const ioStatus = el('span', 'tryout-io-status', '');
     io.append(ioButtons, ioText, ioStatus);
     panel.querySelector('summary').after(io);
 
+    const copyToClipboard = (text) => {
+      ioText.value = text;
+      ioText.focus();
+      ioText.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {}
+      if (navigator.clipboard?.writeText) {
+        return navigator.clipboard.writeText(text).then(
+          () => true,
+          () => ok,
+        );
+      }
+      return Promise.resolve(ok);
+    };
+
     exportButton.addEventListener('click', () => {
       const data = {};
       for (const [key, control] of registry) data[key] = control.get();
-      ioText.value = JSON.stringify(data);
-      ioText.select();
-      const copied = navigator.clipboard?.writeText(ioText.value);
-      if (copied) {
-        copied.then(
-          () => (ioStatus.textContent = 'Copied — paste it to whoever should see this.'),
-          () => (ioStatus.textContent = 'Ready above — copy it (clipboard access was blocked).'),
-        );
-      } else {
-        ioStatus.textContent = 'Ready above — copy it (clipboard not available).';
-      }
+      const json = JSON.stringify(data, null, 2);
+      copyToClipboard(json).then((success) => {
+        ioStatus.textContent = success
+          ? '✓ Settings exported & copied to clipboard!'
+          : '✓ Settings exported below — press Ctrl+C to copy.';
+        ioStatus.style.color = success ? '#4ade80' : '#fbbf24';
+      });
     });
-    importButton.addEventListener('click', () => {
-      let data;
-      try {
-        data = JSON.parse(ioText.value);
-      } catch {
-        ioStatus.textContent = 'That doesn’t look like exported settings — paste the text unchanged.';
+
+    copyButton.addEventListener('click', () => {
+      if (!ioText.value.trim()) {
+        const data = {};
+        for (const [key, control] of registry) data[key] = control.get();
+        ioText.value = JSON.stringify(data, null, 2);
+      }
+      copyToClipboard(ioText.value).then((success) => {
+        ioStatus.textContent = success ? '✓ Copied to clipboard!' : 'Selected above — press Ctrl+C to copy.';
+        ioStatus.style.color = success ? '#4ade80' : '#fbbf24';
+      });
+    });
+
+    clearButton.addEventListener('click', () => {
+      ioText.value = '';
+      ioStatus.textContent = 'Cleared text box.';
+      ioStatus.style.color = '#A8A29E';
+    });
+
+    importButton.addEventListener('click', async () => {
+      let raw = ioText.value.trim();
+      if (!raw && navigator.clipboard?.readText) {
+        try {
+          raw = (await navigator.clipboard.readText()).trim();
+          if (raw) ioText.value = raw;
+        } catch {}
+      }
+
+      if (!raw) {
+        ioStatus.textContent = 'Paste settings into the box first, then click Import.';
+        ioStatus.style.color = '#fbbf24';
         return;
       }
+
+      const data = extractSettings(raw);
       const keys = Object.keys(data);
+      if (keys.length === 0) {
+        ioStatus.textContent = 'Could not find any settings in the pasted text.';
+        ioStatus.style.color = '#f87171';
+        return;
+      }
+
       let applied = 0;
       for (const key of keys) {
-        const control = registry.get(key);
+        let control = registry.get(key);
+        if (!control) {
+          const suffix = key.includes(' :: ') ? key.split(' :: ').slice(1).join(' :: ') : key;
+          for (const [regKey, regCtrl] of registry) {
+            if (regKey.endsWith(` :: ${suffix}`) || regKey === suffix) {
+              control = regCtrl;
+              break;
+            }
+          }
+        }
         if (control) {
-          control.set(data[key]);
-          applied++;
+          try {
+            control.set(data[key]);
+            applied++;
+          } catch {}
         }
       }
-      ioStatus.textContent = `Applied ${applied} of ${keys.length} settings.`;
+
+      ioStatus.textContent = `✓ Applied ${applied} of ${keys.length} settings!`;
+      ioStatus.style.color = applied > 0 ? '#4ade80' : '#f87171';
     });
 
     // Groups of rows, each under a heading that opens and closes. Rows go into the group named last, and naming a
