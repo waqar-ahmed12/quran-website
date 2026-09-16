@@ -186,43 +186,70 @@
     return arrived;
   }
 
-  // The frame on screen first, high priority and nothing else until it has arrived: asked for all at once, the
-  // open book's smaller frames arrived first, so on a phone the book appeared half open and closed in steps as
-  // nearer frames came in (the user, 2026-09-14). Then the two ends, then everything else (§ fillRest), so
-  // scrubbing works before everything arrives — and so switching theme part way through the opening shows the
-  // book where it already is, rather than the closed one until the rest turns up.
-  function loadAll(f) {
-    const onScreen = Math.max(0, Math.min(f.last, Math.round(frameAt(pos === null ? targetScroll() : pos))));
-    load(f, onScreen, 'high').then(() => {
-      load(f, 0);
-      load(f, f.last);
-      idle(() => fillRest(f));
+  // Stream loading for a film: concurrently decodes frames into f.frames.
+  function streamFilm(f, order, concurrency = 8, priority = 'low') {
+    let cursor = 0;
+    let active = 0;
+    return new Promise((resolve) => {
+      const next = () => {
+        if (cursor >= order.length && active === 0) return resolve();
+        while (active < concurrency && cursor < order.length) {
+          const i = order[cursor++];
+          if (f.started.has(i)) continue;
+          active++;
+          load(f, i, priority).finally(() => {
+            active--;
+            next();
+          });
+        }
+        if (active === 0 && cursor >= order.length) resolve();
+      };
+      next();
     });
   }
 
-  // The rest of the set (up to ~87 frames, tens of MB): low network priority and a handful at a time, started
-  // once the browser is idle. Asked for all at once, a first-time visitor's connection was spending its
-  // bandwidth on frames nobody was looking at yet instead of the page's own first paint, which is what made the
-  // book feel slow to turn up (the user, 2026-09-15). This only changes *when* and *how eagerly* the rest
-  // arrives — it's still the same bytes, so scrubbing far ahead before they land can still show a coarser frame.
-  function fillRest(f) {
-    const order = [];
-    for (const step of [8, 4, 2, 1]) for (let i = 0; i <= f.last; i += step) order.push(i);
-    let cursor = 0;
-    let active = 0;
-    const FILL_CONCURRENCY = 4;
-    const next = () => {
-      while (active < FILL_CONCURRENCY && cursor < order.length) {
-        const i = order[cursor++];
-        if (f.started.has(i)) continue;
-        active++;
-        load(f, i, 'low').finally(() => {
-          active--;
-          next();
-        });
-      }
-    };
-    next();
+  // Preloads both takes so scrubbing is 100% fluid on first scroll and theme switching
+  // is instant with ZERO new file downloads. Both WebP sets together are only ~2.3 MB.
+  let loadingThemes = false;
+  function preloadThemes() {
+    if (loadingThemes) return;
+    loadingThemes = true;
+
+    const primary = film();
+    const secondary = light() ? darkFilm : lightFilm;
+    const onScreen = Math.max(0, Math.min(primary.last, Math.round(frameAt(pos === null ? targetScroll() : pos))));
+
+    // 1. Critical covers and on-screen frame first with high priority
+    Promise.allSettled([
+      load(primary, onScreen, 'high'),
+      load(primary, 0, 'high'),
+      load(primary, primary.last, 'high'),
+      load(secondary, 0, 'high'),
+      load(secondary, secondary.last, 'high'),
+    ]).then(() => {
+      // 2. Stream the active take in scroll order (from current screen outwards) with high concurrency
+      const primaryOrder = [];
+      for (let i = onScreen; i <= primary.last; i++) primaryOrder.push(i);
+      for (let i = onScreen - 1; i >= 0; i--) primaryOrder.push(i);
+      streamFilm(primary, primaryOrder, 10, 'high');
+
+      // 3. Concurrently stream the alternate take in the background
+      const secondaryOrder = [];
+      const secOnScreen = Math.min(secondary.last, onScreen);
+      for (let i = secOnScreen; i <= secondary.last; i++) secondaryOrder.push(i);
+      for (let i = secOnScreen - 1; i >= 0; i--) secondaryOrder.push(i);
+      streamFilm(secondary, secondaryOrder, 8, 'low');
+    });
+  }
+
+  // Lookahead buffering in the direction of scroll to ensure adjacent frames are always ready to blend
+  function bufferAhead(f, from, dir) {
+    const LOOKAHEAD = 16;
+    const start = dir >= 0 ? from : Math.max(0, from - LOOKAHEAD);
+    const end = dir >= 0 ? Math.min(f.last, from + LOOKAHEAD) : from;
+    for (let i = start; i <= end; i++) {
+      if (!f.started.has(i)) load(f, i, 'high');
+    }
   }
 
   // Once the cover passes upright its cream lining faces the camera, so the book's right
@@ -435,7 +462,10 @@
     const t = at - a;
     const fade = t > 0 && !!f.frames[a] && !!f.frames[b];
     const base = fade ? a : nearestLoaded(f, Math.round(at));
-    if (base < 0) return false;
+    if (base < 0 || !f.frames[base]) {
+      ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      return false;
+    }
 
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
@@ -558,6 +588,7 @@
     }
     const f = film();
     if (!f.started.has(whole)) load(f, whole, 'high');
+    bufferAhead(f, whole, direction >= 0 ? 1 : -1);
   }
 
   function resize() {
@@ -583,9 +614,9 @@
   // Reduced motion: no scrubbing, just the open book, and only its frame is loaded.
   function applyMotion() {
     document.documentElement.classList.toggle('still', reduceMotion.matches);
-    const f = film(); // the other take's frames are never fetched until the theme calls for them
-    if (reduceMotion.matches) load(f, f.last);
-    else loadAll(f);
+    const f = film();
+    if (reduceMotion.matches) load(f, f.last, 'high');
+    else preloadThemes();
     place();
     dirty = true;
     schedule();
@@ -603,11 +634,24 @@
     applyMotion();
   }
 
+  const prefetchOtherTheme = () => {
+    const other = light() ? darkFilm : lightFilm;
+    const targetFrame = Math.max(0, Math.min(other.last, Math.round(frameAt(pos === null ? targetScroll() : pos))));
+    load(other, targetFrame, 'high');
+    bufferAhead(other, targetFrame, direction >= 0 ? 1 : -1);
+  };
+  themeButton.addEventListener('pointerenter', prefetchOtherTheme);
+  themeButton.addEventListener('touchstart', prefetchOtherTheme, { passive: true });
+
   themeButton.addEventListener('click', () => {
     // Both takes run on the same timeline, down a page of the same height, so the scroll position and the eased
     // position carry straight over: the book is left exactly as far open as it was, still gliding where it was
     // gliding. Nothing here may reset `pos` — that was what made the book jump on a switch (the user, 2026-09-14:
     // "if the Qur'an is closing in black and I change theme, the white Qur'an should be closing as well").
+    const other = light() ? darkFilm : lightFilm;
+    const targetFrame = Math.max(0, Math.min(other.last, Math.round(frameAt(pos === null ? targetScroll() : pos))));
+    load(other, targetFrame, 'high');
+
     const turn = () => {
       const theme = light() ? 'dark' : 'light';
       document.documentElement.dataset.theme = theme;
@@ -617,13 +661,23 @@
         // a private window can refuse; the switch still works for this visit
       }
       applyTheme();
+      dirty = true;
       paint(); // draw now, so the cross-fade ends on the new book
       waitToFinish(); // clicking stopped any glide the page had running; pick it up again
     };
+
     // The cross-fade waits for the page to draw, so a page that isn't showing just changes. The browser can still cancel
     // a cross-fade part way; the theme changes all the same, so its promises are allowed to fail quietly.
     if (!document.startViewTransition || reduceMotion.matches || document.visibilityState !== 'visible') return turn();
-    const fade = document.startViewTransition(turn);
+    const fade = document.startViewTransition(async () => {
+      if (!other.frames[targetFrame]) {
+        await Promise.race([
+          load(other, targetFrame, 'high'),
+          new Promise((r) => setTimeout(r, 200)),
+        ]);
+      }
+      turn();
+    });
     Promise.allSettled([fade.ready, fade.updateCallbackDone, fade.finished]);
   });
 

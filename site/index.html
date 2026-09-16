@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Qur'an</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231F1A18'/><path d='M8 7v18c3-2 6-2 8 0 2-2 5-2 8 0V7c-3-2-6-2-8 0-2-2-5-2-8 0z' fill='none' stroke='%23C9A046' stroke-width='2' stroke-linejoin='round'/><line x1='16' y1='7' x2='16' y2='25' stroke='%23C9A046' stroke-width='1.5'/></svg>">
   <meta name="theme-color" content="#1F1A18">
   <!-- Light or dark, set before the page draws so it never flashes the wrong one: the visitor's own choice if they made
        one on this device, otherwise dark, the only theme with the book opening. -->
@@ -13,13 +14,19 @@
     try {
       const isLight = localStorage.getItem('theme') === 'light';
       document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
-      const preload = document.createElement('link');
-      preload.rel = 'preload';
-      preload.as = 'image';
-      preload.fetchPriority = 'high';
       const ext = new URLSearchParams(window.location.search).has('png') ? 'png' : 'webp';
-      preload.href = isLight ? `assets/hero/light-frames/f000.${ext}` : `assets/hero/frames/f000.${ext}`;
-      document.head.appendChild(preload);
+      const p1 = document.createElement('link');
+      p1.rel = 'preload';
+      p1.as = 'image';
+      p1.fetchPriority = 'high';
+      p1.href = isLight ? `assets/hero/light-frames/f000.${ext}` : `assets/hero/frames/f000.${ext}`;
+      document.head.appendChild(p1);
+      const p2 = document.createElement('link');
+      p2.rel = 'preload';
+      p2.as = 'image';
+      p2.fetchPriority = 'low';
+      p2.href = isLight ? `assets/hero/frames/f000.${ext}` : `assets/hero/light-frames/f000.${ext}`;
+      document.head.appendChild(p2);
     } catch {
       document.documentElement.dataset.theme = 'dark';
     }
