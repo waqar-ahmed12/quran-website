@@ -5,7 +5,7 @@
 <html lang="en"
       data-tiles="paper" data-grouping="families" data-size="comfortable" data-peek="under" data-seenmark="dot"
       data-arrive="stagger" data-progress="title" data-bar="line" data-track="show" data-titlemark="alif"
-      data-bg="light" data-madani-font="amiri" data-indopak-font="noto">
+      data-titlemark-font="amiri" data-bg="light" data-madani-font="amiri" data-indopak-font="noto">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -77,14 +77,17 @@
         </div>
         <h1 data-words="Lesson title">The letters</h1>
         <p class="lede" data-words="Line under the title">All twenty-nine letters, in the order of a printed Qaida. Tap a letter to see its name.</p>
-        <!-- What the student chose on their first visit, and a way to change it. qaida.js fills in the two spans. -->
+        <!-- What the student chose on their first visit, and a way to change it. qaida.js fills in the spans. -->
         <p class="setup"
            data-madani="Madani script" data-indopak="Indo-Pak script"
            data-fatha="Fatha, kasra, damma" data-zabar="Zabar, zair, paish"
-           data-words-attr="data-madani|Settings line: Madani;data-indopak|Settings line: Indo-Pak;data-fatha|Settings line: fatha names;data-zabar|Settings line: zabar names">
+           data-families="Shape families" data-grid="Even grid"
+           data-words-attr="data-madani|Settings line: Madani;data-indopak|Settings line: Indo-Pak;data-fatha|Settings line: fatha names;data-zabar|Settings line: zabar names;data-families|Settings line: shape families;data-grid|Settings line: even grid">
           <span class="setup-script"></span>
           <span class="dot" aria-hidden="true"></span>
           <span class="setup-names"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="setup-grouping"></span>
           <button class="link open-settings" type="button" aria-haspopup="dialog"><span data-words="Settings line: change link">Change</span></button>
         </p>
       </div>
@@ -172,12 +175,27 @@
           <label class="option">
             <input type="radio" name="names" value="fatha">
             <span class="option-name" data-words="Choice: fatha names">Fatha, kasra, damma</span>
-            <span class="option-note" data-words="Choice: fatha names note">Letters called Thaa, Dhaal, Ṣaad</span>
+            <span class="option-note" data-words="Choice: fatha names note">Arabic names for the vowel marks</span>
           </label>
           <label class="option">
             <input type="radio" name="names" value="zabar">
             <span class="option-name" data-words="Choice: zabar names">Zabar, zair, paish</span>
-            <span class="option-note" data-words="Choice: zabar names note">Letters called Saa, Zaal, Suaad</span>
+            <span class="option-note" data-words="Choice: zabar names note">South Asian names for the vowel marks</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend data-words="Choice: grouping heading">Letter grouping</legend>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="grouping" value="families">
+            <span class="option-name" data-words="Choice: grouping families">Shape families</span>
+            <span class="option-note" data-words="Choice: grouping families note">Look-alike letters sit together (ب ت ث)</span>
+          </label>
+          <label class="option">
+            <input type="radio" name="grouping" value="grid">
+            <span class="option-name" data-words="Choice: grouping grid">Even grid</span>
+            <span class="option-note" data-words="Choice: grouping grid note">Uniform spacing across all 29 letters</span>
           </label>
         </div>
       </fieldset>

@@ -65,7 +65,7 @@ a KFGQPC IndoPak font) should replace it before launch. `Scheherazade New` is a 
    under it once the page scrolls. Under 420px the star stands in for the name.
 2. **Lesson head:** "LESSON 1 OF 14" in gold caps beside a **14-lesson track** (14 short bars, this one gold and
    longer) · title "The letters" · one-line lede · a **settings line** ("Madani script · Fatha, kasra, damma · Change").
-   A **large gold alif** sits at the right of the head (the first letter, and the "Alif" of the site's name).
+   A **large gold alif** sits at the right of the head (centered with the title block, rendered in classical *Amiri Quran* calligraphy).
 3. **Progress:** "7 of 29 letters seen" with a quiet "Start again" link, over a 3px bar that fills in gold.
 4. **The letters:** 29 tiles, **right to left**, in **shape families** (ا · ب ت ث · ج ح خ · د ذ · ر ز · س ش · ص ض ·
    ط ظ · ع غ · ف ق · then one each), 10px apart inside a family and 20–44px between families.
@@ -124,7 +124,7 @@ page's eight-pointed stars joined by lines, at 9%, fading down the page · **Pla
 | Seen dot | scale in with a small overshoot | 400 ms |
 | Bar fill | scaleX | 700 ms |
 | Finished | bar sweep, dots pulse in turn, star turns in | 600–1200 ms, once |
-| Choice panel | rise + backdrop fade | 500 / 300 ms |
+| Choice panel | enter: rise + backdrop fade (500 / 300 ms); exit: fall + backdrop fade (260 ms) |
 | Hovers, colours | | 200 ms |
 
 Only `transform`, `translate`, `scale` and `opacity` animate. **Reduced motion:** no arrival, no pulse or sweep, and

@@ -82,7 +82,9 @@
 
   section('Letters', true);
   option('Letter tiles', { Paper: 'paper', Outline: 'line', 'Gold ink': 'gold' }, 'tiles');
-  option('Letters grouped', { 'In shape families': 'families', 'Even grid': 'grid' }, 'grouping');
+  option('Letters grouped', { 'In shape families': 'families', 'Even grid': 'grid' }, 'grouping', (v) => {
+    if (window.qaida && window.qaida.setGrouping) window.qaida.setGrouping(v);
+  });
   option('Letter size', { Comfortable: 'comfortable', Large: 'large' }, 'size');
   option('Name shows', { 'Under the letter': 'under', 'As a tag above': 'tag', 'Letter turns over': 'turn' }, 'peek');
   slider('Name stays for', 0.8, 4, 0.1, qaida.peekMs / 1000, (v) => `${v.toFixed(1)} s`, (v) => qaida.setPeek(v * 1000));
@@ -93,7 +95,8 @@
   option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
   option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
   option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
-  option('Big alif by the title', { Show: 'alif', Hide: 'none' }, 'titlemark');
+  option('Big alif by the title', { 'Center': 'alif', 'Top': 'top', 'Watermark': 'watermark', 'Hide': 'none' }, 'titlemark');
+  option('Big alif font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', 'Scheherazade': 'scheherazade' }, 'titlemarkFont');
   option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
   actions('Try it', {
     'See every letter': () => qaida.seeAll(),

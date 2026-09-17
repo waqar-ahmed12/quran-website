@@ -12,31 +12,31 @@
     ['ا', 'Alif', 'Alif'],
     ['ب', 'Baa', 'Baa'],
     ['ت', 'Taa', 'Taa'],
-    ['ث', 'Thaa', 'Saa'],
+    ['ث', 'Thaa', 'Thaa'],
     ['ج', 'Jeem', 'Jeem'],
-    ['ح', 'Ḥaa', 'Haa'],
+    ['ح', 'Ḥaa', 'Ḥaa'],
     ['خ', 'Khaa', 'Khaa'],
     ['د', 'Daal', 'Daal'],
-    ['ذ', 'Dhaal', 'Zaal'],
+    ['ذ', 'Dhaal', 'Dhaal'],
     ['ر', 'Raa', 'Raa'],
-    ['ز', 'Zaay', 'Zaa'],
+    ['ز', 'Zaa', 'Zaa'],
     ['س', 'Seen', 'Seen'],
     ['ش', 'Sheen', 'Sheen'],
-    ['ص', 'Ṣaad', 'Suaad'],
-    ['ض', 'Ḍaad', 'Zuaad'],
-    ['ط', 'Ṭaa', 'Toay'],
-    ['ظ', 'Ẓaa', 'Zoay'],
-    ['ع', 'ʿAyn', 'Ain'],
-    ['غ', 'Ghayn', 'Ghain'],
+    ['ص', 'Ṣaad', 'Ṣaad'],
+    ['ض', 'Ḍaad', 'Ḍaad'],
+    ['ط', 'Ṭaa', 'Ṭaa'],
+    ['ظ', 'Ẓaa', 'Ẓaa'],
+    ['ع', 'ʿAyn', 'ʿAyn'],
+    ['غ', 'Ghayn', 'Ghayn'],
     ['ف', 'Faa', 'Faa'],
     ['ق', 'Qaaf', 'Qaaf'],
     ['ك', 'Kaaf', 'Kaaf'],
     ['ل', 'Laam', 'Laam'],
     ['م', 'Meem', 'Meem'],
     ['ن', 'Noon', 'Noon'],
-    ['ه', 'Haa', 'Ha'],
-    ['و', 'Waaw', 'Waao'],
-    ['ء', 'Hamzah', 'Hamza'],
+    ['ه', 'Haa', 'Haa'],
+    ['و', 'Waaw', 'Waaw'],
+    ['ء', 'Hamzah', 'Hamzah'],
     ['ي', 'Yaa', 'Yaa'],
   ];
   const TOTAL = LETTERS.length;
@@ -47,10 +47,10 @@
 
   // Shape families, by position in LETTERS: letters that share a shape and differ only by dots sit together.
   const FAMILIES = [[0], [1, 2, 3], [4, 5, 6], [7, 8], [9, 10], [11, 12], [13, 14], [15, 16], [17, 18], [19, 20],
-    [21], [22], [23], [24], [25], [26], [27], [28]];
+  [21], [22], [23], [24], [25], [26], [27], [28]];
 
   // What the student chose and how far they've reached, on this device only (no accounts).
-  const state = { script: 'madani', names: 'fatha', seen: [], chosen: false };
+  const state = { script: 'madani', names: 'fatha', grouping: 'families', seen: [], chosen: false };
   try {
     Object.assign(state, JSON.parse(localStorage.getItem(STORE)) || {});
   } catch {
@@ -60,6 +60,7 @@
   state.seen = [...new Set(state.seen)].filter((i) => Number.isInteger(i) && i >= 0 && i < TOTAL);
   if (!(state.script in { madani: 1, indopak: 1 })) state.script = 'madani';
   if (!(state.names in NAMES)) state.names = 'fatha';
+  if (!(state.grouping in { families: 1, grid: 1 })) state.grouping = 'families';
 
   const save = () => {
     try {
@@ -166,7 +167,7 @@
     next.setAttribute('aria-disabled', String(!done));
     if (justFinished) {
       lesson.classList.add('just-finished');
-      setTimeout(() => lesson.classList.remove('just-finished'), 2400);
+      setTimeout(() => lesson.classList.remove('just-finished'), 2600);
     }
   }
 
@@ -205,6 +206,7 @@
   function renderSetup() {
     root.dataset.script = state.script;
     root.dataset.names = state.names;
+    root.dataset.grouping = state.grouping;
     const names = NAMES[state.names];
     tiles.forEach((tile, i) => {
       tile.querySelector('.name').textContent = names[i];
@@ -212,13 +214,46 @@
     });
     setup.querySelector('.setup-script').textContent = setup.dataset[state.script];
     setup.querySelector('.setup-names').textContent = setup.dataset[state.names];
+    const groupingEl = setup.querySelector('.setup-grouping');
+    if (groupingEl) groupingEl.textContent = setup.dataset[state.grouping];
     for (const input of chooser.querySelectorAll('input')) input.checked = input.value === state[input.name];
   }
 
+  let closingChooser = false;
+  let chooserTimer = 0;
+
+  function closeChooser() {
+    if (!chooser.open || closingChooser) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      chooser.close();
+      return;
+    }
+    closingChooser = true;
+    chooser.classList.add('closing');
+
+    const done = () => {
+      clearTimeout(chooserTimer);
+      chooser.removeEventListener('animationend', onEnd);
+      chooser.classList.remove('closing');
+      closingChooser = false;
+      if (chooser.open) chooser.close();
+    };
+
+    const onEnd = (event) => {
+      if (event.target === chooser) done();
+    };
+
+    chooser.addEventListener('animationend', onEnd);
+    chooserTimer = setTimeout(done, 300);
+  }
+
   function showChooser() {
-    if (chooser.open) return;
+    if (chooser.open && !closingChooser) return;
+    clearTimeout(chooserTimer);
+    chooser.classList.remove('closing');
+    closingChooser = false;
     chooserButton.textContent = state.chosen ? chooserButton.dataset.later : chooserButton.dataset.first;
-    chooser.showModal();
+    if (!chooser.open) chooser.showModal();
   }
 
   chooser.addEventListener('change', (event) => {
@@ -230,11 +265,26 @@
   chooser.addEventListener('close', () => {
     state.chosen = true;
     save();
+    chooser.classList.remove('closing');
+    closingChooser = false;
   });
 
-  // A click on the dimmed page around the panel closes it (the form fills the panel, so only the backdrop is the dialog).
+  chooser.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeChooser();
+  });
+
+  const chooserForm = chooser.querySelector('form');
+  if (chooserForm) {
+    chooserForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      closeChooser();
+    });
+  }
+
+  // A click on the dimmed page around the panel closes it smoothly (the form fills the panel, so only the backdrop is the dialog).
   chooser.addEventListener('click', (event) => {
-    if (event.target === chooser) chooser.close();
+    if (event.target === chooser) closeChooser();
   });
 
   for (const button of document.querySelectorAll('.open-settings')) button.addEventListener('click', showChooser);
@@ -297,6 +347,13 @@
       const list = text.split(',').map((name) => name.trim());
       NAMES[set] = LETTERS.map((letter, i) => list[i] || '');
       renderSetup();
+    },
+    setGrouping(g) {
+      if (g in { families: 1, grid: 1 }) {
+        state.grouping = g;
+        save();
+        renderSetup();
+      }
     },
     showChooser() {
       state.chosen = false;
