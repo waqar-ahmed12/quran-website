@@ -28,6 +28,32 @@ if (+size[1] !== edges.width || +size[2] !== edges.height) {
   throw new Error(`The frames are ${edges.width}x${edges.height} but main.js draws ${size[1]}x${size[2]}`);
 }
 
+// The edge finder can lose the right edge and fall back near the fold. As the book flattens, a light washes the top
+// of the pages, the true edge stops being the sharpest step in the row, and the strongest step left is the fold
+// itself. It shows as a frame or two collapsing hundreds of pixels left and straight back (995, 642, 642, 1013),
+// which would snap the book narrow and wide again just before it settles. The edge does drift left by a few pixels
+// early on while the cover swings, but once it is past OPENING the book only widens, so a reading well below the
+// last trusted one is dropped and filled in from its neighbours.
+const OPENING = 700; // past here the book is unmistakably opening
+const SLACK = 20;    // a drop bigger than this is the finder losing the edge, not the book moving
+const bad = [];
+let lastGood = right[0];
+for (let i = 1; i < right.length; i++) {
+  if (lastGood > OPENING && right[i] < lastGood - SLACK) bad.push(i);
+  else lastGood = right[i];
+}
+for (const i of bad) {
+  let before = i - 1;
+  while (bad.includes(before)) before--;
+  let after = i + 1;
+  while (after < right.length && bad.includes(after)) after++;
+  right[i] =
+    after < right.length
+      ? Math.round(right[before] + ((right[after] - right[before]) * (i - before)) / (after - before))
+      : right[before];
+}
+if (bad.length) console.log(`Repaired ${bad.length} lost edge measurement(s), at frame(s) ${bad.join(', ')}.`);
+
 // How far right the book reaches once open, as OPEN_RIGHT is for the dark footage: main.js sizes the book so
 // that this still fits across the window.
 const open = Math.max(...right);

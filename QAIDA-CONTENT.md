@@ -64,8 +64,27 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
 - **Transliteration:** off; tapping a letter shows its name for a moment. Whether it stays once real words start is
   for a later pass.
 - **Progress bar:** shows how far the student has reached.
-- **Audio:** left out for now. When it comes back, the rule below applies.
-- **Extras, later:** record your own voice, trace the letters, finish screen.
+- **Audio** *(revised 2026-09-18)*: the player is built and the recordings arrive gradually — the teacher records
+  **the lesson's own items, plus 3–4 example words per exercise**, "because there are a lot of words". Nothing
+  assumes a file exists: `site/qaida/audio/manifest.json` lists only what has been recorded, and the lesson says
+  plainly how many are in. Until a letter has one, it plays a **wordless hum** — a human timbre saying nothing at
+  all, never a machine pronouncing the letter. `site/qaida/recordings.html` lists what's still missing.
+- **Trace the letters** *(revised 2026-09-18)*: moved out of "later" and into Lesson 1, because the user wants it
+  "for learning purpose for people, to practice" — a student traces a letter the moment they've learnt it. Deliberately
+  **unmarked**: handwriting recognition on Arabic isn't reliable enough to tell a student they're wrong, and a
+  printed Qaida asks them to compare by eye anyway.
+- **Extras, later:** record your own voice, finish screen.
+- **Finishing a drill lesson is a recommendation, not a gate** *(the user, 2026-09-19)*: "a recommendation that you
+  seem okay, let's move on, or if some letters are wrong, repeat them not in a row but increase the frequency, but
+  if more frequent, recommend to go back". So a missed item comes back **more often but never straight away**, and
+  one missed repeatedly raises "go back and look at it again" — advice with a way back, never a block.
+- **Mixed review carries through every later lesson** *(the user, 2026-09-19 — this answers the interleaving
+  question that was open at items 5 and 6)*. From lesson 5 on, a lesson's pool is its own items **plus** review
+  items from earlier lessons. **The lesson's own items are the gate; the review items never are.**
+- **Skipping ahead is allowed** *(the user, 2026-09-19)*: "if the user wanted to skip they can, but they should
+  also be advised that if they are new, it is recommended to go with the flow". **Nothing in the Qaida is locked.**
+  A lesson reached out of turn advises once and then lets the student through. This overrules the locks built at
+  step 1; the full spec is `docs/lesson-2/09-going-in-order.md`.
 
 ## Content rules carried over from the landing page
 
@@ -77,9 +96,8 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
 
 ## Still open
 
-- **Interleaving scope** — does the mixed-review pattern in items 5/6 carry forward through
-  every later lesson (tanween re-includes harakat, madd re-includes tanween, etc.), or was
-  it meant only for the zabar/zair/paish trio? Ask at build step 4.
 - **Jazam after leen (items 10–13 before 14)** — deliberate (leen memorized as a pattern
   first, generalized to the jazam rule after), or should jazam move earlier so leen is
   taught as "jazam on wow/yaa after zabar" instead of a standalone exception? Ask at build step 6.
+
+*(**Interleaving scope** was the other one. Answered 2026-09-19 — see **Decided** above.)*

@@ -131,7 +131,9 @@
   // What the student chose and how far they've reached, on this device only (no accounts) ------
   // { v, script, names, grouping, chosen, lessons: { "1": { seen: ["ا", …], done: false } } }
 
-  const blank = () => ({ v: 1, script: 'madani', names: 'fatha', grouping: 'families', chosen: false, lessons: {} });
+  const blank = () => ({
+    v: 1, script: 'madani', names: 'fatha', grouping: 'families', chosen: false, muted: false, lessons: {},
+  });
 
   function read() {
     let saved = null;
@@ -148,6 +150,7 @@
     if (saved.names === 'fatha' || saved.names === 'zabar') state.names = saved.names;
     if (saved.grouping === 'families' || saved.grouping === 'grid') state.grouping = saved.grouping;
     state.chosen = saved.chosen === true;
+    state.muted = saved.muted === true;
 
     // The first draft kept one flat list of lesson-1 positions. Carry it over, once, as letters.
     if (!saved.v && Array.isArray(saved.seen)) {
@@ -390,6 +393,28 @@
 
   applyTheme();
 
+  // Sound on or off, kept on this device like the theme ------------------------------------------
+
+  const muteButton = $('.mute');
+
+  function applyMute() {
+    root.dataset.muted = String(state.muted);
+    if (!muteButton) return;
+    muteButton.setAttribute('aria-pressed', String(state.muted));
+    muteButton.setAttribute('aria-label', state.muted ? muteButton.dataset.on : muteButton.dataset.off);
+  }
+
+  if (muteButton) {
+    muteButton.addEventListener('click', () => {
+      state.muted = !state.muted;
+      save();
+      applyMute();
+      if (state.muted && window.qaidaAudio) window.qaidaAudio.stop();
+    });
+  }
+
+  applyMute();
+
   // The top bar gains its hairline once the page has scrolled.
   const topbar = $('.topbar');
   const sentinel = $('.top-sentinel');
@@ -417,6 +442,7 @@
     isOpen,
     doneCount,
     renderSetup,
+    applyMute,
     onChange,
     showChooser,
     closeChooser,

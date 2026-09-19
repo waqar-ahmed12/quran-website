@@ -27,6 +27,14 @@ const types = {
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
   '.mp4': 'video/mp4',
+  // The Qaida's recordings. Whichever of these your phone or recorder gives you, the browser can play it.
+  '.wav': 'audio/wav',
+  '.mp3': 'audio/mpeg',
+  '.m4a': 'audio/mp4',
+  '.aac': 'audio/aac',
+  '.ogg': 'audio/ogg',
+  '.opus': 'audio/ogg',
+  '.webm': 'audio/webm',
 };
 
 http.createServer((req, res) => {

@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="en">
+<!-- data-topbar-scroll="stays": the bar stays in view the whole way down (the user, 2026-09-19). -->
+<html lang="en" data-topbar-scroll="stays">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -51,6 +52,9 @@
   <!-- TEMPORARY, local preview only: options and text fields for the bottom of the page. Delete this line and
        footer-options.js once the bottom is chosen. -->
   <script src="footer-options.js" defer></script>
+  <!-- TEMPORARY, local preview only: records one scroll frame by frame, to find the jolt when scrolling starts. Delete
+       this line, scroll-check.js and window.heroState in main.js once it is fixed. -->
+  <script src="scroll-check.js" defer></script>
 </head>
 <body>
   <!-- The top bar. The name is a stand-in until the site name is chosen. Free Qaida goes to the real page
@@ -122,6 +126,10 @@
             <canvas role="img" aria-label="A black leather Qur'an with a gold roundel on its cover, opening to two cream pages."></canvas>
           </div>
         </div>
+        <!-- Under the open book, clear of it. Someone meeting a book on a screen for the first time tries to turn the
+             page sideways rather than scroll on (the user, 2026-09-19: "they expect to turn the page over"). This says
+             which way to go, and main.js flashes it when a sideways swipe arrives. -->
+        <div class="open-hint" aria-hidden="true"><span>Keep scrolling</span></div>
       </div>
     </section>
     <!-- Phase 5: the ending. Free Qaida goes to the real page (site/qaida/, 2026-09-18). One-to-one lessons is a

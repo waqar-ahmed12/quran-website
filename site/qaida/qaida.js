@@ -16,18 +16,24 @@
   const reset = $('.reset');
   const endLine = $('.end-line');
   const next = $('.next');
+  const soundNote = $('.sound-note');
+  const current = $('.current');
 
   let tiles = [];
   let letters = [];
   let shape = ''; // which script and grouping the tiles on screen were built for
   let peekMs = 1600;
   let open = null;
+  let chosen = -1; // the letter the strip under the grid is showing
 
   // The letters ------------------------------------------------------------------------------
 
   function build() {
     letters = shell.lettersOf();
     open = null;
+    // The two scripts don't hold the same letters in the same places, so the strip starts empty again.
+    chosen = -1;
+    if (current) current.hidden = true;
     grid.textContent = '';
 
     tiles = letters.map(([glyph], i) => {
@@ -38,7 +44,11 @@
       tile.innerHTML =
         `<span class="glyph" lang="ar" aria-hidden="true">${glyph}</span>` +
         '<span class="name" dir="ltr" aria-hidden="true"></span>' +
-        '<span class="mark-seen" aria-hidden="true"></span>';
+        '<span class="mark-seen" aria-hidden="true"></span>' +
+        // Only shown once this letter has a real recording — see renderSound().
+        '<span class="mark-sound" aria-hidden="true">' +
+        '<svg viewBox="0 0 24 24" focusable="false"><path d="M4.5 9.5h3L11 6.5v11L7.5 14.5h-3z" />' +
+        '<path class="wave" d="M14 9.5a4 4 0 0 1 0 5" /></svg></span>';
       tile.addEventListener('click', () => peek(i));
       return tile;
     });
@@ -79,13 +89,41 @@
     tile.classList.add('peek');
     open = tile;
     tile.timer = setTimeout(() => close(tile), peekMs);
+    // Seeing the name and hearing it are the same tap: that's how a letter is learnt.
+    if (window.qaidaAudio) window.qaidaAudio.play('letters', letters[i][0]);
+    showChosen(i);
     if (shell.markSeen(LESSON, letters[i][0])) renderProgress(shell.seenCount(LESSON) === letters.length);
   }
 
+  // The letter last tapped, held in a strip under the grid: hear it again, or trace it. A tile is already a button,
+  // so its own buttons can't live inside it — and at this size they'd crowd the letter anyway.
+  function showChosen(i) {
+    chosen = i;
+    if (!current) return;
+    const [glyph, name] = letters[i];
+    current.querySelector('.current-glyph').textContent = glyph;
+    current.querySelector('.current-name').textContent = name;
+    current.hidden = false;
+  }
+
   document.addEventListener('keydown', (event) => {
-    const chooser = document.querySelector('.chooser');
-    if (event.key === 'Escape' && open && !(chooser && chooser.open)) close(open);
+    if (event.key !== 'Escape' || !open) return;
+    // A panel on top of the page gets the Escape first; it has its own way of closing.
+    if (document.querySelector('dialog[open]')) return;
+    close(open);
   });
+
+  if (current) {
+    current.querySelector('.current-hear').addEventListener('click', () => {
+      if (chosen < 0) return;
+      peek(chosen);
+    });
+
+    current.querySelector('.current-trace').addEventListener('click', () => {
+      if (chosen < 0 || !window.qaidaTrace) return;
+      window.qaidaTrace.open(letters[chosen][0], letters[chosen][1]);
+    });
+  }
 
   // Progress ---------------------------------------------------------------------------------
 
@@ -144,6 +182,26 @@
     shell.say(next.dataset.standin); // stand-in until Lesson 2 exists
   });
 
+  // Sound ------------------------------------------------------------------------------------
+
+  // A speaker mark on the letters that have a real recording, and one honest line about the rest. The recordings
+  // arrive a few at a time, so this is the state of things rather than a promise.
+  function renderSound() {
+    const audio = window.qaidaAudio;
+    if (!audio || !soundNote) return;
+    let recorded = 0;
+    tiles.forEach((tile, i) => {
+      const has = audio.has('letters', letters[i][0]);
+      if (has) recorded += 1;
+      tile.toggleAttribute('data-recorded', has);
+    });
+    const total = letters.length;
+    soundNote.hidden = recorded === total;
+    soundNote.textContent = (recorded === 0 ? soundNote.dataset.none : soundNote.dataset.some)
+      .replaceAll('{done}', recorded)
+      .replaceAll('{total}', total);
+  }
+
   // Drawing it all ---------------------------------------------------------------------------
 
   // The names on the tiles follow the student's choice; the letters themselves follow the script, so a change of
@@ -163,12 +221,16 @@
     });
 
     renderProgress();
+    renderSound();
     if (rebuilt) replay();
   }
 
   shell.onChange(render);
   shell.renderSetup(); // draws the page for the first time, through the listener above
   if (!shell.state.chosen) requestAnimationFrame(shell.showChooser);
+
+  // The manifest arrives a moment later; the speaker marks appear when it does.
+  if (window.qaidaAudio) window.qaidaAudio.ready.then(renderSound);
 
   // For the options panel (qaida-options.js).
   window.qaida = {

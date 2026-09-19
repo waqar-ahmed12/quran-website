@@ -10,6 +10,15 @@
   const TAU = Math.PI * 2;
   const wave = (t, period, phase = 0) => Math.sin((t / period) * TAU + phase);
   const ease = (value, target, seconds, dt) => value + (target - value) * (1 - Math.exp(-dt / seconds));
+  // Like ease(), but carries speed from frame to frame (a critically damped spring), so a change starts gently instead
+  // of at full speed. Returns [value, speed].
+  const settle = (value, speed, target, seconds, dt) => {
+    const w = 2 / seconds;
+    const e = Math.exp(-w * dt);
+    const gap = value - target;
+    const push = speed + w * gap;
+    return [target + (gap + push * dt) * e, (speed - w * push * dt) * e];
+  };
   const rand = (min, max) => min + Math.random() * (max - min);
   const wrap = (v, size) => (v < -20 ? v + size + 40 : v > size + 20 ? v - size - 40 : v);
 
@@ -25,7 +34,7 @@
 
   // Starting choices, until the user picks from the options panel. Amounts are percentages, 0 for none; glow is the
   // glow's radius in CSS pixels. reach: 'book' keeps the air on the book's screen, 'page' carries it on behind the ending.
-  const settings = { dust: 100, leaf: 40, glints: 0, haze: 30, halo: 40, pattern: 'off', glow: 90, idle: 'drift', move: 100, text: 'steady', reach: 'page' };
+  const settings = { dust: 100, leaf: 40, glints: 0, haze: 30, halo: 40, pattern: 'off', glow: 90, idle: 'drift', move: 100, text: 'steady', reach: 'page', stop: 'gently' };
   const IDLE_DELAY = 600;    // ms the book must have stopped before it starts moving by itself
   const MAX_PARTICLES = 400; // of each kind
   const LENS = 150;          // radius, in CSS pixels, of the patch of pattern the mouse uncovers
@@ -63,6 +72,7 @@
   let ox = 0;
   let oy = 0;
   let idle = 0;               // 0 while the book moves with the scroll, 1 once it has been still a while
+  let idleSpeed = 0;          // how fast idle is changing, for the gentle settle
   let motion = settings.idle; // the last movement chosen, so switching it off eases out
   let bookTransform = '';
   let bookLayer = false;      // whether .subject has will-change: transform
@@ -631,6 +641,7 @@
   function refresh() {
     if (running()) return wake();
     idle = 0;
+    idleSpeed = 0;
     setBook('');
     for (const L of layers) {
       if (!L.inked) continue;
@@ -677,7 +688,17 @@
     last = now;
     const t = now / 1000;
     const quiet = !gliding && now - lastMove > IDLE_DELAY;
-    idle = ease(idle, quiet && settings.idle !== 'off' ? 1 : 0, quiet ? 1.2 : 0.12, dt);
+    const goal = quiet && settings.idle !== 'off' ? 1 : 0;
+    if (settings.stop === 'gently') {
+      // The float used to be pulled back to centre with a 0.12 s ease the moment scrolling began: up to 93 px/s at
+      // once, about eight times the float's own top speed, which read as a jolt before the book opened (the user,
+      // 2026-09-18, with Movement at 300%). The spring starts from the float's own speed and eases in.
+      [idle, idleSpeed] = settle(idle, idleSpeed, goal, quiet ? 1.2 : 0.5, dt);
+      idle = Math.min(1, Math.max(0, idle));
+    } else {
+      idle = ease(idle, goal, quiet ? 1.2 : 0.12, dt);
+      idleSpeed = 0;
+    }
     paint(t, dt);
     if (heroSeen) moveBook(t);
     measure(now, dtMs);
@@ -746,6 +767,7 @@
     if (mouse.matches) addSlider('Mouse glow', 0, 240, 5, settings.glow, (v) => (v ? `${v} px` : 'Off'), choose('glow'));
     addOption('Book when still', { Off: 'off', Float: 'float', Breathe: 'breathe', Drift: 'drift' }, settings.idle, choose('idle', (v) => v !== 'off' && (motion = v)));
     addSlider('Movement', 0, 300, 5, settings.move, (v) => `${v}%`, choose('move'));
+    addOption('Book when scrolling starts', { 'Stops at once': 'at once', 'Settles gently': 'gently' }, settings.stop, choose('stop'));
     addOption('Aayat while moving', { 'As before': 'before', 'Fix A': 'steady', 'Fix B': 'flat' }, settings.text, choose('text', (v) => (root.dataset.ink = v === 'flat' ? 'flat' : '')));
     tryoutGroup('Ending');
     addOption('Dust in the ending and footer', { 'Stays with the book': 'book', 'Carries on': 'page' }, settings.reach, choose('reach'));

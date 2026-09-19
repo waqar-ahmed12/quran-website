@@ -8,6 +8,16 @@
   const smoothstep = (t) => t * t * (3 - 2 * t);
   const light = () => document.documentElement.dataset.theme === 'light';
 
+  // A critically damped spring: moves [pos, vel] toward target over roughly `tau` seconds. Unlike the plain ease in
+  // step(), it carries speed from frame to frame, so a new target starts the motion gently instead of at full speed.
+  function springTo(pos, vel, target, tau, dt) {
+    const w = 2 / tau;
+    const e = Math.exp(-w * dt);
+    const gap = pos - target;
+    const push = vel + w * gap;
+    return [target + (gap + push * dt) * e, (vel - w * push * dt) * e];
+  }
+
   // Frames --------------------------------------------------------------------
 
   const SKIP = [39, 40]; // identical to f038, a hold in the source video
@@ -36,13 +46,14 @@
 
   const LIGHT_LEFT = 262; // left edge of the book, as BOOK_LEFT is for dark; read off the open frame
 
-  const LIGHT_OPEN_RIGHT = 995; // right edge fully open
+  const LIGHT_OPEN_RIGHT = 1028; // right edge fully open
   // The book's right edge in each frame, measured by videos/make-light-frames.ps1. main.js smooths these the
   // same way it smooths the dark frames' own measurements.
   const rightsLight = [
     653, 653, 653, 653, 653, 653, 653, 653, 654, 654, 654, 654, 654, 654, 655, 655, 655, 655, 646, 647, 647, 642,
     642, 644, 645, 646, 643, 642, 643, 647, 642, 653, 645, 655, 656, 657, 651, 655, 660, 661, 646, 664, 683, 702,
-    721, 735, 754, 774, 793, 819, 838, 855, 872, 888, 903, 917, 931, 943, 959, 969, 979, 987, 995,
+    721, 735, 754, 774, 793, 819, 838, 855, 872, 888, 903, 917, 931, 943, 959, 969, 979, 987, 995, 1001, 1007,
+    1013, 1017, 1010, 1023, 1025, 1027, 1027, 1028, 1028,
   ];
 
   // One frame file per measurement, so the two can't fall out of step.
@@ -65,6 +76,23 @@
   // A mouse wheel scrolls in steps, so everything glides toward the scroll position instead of
   // jumping to it, and the book cross-fades between frames. The user chose this "slow glide" by eye.
   let glide = 0.28; // roughly the seconds it takes to close two thirds of the gap; 0 jumps straight there
+  // How the shown position catches up: 'before' is the plain ease the user chose; 'soft' is a spring that starts
+  // gently. Only the drawing changes: the page's own scrolling and the finish glide are untouched. TRYOUT "Glide feel".
+  let feel = 'before';
+  // The wheel. The browser's own wheel scrolling is a quick burst (Firefox: 408 px in 117 ms for four notches, peaking
+  // near 7,800 px/s), then the page stands still for `finishWait`, then the automatic finish starts at full speed:
+  // burst, stop, sudden restart (the user, 2026-09-18, "a jolt, then the page starts to move ... the speed of scroll is
+  // different from the automatic", measured with the Scroll check). So the page takes the wheel over: each notch adds
+  // to a target and the real scroll position glides to it, and the automatic finish carries on from wherever that glide
+  // has got to, at the speed it was going. TRYOUT "Wheel scrolling" and "Wheel smoothness".
+  let wheelSmooth = true;
+  let wheelTau = 0.2;  // seconds, roughly how long the wheel's glide takes to settle
+  let wheelTarget = 0; // where the wheel is sending the page, in px
+  let wheelPos = 0;    // where the glide has got to, in px; kept here because scrollY is rounded to whole pixels
+  let wheelVel = 0;    // px a second
+  let wheelSet = 0;    // the last position handed to scrollTo, so scrolling by anything else is noticed
+  let wheelLast = 0;   // time of the glide's previous step
+  let wheelRaf = 0;    // the animation frame of the glide, 0 when it isn't running
   let blend = true; // cross-fade neighbouring frames, rather than showing whole frames only
   // Stopped between two frames, the cross-fade settles onto the nearer frame over this many seconds: held still, it looks blurred.
   const SHARPEN = 0.25;
@@ -76,12 +104,23 @@
   let finish = 'direction';
   let finishSpeed = 1;     // screens of scrolling a second; a half-open book is about one screen from either end
   let finishWait = 100;    // ms without scrolling before it finishes; 180 felt stuck (2026-09-14). TRYOUT "Wait before gliding"
-  // How the page's own scrolling starts: 'moving' carries on as the visitor's scrolling stops; 'gentle' eases in from
-  // still, as before 2026-09-14. TRYOUT "Glide start".
-  let glideStart = 'moving';
+  // How the page's own scrolling starts when the wheel isn't still gliding: 'moving' starts at full speed, as if carrying
+  // on from the visitor's scrolling, and jumps if that had already stopped; 'gentle' eases in from still. 'gentle' is
+  // the user's own pick (setting.txt, 2026-09-18). TRYOUT "Glide start".
+  let glideStart = 'gentle';
   const TAB_SPEED = 3;     // screens a second when Tab glides through the opening
   // The same goes for the ending: the page never rests with it part way in (settleEnding). TRYOUT "Ending locks into place".
   let lockEnding = true;
+  // A book on a screen invites the one gesture this page hasn't got: someone who has never met a page like this swipes
+  // sideways to turn over, nothing happens, and the open book looks like the end of the site (the user, 2026-09-19:
+  // "they expect to turn the page over"). 'nudge' answers the sideways try with the downward move it was asking for:
+  // the cue flashes and the page eases down a little, so the gesture teaches itself. 'flash' only lights the cue.
+  // TRYOUT "If they swipe sideways".
+  let swipeAnswer = 'nudge';
+  const SWIPE_X = 48;    // px sideways before a drag counts as a page-turn try
+  const SWIPE_EDGE = 40; // a drag starting this near either edge is the browser's own back and forward, left alone
+  const SWIPE_GAP = 900; // ms; one gesture gets one answer
+  const SWIPE_NUDGE = 0.2; // screens the page eases down, enough to show it moves without taking them off the book
 
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const wide = matchMedia('(min-width: 768px)'); // "Under the book" is for computers only
@@ -90,6 +129,7 @@
   const subject = stage.querySelector('.subject'); // the book and its aayat, moved together by atmosphere.js
   const canvas = subject.querySelector('canvas');
   const wordmark = stage.querySelector('.wordmark');
+  const openHint = stage.querySelector('.open-hint'); // the cue under the open book
   const ctx = canvas.getContext('2d');
   const close = document.querySelector('.close'); // the ending, after the book
   const closeInner = close.querySelector('.inner');
@@ -107,6 +147,7 @@
 
   let scale = 1;      // footage pixels to CSS pixels, set on resize
   let pos = null;     // scroll position shown, in screens; lags the real one while gliding
+  let vel = 0;        // its speed in screens a second, used by the 'soft' glide only
   let painted = null; // position last shown
   let drawn = null;   // frame last drawn; fractional between frames
   let last = 0;       // time of the previous glide step, 0 when at rest
@@ -141,6 +182,7 @@
     openRight: LIGHT_OPEN_RIGHT,
     last: LAST_LIGHT,
     measure: false,
+    smoothEdge: 8, // frames each side, see rightEdge; 0 for the plain average. TRYOUT "Light book sway"
   };
   const film = () => (light() ? lightFilm : darkFilm);
 
@@ -272,8 +314,34 @@
     }
   }
 
+  // The light take's measured edge wobbles by up to 10 px while the cover swings up (646, 664, 661, 646 ...), and the
+  // book is centred on it, so it swayed left and right there (the user, 2026-09-19, "moves left and right unnaturally").
+  // The book only ever opens wider, so the measurement is taken as its running maximum, then averaged over `smoothEdge`
+  // frames each side, the window shrinking toward both ends so the first and last frames keep their exact values (the
+  // open book's place, and so the aayat's, depends on the last). 12 backward steps of the centre became none, and the
+  // irregular jerk fell from 2.5 to 1.0 px a frame. Worked out once and kept.
+  function smoothedRights(f) {
+    if (f.smoothed && f.smoothed.from === f.rights) return f.smoothed.values;
+    const peak = [];
+    f.rights.forEach((r, i) => peak.push(Math.max(r, i ? peak[i - 1] : 0)));
+    const values = peak.map((_, i) => {
+      const r = Math.min(f.smoothEdge, i, f.last - i);
+      let sum = 0;
+      let weight = 0;
+      for (let j = i - r; j <= i + r; j++) {
+        const w = r + 1 - Math.abs(j - i);
+        sum += peak[j] * w;
+        weight += w;
+      }
+      return sum / weight;
+    });
+    f.smoothed = { from: f.rights, values };
+    return values;
+  }
+
   // Averaged over nearby frames so the centring glides instead of stepping.
   function rightEdge(f, i) {
+    if (f.smoothEdge) return smoothedRights(f)[i];
     let sum = 0;
     let n = 0;
     for (let j = Math.max(0, i - 3); j <= Math.min(f.last, i + 3); j++) {
@@ -433,8 +501,9 @@
 
   // The top bar and the scroll hint --------------------------------------------------------
 
-  // The top bar slides away while the visitor scrolls down, so the opening has the screen to itself, and comes back as
-  // soon as they scroll up, and near the top. TRYOUT "Scrolling down: Bar stays" keeps it in place.
+  // The top bar stays in view the whole way down: data-topbar-scroll="stays" on <html> (the user, 2026-09-19).
+  // TRYOUT "Scrolling down: Bar slides away" gives the opening the screen to itself instead, the bar coming back as
+  // soon as they scroll up, and near the top.
   let barY = scrollY; // where the page was when the bar last moved
   function placeTopbar() {
     const dy = scrollY - barY;
@@ -445,10 +514,39 @@
   }
 
   // The scroll hint sits under the headline only where the space under the closed book holds both with room to spare.
+  // The open book's cue needs far less, being on its own at the foot of the stage — but it still has to clear the book.
   function fitHint() {
     const room = (canvas.clientHeight - BOOK_H * scale) / 2;
     const words = wordmark.querySelector('h1').offsetHeight + wordmark.querySelector('p').offsetHeight;
     stage.classList.toggle('roomy', room >= words + 130); // the hint takes about 78px, leaving 26px above and below
+    stage.classList.toggle('roomy-open', room >= 78); // the cue itself, with a little air under the book
+  }
+
+  // The cue under the open book, from the moment the aayat fade in until the visitor scrolls on past the hero. Once
+  // they have, it has done its job and never shows again — including on the way back up, so it doesn't nag.
+  let cueDone = false;
+  function showOpenCue(s, still) {
+    if (still) return;
+    if (s >= total - 0.1) cueDone = true;
+    stage.classList.toggle('open-cue', !cueDone && s >= APPEAR);
+  }
+
+  // Answers a sideways swipe: the cue flashes, and with 'nudge' the page eases down far enough to show that this is
+  // the way through. Only while the cue itself is live, so it never fires on the ending or the footer.
+  let swipeAt = 0;
+  function answerSwipe() {
+    if (swipeAnswer === 'off' || reduceMotion.matches || cueDone || pos === null || pos < APPEAR) return;
+    const now = performance.now();
+    if (now - swipeAt < SWIPE_GAP) return;
+    swipeAt = now;
+    openHint.classList.remove('flash');
+    void openHint.offsetWidth; // lets the animation run again on a second swipe
+    openHint.classList.add('flash');
+    if (swipeAnswer !== 'nudge') return;
+    const limit = document.documentElement.scrollHeight - innerHeight;
+    takeOver();
+    freeScroll(true); // snapping would pull the page straight back
+    scrollToY(Math.min(limit, scrollY + innerHeight * SWIPE_NUDGE), 1.6, true);
   }
 
   // Drawing -----------------------------------------------------------------------
@@ -512,10 +610,11 @@
     return gradient;
   }
 
-  // How far the hero has been scrolled, in computer screen heights (0 to total).
-  function targetScroll() {
+  // How far the hero has been scrolled, in computer screen heights (0 to total). With `at`, how far it will have been
+  // scrolled once the page rests at that scroll position.
+  function targetScroll(at = scrollY) {
     const range = hero.offsetHeight - stage.offsetHeight;
-    return range > 0 ? clamp(-hero.getBoundingClientRect().top / range) * total : 0;
+    return range > 0 ? clamp(-(hero.getBoundingClientRect().top + (scrollY - at)) / range) * total : 0;
   }
 
   // The book's frame at a scroll position; smoothstep eases into and out of the opening. The two takes have
@@ -551,8 +650,16 @@
     const dt = last ? Math.min(now - last, 50) / 1000 : 1 / 60;
     if (pos === null || reduceMotion.matches || !glide) {
       pos = target;
+      vel = 0;
+    } else if (feel === 'soft') {
+      [pos, vel] = springTo(pos, vel, target, glide, dt);
+      if (Math.abs(target - pos) < 0.0005 && Math.abs(vel) < 0.001) {
+        pos = target;
+        vel = 0;
+      }
     } else {
       pos += (target - pos) * (1 - Math.exp(-dt / glide));
+      vel = 0;
       if (Math.abs(target - pos) < 0.0005) pos = target;
     }
     sharpen = pos === target ? Math.min(1, sharpen + dt / SHARPEN) : Math.max(0, sharpen - (3 * dt) / SHARPEN);
@@ -577,6 +684,7 @@
       const rest = still ? 1 : 1 - clamp(frame / NAME_GONE);
       for (const part of resting) part.style.opacity = rest;
       showAayat(pos, still);
+      showOpenCue(pos, still);
       endAt(pos);
       painted = pos;
     }
@@ -926,6 +1034,12 @@
       return field;
     };
 
+    // What scroll-check.js records each frame: where the shown position is, and which frame is drawn.
+    window.heroState = () => ({ pos, drawn, target: targetScroll(), sharpen });
+
+    // top-options.js owns the row, next to the other two cues; the setting itself lives in here.
+    window.setSwipeAnswer = (value) => (swipeAnswer = value);
+
     const redraw = () => {
       dirty = true;
       schedule();
@@ -950,10 +1064,22 @@
     }
     addSlider('Wait before gliding', 0, 400, 10, finishWait, (v) => `${v} ms`, (v) => (finishWait = v));
     addOption('Glide start', { 'Already moving': 'moving', 'Gently (before)': 'gentle' }, glideStart, (v) => (glideStart = v));
+    addOption('Wheel scrolling', { 'Browser’s own': false, Smooth: true }, wheelSmooth, (v) => {
+      wheelSmooth = v;
+      cancelWheelGlide();
+    });
+    addSlider('Wheel smoothness', 0.05, 0.5, 0.01, wheelTau, (v) => `${v.toFixed(2)} s`, (v) => (wheelTau = v));
     tryoutGroup('Opening and aayat');
     const glideText = (v) => (v ? `${v.toFixed(2)} s${v === 0.28 ? ' (your pick)' : ''}` : 'Off');
     addSlider('Opening glide', 0, 0.5, 0.01, glide, glideText, retime((v) => (glide = v)));
+    addOption('Glide feel', { 'As before': 'before', 'Soft start': 'soft' }, feel, retime((v) => (feel = v)));
     addOption('Blend frames', { Off: false, On: true }, blend, retime((v) => (blend = v)));
+    addOption('Light book sway', { 'As before': 0, Smoothed: 8 }, lightFilm.smoothEdge, (v) => {
+      lightFilm.smoothEdge = v;
+      place();
+      dirty = true;
+      schedule();
+    });
     addOption('Half-open book', { Stays: 'off', 'Nearer end': 'nearest', 'Way you scrolled': 'direction' }, finish, (v) => (finish = v));
     addSlider('Auto open/close speed', 25, 300, 5, finishSpeed * 100, (v) => `${v}%`, (v) => (finishSpeed = v / 100));
     addOption('Arabic lettering', { 'Amiri Quran': 'amiri', Scheherazade: 'scheherazade' }, 'amiri', setData('arabic'));
@@ -975,14 +1101,14 @@
     schedule();
     placeTopbar();
     if (autoScroll) return; // the page's own scrolling
-    direction = Math.sign(scrollY - lastY) || direction;
+    if (!wheelRaf) direction = Math.sign(scrollY - lastY) || direction; // while the wheel glides, its own direction stands
     lastY = scrollY;
-    waitToFinish();
+    if (!wheelRaf) waitToFinish(); // while the wheel's glide runs, the wheel itself times the finish (onWheel)
   }
 
-  function waitToFinish() {
+  function waitToFinish(extra = 0) {
     clearTimeout(finishTimer);
-    finishTimer = setTimeout(finishOpening, finishWait);
+    finishTimer = setTimeout(finishOpening, finishWait + extra);
   }
 
   // Phones and tablets stop at each part of the page by themselves (scroll snapping in styles.css), which also catches
@@ -993,9 +1119,10 @@
 
   function finishOpening() {
     if (touching || autoScroll || reduceMotion.matches || snapping()) return;
-    if (lockEnding && settleEnding()) return;
+    const at = wheelRaf ? wheelTarget : scrollY; // while the wheel's glide runs, judge from where it is heading
+    if (lockEnding && settleEnding(at)) return;
     if (finish === 'off' || !visible) return;
-    const progress = (targetScroll() - REST) / OPEN;
+    const progress = (targetScroll(at) - REST) / OPEN;
     if (progress <= 0.002 || progress >= 0.998) return; // closed or open already
     const open = finish === 'nearest' ? progress >= 0.5 : direction > 0;
     scrollToScreens(open ? REST + OPEN : REST);
@@ -1008,17 +1135,17 @@
   // the nearer one), so the book glides up and the ending settles into the screen. Past the last, the footer scrolls
   // freely. Like the half-open book, it waits for scrolling to stop, and any wheel, key, click or touch takes over.
   // Returns whether it moved.
-  function settleEnding() {
+  function settleEnding(at = scrollY) {
     if (under()) return false; // there the ending shares the book's screen
-    const top = close.getBoundingClientRect().top;
+    const top = close.getBoundingClientRect().top + (scrollY - at); // where the ending's top is once the page rests at `at`
     const stops = [stage.offsetHeight, 0, -close.offsetHeight];
     for (let k = 0; k < 2; k++) {
       const above = stops[k];
       const below = stops[k + 1];
       if (top >= above - 1 || top <= below + 1) continue;
       const down = finish === 'nearest' ? top - below < above - top : direction > 0;
-      const y = Math.min(scrollY + top - (down ? below : above), document.documentElement.scrollHeight - innerHeight);
-      if (Math.abs(y - scrollY) < 1) return false; // the page doesn't go any further
+      const y = Math.min(at + top - (down ? below : above), document.documentElement.scrollHeight - innerHeight);
+      if (Math.abs(y - at) < 1) return false; // the page doesn't go any further
       scrollToY(y);
       return true;
     }
@@ -1033,19 +1160,51 @@
 
   // Scrolls the page to y at `speed` screens a second, starting already moving, or gently from still. Snapping pauses
   // meanwhile, or it would pull each step of the glide back to a stop.
+  //
+  // If the wheel's glide is still moving, this carries on from where it has got to and how fast it was going: a curve
+  // that leaves at that speed and arrives at rest, so there is no stop and no sudden start in between.
   let autoDir = 0; // which way the page's own scrolling is going
+  let autoVel = 0; // and how fast, in px a second, so a wheel turned the other way can swing it back instead of stopping it dead
   function scrollToY(y, speed = finishSpeed, gentle = glideStart === 'gentle') {
+    if (wheelRaf && Math.abs(wheelVel) > 100) {
+      // Carrying on needs y ahead of the wheel's glide, with room to slow down: behind it, or too close to stop in,
+      // the page would have to turn round or stop dead. Then the glide is left to arrive first, and the finish
+      // (started again when it does) runs from rest.
+      const toGo = y - wheelPos;
+      if (toGo * wheelVel <= 0 || (3 * Math.abs(toGo)) / Math.abs(wheelVel) < 0.15) return;
+    }
     cancelAnimationFrame(autoScroll);
+    const carry = wheelRaf ? { from: wheelPos, v: wheelVel, at: wheelLast } : null;
+    cancelWheelGlide(); // only one thing drives the scroll position at a time, or they fight over it every frame
     freeScroll(true);
-    const from = scrollY;
+    const from = carry ? carry.from : scrollY;
     const distance = y - from;
     autoDir = Math.sign(distance);
-    const duration = Math.max(300, (1000 * Math.abs(distance)) / innerHeight / speed); // a short finish still eases
-    const start = performance.now();
+    let seconds = Math.max(300, (1000 * Math.abs(distance)) / innerHeight / speed) / 1000; // a short finish still eases
+    let v0 = 0;
+    if (carry) {
+      // Leaving at speed v0 and arriving at rest without running past the end takes at most 3 x distance / v0, so when
+      // the wheel was going fast and the finish is slow, the finish takes a little less time than it would, rather than
+      // the speed dropping in one frame. Going away from the end, the speed is held to what 3 x distance / time allows.
+      v0 = carry.v;
+      const room = 3 * Math.abs(distance);
+      if (v0 * distance > 0) seconds = Math.min(seconds, room / Math.abs(v0));
+      else v0 = Math.max(-room / seconds, Math.min(room / seconds, v0));
+    }
+    const duration = seconds * 1000;
+    const start = carry && carry.at ? carry.at : performance.now(); // from the wheel glide's last step, so no frame is lost
+    let lastAt = from;
+    let lastTime = start;
+    autoVel = v0;
     const tick = (now) => {
       const t = Math.min(1, (now - start) / duration);
-      const eased = !gentle ? Math.sin((t * Math.PI) / 2) : t < 0.5 ? 4 * t * t * t : 1 - (2 - 2 * t) ** 3 / 2;
-      scrollTo(0, from + distance * eased);
+      let at;
+      if (carry) at = from + v0 * seconds * (t * t * t - 2 * t * t + t) + distance * (3 * t * t - 2 * t * t * t);
+      else at = from + distance * (!gentle ? Math.sin((t * Math.PI) / 2) : t < 0.5 ? 4 * t * t * t : 1 - (2 - 2 * t) ** 3 / 2);
+      scrollTo(0, at);
+      autoVel = ((at - lastAt) * 1000) / Math.max(1, now - lastTime);
+      lastAt = at;
+      lastTime = now;
       autoScroll = t < 1 ? requestAnimationFrame(tick) : 0;
       if (!autoScroll) {
         lastY = scrollY;
@@ -1068,10 +1227,104 @@
     tabFrom = null;
   }
 
-  addEventListener('scroll', onScroll, { passive: true });
-  for (const type of ['keydown', 'mousedown']) addEventListener(type, takeOver, { passive: true });
+  // Stops the wheel's own glide, for whatever takes over from it: a key, a click, a touch, the page's own finish.
+  function cancelWheelGlide() {
+    cancelAnimationFrame(wheelRaf);
+    wheelRaf = 0;
+    wheelVel = 0;
+    wheelLast = 0;
+  }
+
+  // Each frame, glides the real scroll position toward where the wheel has sent it, with a spring (like `glide`, it
+  // starts gently rather than at full speed, so a burst of notches doesn't lurch).
+  function stepWheel(now) {
+    wheelRaf = 0;
+    if (Math.abs(scrollY - wheelSet) > 3) {
+      // Something else moved the page (a jump to a link, the browser's find): leave it to that.
+      cancelWheelGlide();
+      waitToFinish();
+      return;
+    }
+    const max = document.documentElement.scrollHeight - innerHeight;
+    wheelTarget = Math.min(max, Math.max(0, wheelTarget));
+    const dt = wheelLast ? Math.min(now - wheelLast, 50) / 1000 : 1 / 60;
+    wheelLast = now;
+    // A spring pulls harder the further it is from its target, so a huge flick would lurch. The glide chases a point no
+    // more than 0.6 of a screen ahead of it, which caps the pull and, for very long flicks, the speed; nearer than that
+    // it is the plain spring.
+    const reach = Math.max(300, innerHeight * 0.6);
+    const chase = wheelPos + Math.max(-reach, Math.min(reach, wheelTarget - wheelPos));
+    [wheelPos, wheelVel] = springTo(wheelPos, wheelVel, chase, Math.max(0.02, wheelTau), dt);
+    if (wheelPos < 0 || wheelPos > max) {
+      wheelPos = Math.min(max, Math.max(0, wheelPos)); // the page's ends stop it dead
+      wheelVel = 0;
+    }
+    const arrived = Math.abs(wheelTarget - wheelPos) < 1 && Math.abs(wheelVel) < 30;
+    if (arrived) wheelPos = wheelTarget;
+    wheelSet = wheelPos;
+    scrollTo(0, wheelPos);
+    if (arrived) {
+      cancelWheelGlide();
+      waitToFinish(); // the glide has come to rest: now the usual wait for the finish
+      return;
+    }
+    wheelRaf = requestAnimationFrame(stepWheel);
+  }
+
+  // Whether something under the pointer can scroll itself the way the wheel turned (the options panel, a text box), so
+  // the wheel is left to it.
+  function scrollsItself(node, dy) {
+    for (let el = node instanceof Element ? node : node && node.parentElement; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+      const overflow = getComputedStyle(el).overflowY;
+      if ((overflow === 'auto' || overflow === 'scroll') && el.scrollHeight > el.clientHeight + 1) {
+        if (dy < 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true;
+      }
+    }
+    return false;
+  }
+
+  // The wheel, in CSS pixels, whatever unit the browser reports it in (Firefox counts a line as 34 px).
+  const wheelPixels = (e) => e.deltaY * (e.deltaMode === 1 ? 34 : e.deltaMode === 2 ? innerHeight : 1);
+  // The browser's own smooth scrolling took about this long (ms) to finish a notch, and "Wait before gliding" was
+  // counted from there; the finish keeps that timing (the user tuned it), so it comes this long after the last notch.
+  const WHEEL_TAIL = 130;
+
   // A wheel turned the way the page is already going doesn't stop it: stopping there felt stuck (the user, 2026-09-14).
-  addEventListener('wheel', (e) => (autoScroll && Math.sign(e.deltaY) === autoDir) || takeOver(), { passive: true });
+  function onWheel(e) {
+    if (e.ctrlKey || e.shiftKey || e.defaultPrevented || !e.deltaY || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // zoom, sideways
+    const same = autoScroll && Math.sign(e.deltaY) === autoDir;
+    if (!wheelSmooth || reduceMotion.matches || snapping() || scrollsItself(e.target, e.deltaY)) {
+      cancelWheelGlide(); // the browser scrolls this one itself
+      if (!same) takeOver();
+      return;
+    }
+    e.preventDefault(); // this wheel now moves the page through the glide below, not the browser's own burst
+    if (same) return;
+    const carried = autoScroll ? autoVel : 0; // turned against the page's own glide: it swings back, not stops dead
+    takeOver();
+    direction = Math.sign(e.deltaY); // the way the wheel turned, at once: the page hasn't moved yet, so it can't say
+    if (!wheelRaf) {
+      wheelPos = wheelSet = wheelTarget = scrollY;
+      wheelVel = carried;
+      wheelLast = 0;
+    }
+    wheelTarget = Math.min(document.documentElement.scrollHeight - innerHeight, Math.max(0, wheelTarget + wheelPixels(e)));
+    if (!wheelRaf) wheelRaf = requestAnimationFrame(stepWheel);
+    waitToFinish(WHEEL_TAIL); // the finish comes this long after the last notch, while the glide is still moving
+  }
+
+  addEventListener('scroll', onScroll, { passive: true });
+  for (const type of ['keydown', 'mousedown']) {
+    addEventListener(
+      type,
+      () => {
+        cancelWheelGlide();
+        takeOver();
+      },
+      { passive: true },
+    );
+  }
+  addEventListener('wheel', onWheel, { passive: false });
 
   // Tab from the top bar lands on the ending's buttons, and the browser jumps there past the opening (the user,
   // 2026-09-14). Instead the page glides there through the book, quickly. Arrows, Space and Page Down scrub as always.
@@ -1093,11 +1346,48 @@
     // Chrome has already jumped by now; a browser that jumps after this event is caught before the next frame is drawn.
     if (!glide()) requestAnimationFrame(glide);
   });
+  // Where a touch began, so a sideways drag can be told from a scroll (answerSwipe).
+  let touchX = 0;
+  let touchY = 0;
+  let swiped = false; // this gesture has already been answered
   addEventListener(
     'touchstart',
-    () => {
+    (e) => {
       touching = true;
+      cancelWheelGlide();
       takeOver();
+      const t = e.touches[0];
+      swiped = false;
+      if (t) {
+        touchX = t.clientX;
+        touchY = t.clientY;
+      }
+    },
+    { passive: true },
+  );
+
+  addEventListener(
+    'touchmove',
+    (e) => {
+      const t = e.touches[0];
+      if (!t || swiped) return;
+      const dx = t.clientX - touchX;
+      const dy = t.clientY - touchY;
+      // Clearly sideways rather than a scroll that wandered, and not started at an edge, where the drag belongs to the
+      // browser's own back and forward.
+      if (Math.abs(dx) < SWIPE_X || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+      if (touchX < SWIPE_EDGE || touchX > innerWidth - SWIPE_EDGE) return;
+      swiped = true;
+      answerSwipe();
+    },
+    { passive: true },
+  );
+
+  // A trackpad pushed sideways is the same question asked with two fingers.
+  addEventListener(
+    'wheel',
+    (e) => {
+      if (Math.abs(e.deltaX) > 24 && Math.abs(e.deltaX) > Math.abs(e.deltaY) * 2) answerSwipe();
     },
     { passive: true },
   );

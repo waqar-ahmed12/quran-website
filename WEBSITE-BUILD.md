@@ -499,6 +499,40 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      screens only, under Ending). (4) *Star:* on an upright phone it grows toward the share of the screen's height it
      has on a computer, up to 125% of the width (469 px on a 375 px phone, was 360): the outer ring runs past the sides
      and the star inside stays whole.
+   - **Jolt when scrolling starts (the user, 2026-09-18: "a jolt, then the page starts to move ... the speed of scroll
+     is different from the automatic").** Found with the Scroll check recording (the user is on **Firefox 156**): the
+     browser's own wheel scrolling moved the page 408 px in about 117 ms (peak near 7,800 px/s), then the page stood
+     still for the finish wait, then the automatic finish started at full speed (about 1,500 px/s): burst, stop, sudden
+     restart. Nothing the page draws was involved, which is why the first changes did nothing: a spring for the book's
+     glide, the float settling gently (atmosphere.js: real but small), a speed cap, and a first wheel takeover that was
+     **reverted** because it stalled on whole-pixel scroll offsets and broke "Nearer end" / "Way you scrolled".
+     **Built (2026-09-19):** the page takes the wheel over (`onWheel`, `stepWheel` in main.js): each notch adds to a
+     target and the real scroll position glides to it with a spring, chasing no more than 0.6 of a screen ahead; the
+     glide's position is kept in `wheelPos`, never read back from `scrollY`. The automatic finish carries on from the
+     wheel glide's position and speed (a Hermite curve in `scrollToY`), is judged from where the wheel is heading
+     (`settleEnding(at)`, `targetScroll(at)`), takes its direction from the wheel, and starts `finishWait` + 130 ms
+     (`WHEEL_TAIL`, what the browser's own burst used to add) after the last notch. If the finish would have to turn the
+     page round or stop it dead, the wheel glide arrives first and the finish runs from rest. Left to the browser: zoom
+     and sideways wheels, boxes that scroll themselves, reduced motion, touch screens that snap. TRYOUTS in **Ending:**
+     **Wheel scrolling** (Browser's own / Smooth, default Smooth) and **Wheel smoothness** (0.05 to 0.5 s, default 0.2);
+     **Glide start** now defaults to Gently (the user's own pick in setting.txt). Also **Atmosphere → Book when
+     scrolling starts** (Stops at once / Settles gently, default gently) and **Opening and aayat → Glide feel** (As
+     before / Soft start). The **Scroll check** group at the top of the options panel (site/scroll-check.js, temporary)
+     records one scroll frame by frame; delete it, its script line in index.html and `window.heroState` in main.js once
+     the user is happy. The options panel's `backdrop-filter` blur was removed (it is redone every frame over the moving
+     book). **Tests:** `node tools/scroll-sim/checks.js` runs the real main.js in a simulated page (43 checks, including
+     600 random gestures that must end where the browser's own wheel ends; the worst one-frame speed change is 780 px/s,
+     against over 7,500 for the browser's own); `tools/scroll-sim/trace.js` follows one gesture. Run it after ANY change
+     to the scroll, finish or glide code. Not yet seen in a real browser by the user.
+   - **Light book sways left and right while the cover swings (the user, 2026-09-19, with a screenshot).** The light take's
+     measured right edge wobbles by up to 10 px before the cover passes upright, and the book is centred on it. Fix in
+     main.js (`smoothedRights`, `lightFilm.smoothEdge`): the edge is taken as its running maximum, then averaged over 8
+     frames each side, the window shrinking to nothing at both ends so the first and last frames stay exact. Backward
+     steps of the centre: 12 to 0; jerk 2.5 to 1.0 px a frame. The fastest sideways step barely changes (9.8 to 9.1 px)
+     because the cover's edge really does move that fast; if that still reads as sliding, centre less aggressively
+     through the swing. The dark take is untouched. TRYOUT **Opening and aayat → Light book sway** (As before /
+     Smoothed, default Smoothed). videos/build-light-geom.js rewrites `rightsLight` in main.js (74 frames on 2026-09-19);
+     this doesn't depend on those numbers.
    WebP conversion needs a tool; do it after the PC is cleaned (e.g. `sharp` in Node), aiming for a few MB total.
    **Before launch, check the free Qaida is live.** The line under the headline promises it. If it isn't ready, change
    the line so visitors aren't sent looking for something that doesn't exist yet. The site name also needs adding.

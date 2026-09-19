@@ -10,7 +10,7 @@ Qaida with one line: the current step, its skills, and the next step.
 
 ## Where we are
 
-**Step 1 of 12 — the Qaida page and Lesson 1.** In progress.
+**Steps 1–3 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing.
 
 ## Decisions
 
@@ -24,25 +24,34 @@ Qaida with one line: the current step, its skills, and the next step.
 | Extras | **All of them, later:** record your own voice, trace the letters, finish screen. Not in step 1 |
 | Letter order | **Claude's call** (the user: "do what you like best"): alphabet order, taught in shape families. See `QAIDA-CONTENT.md` |
 | Match a printed Qaida | The user wasn't sure. Alphabet order keeps the page in step with a printed Qaida anyway |
+| Finishing a drill lesson | **A recommendation, not a gate** *(2026-09-19)*: "a recommendation that you seem okay, let's move on". A missed letter **comes back more often but never straight away**; one missed repeatedly earns "go back and look at it again" — advice, never a block |
+| Mixed review | **Every later lesson mixes in** earlier material *(2026-09-19)*. The lesson's own items are the gate; review items ride along and never are. Answers the "ask first" on steps 6 and 8 |
+| Skipping ahead | **Allowed** *(2026-09-19)*: "if the user wanted to skip they can, but they should also be advised that if they are new, it is recommended to go with the flow". **Nothing is locked.** A lesson out of turn advises once, then lets them through. Overrules step 1's locks — see `docs/lesson-2/09-going-in-order.md` |
 
 ## Steps
 
 One step at a time, with the user's sign-off before the next.
 
+**Reordered 2026-09-18.** Sound and tracing were at the end (old steps 7 and 9). The user asked where they were and
+said the whiteboard is *"for learning purpose for people, to practice"* — which the end of the queue doesn't serve.
+Both attach to Lesson 1, which already exists, so doing them now makes Lesson 1 a complete example of what a lesson
+is, and lessons 2–14 get built against it instead of being retrofitted.
+
 | # | Step | Skills | Status |
 |---|---|---|---|
-| 1 | **The Qaida page and Lesson 1.** A home with the 14 lessons (only lesson 1 open) and the progress bar; a first-visit choice of script and names, changeable any time; Lesson 1, the 29 letters, tap to peek; progress kept on this device; the landing page's look, light and dark; an options panel with tryouts and a text field for every line | `minimalist-ui`, `ui-ux-pro-max`, `full-output-enforcement` | **In progress** |
-| 2 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | |
-| 3 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | |
-| 4 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | Ask first: mixed review in every later lesson? |
-| 5 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | |
-| 6 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Ask first: jazam before or after leen? |
-| 7 | **Sound:** the user's recordings in every lesson | `ui-ux-pro-max`, `full-output-enforcement` | Left out for now |
-| 8 | **Record your own voice** and play it back | `ui-ux-pro-max`, `minimalist-ui` | |
-| 9 | **Trace the letters** with a finger or mouse | `minimalist-ui`, `high-end-visual-design` | |
-| 10 | **Finish screen:** a mark for each finished lesson, and a last screen pointing to one-to-one lessons | `minimalist-ui` | |
-| 11 | **Polish:** spacing, lettering, motion | `high-end-visual-design` | |
-| 12 | **Audit and connect:** keyboard, screen readers, phones, MASTER.md's checklist; options panels removed; a licensed Indo-Pak font in place of the Noto Naskh stand-in | `web-design-guidelines` | The landing page's three Free Qaida links were pointed at `qaida/` early, 2026-09-18 |
+| 1 | **The Qaida page, Lesson 1 and the Qaida home.** The 14 lessons (only lesson 1 open) and the progress bar; a first-visit choice of script, names and grouping, changeable any time; Lesson 1, the letters, tap to peek; progress kept on this device; the landing page's look, light and dark; an options panel with tryouts and a text field for every line | `minimalist-ui`, `ui-ux-pro-max`, `full-output-enforcement` | **Built, awaiting sign-off** |
+| 2 | **Sound in Lesson 1.** The player, `audio/manifest.json`, the wordless stand-in, the mute switch, and the recording list at `recordings.html` | `ui-ux-pro-max`, `full-output-enforcement` | **Built, awaiting sign-off.** The teacher records gradually (2026-09-18) |
+| 3 | **Trace the letters** with a finger, mouse or pen, inside Lesson 1 | `minimalist-ui`, `high-end-visual-design` | **Built, awaiting sign-off.** Was step 9 |
+| 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Specified in `docs/lesson-2/`** (2026-09-19) — read it before building. Not built |
+| 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | |
+| 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-19: mixed review carries through **every** later lesson |
+| 7 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | |
+| 8 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Ask first: jazam before or after leen? |
+| 9 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Each lesson adds its rows to the recording list as it's built |
+| 10 | **Record your own voice** and play it back against the teacher's | `ui-ux-pro-max`, `minimalist-ui` | Only means something once the recordings are in |
+| 11 | **Finish screen:** a mark for each finished lesson, and a last screen pointing to one-to-one lessons | `minimalist-ui` | |
+| 12 | **Polish:** spacing, lettering, motion | `high-end-visual-design` | |
+| 13 | **Audit and connect:** keyboard, screen readers, phones, MASTER.md's checklist; options panels and `recordings.html` removed; a licensed Indo-Pak font in place of the Noto Naskh stand-in | `web-design-guidelines` | The landing page's three Free Qaida links were pointed at `qaida/` early, 2026-09-18 |
 
 ## Skills on this PC
 
@@ -101,3 +110,60 @@ directly.
 
   Still open from that look: whether the brighter gold is enough, and whether Ḥaa / Ṣaad / ʿAyn should lose their
   dots for a beginner.
+
+### Steps 2 and 3 — sound and tracing in Lesson 1
+
+*Built 2026-09-18, after the user asked where the whiteboard and the audio were in the plan.*
+
+**Sound.** `audio.js` plus `audio/manifest.json`. The manifest lists **only what has been recorded**, because the
+teacher is uploading gradually ("there are a lot of words") — anything not listed simply has no recording, and the
+page says so instead of breaking. Filenames are ASCII slugs (`letters/alif.mp3`), since Arabic in a filename is
+fragile across Windows, git and the server; one recording serves both scripts, because `shell.keyOf` already folds
+ک ہ ی onto ك ه ي. Tapping a letter shows its name and plays it; a speaker mark appears only on letters that have a
+real recording; a line under the progress bar says how many are in. A mute switch sits in the top bar, kept on the
+device like the theme. Nothing autoplays.
+
+**The stand-in is a wordless hum, not speech** (`make-placeholder-voice.js` writes the WAV by hand — no ffmpeg, no
+Python). The user asked for "something resembling voice" rather than a beep; a human timbre that says nothing keeps
+that feel without breaking the rule that a student must never hear a machine pronounce a letter.
+
+**The recording list** (`recordings.html`) is for the teacher only — nothing on the site links to it. It lists every
+clip wanted, checks the folder for files, and writes out a ready-made `manifest.json` to paste. Each later lesson
+adds its rows as it's built. Removed at step 13.
+
+**Tracing.** `trace.js` — tapping a letter now also fills a strip under the grid (the letter, its name, "Hear it
+again", "Trace it"), because a tile is itself a button and can't hold buttons of its own. "Trace it" opens a board
+with the letter faint underneath, drawn with a finger, mouse or pen; undo, clear, and hide the letter to try from
+memory. **No marking:** handwriting recognition on Arabic isn't reliable enough to tell a student they're wrong.
+
+**After the user's look (2026-09-18):** the guide letter sat low for ج ح خ ع غ ي. CSS centres a letter's *text box*,
+and those letters carry most of their weight below the line they sit on. It's now drawn onto its own canvas and
+centred on its **ink**, measured with `measureText`, so every letter sits in the middle of the square whatever its
+shape. The lettering and colour still come from CSS, so it follows the script and the theme.
+
+Checked with `node --check`. **Not seen in a browser** — the user previews it.
+
+### Step 4 planned, and Export settings added to the Qaida panel
+
+*2026-09-19. The user: "plan the next lesson, do add the export settings… make a folder of md of lesson 2, so that
+other models look at it for dev."*
+
+**Lesson 2 is specified, not built.** `docs/lesson-2/` holds eleven files — the pedagogy, the `practice.js` API,
+the storage extension and its validation, the page and its CSS, every line of wording, accessibility, the options
+panel, the file list and build order, and the open questions. `README.md` in that folder gives the read order. It
+is a specification another model builds from; the design record in `design-system/quran-landing/pages/qaida.md` is
+written afterwards, once the code exists and the user has seen it.
+
+**Three decisions, all in the Decisions table above.** Finishing is a **recommendation** rather than a gate; mixed
+review **carries through every later lesson**; and **skipping ahead is allowed**, with advice, which overrules step
+1's locks across the whole Qaida (`docs/lesson-2/09-going-in-order.md` — not built yet either).
+
+**Export settings** now sit at the top of the Qaida options panel, the same as the landing page's
+(`site/main.js:806-959`): every control registers under `"<section> :: <label>"`, **Export** turns the lot into one
+block and copies it, **Import** reads that block back. That is how the Qaida's picks reach `setting.txt`. Two
+things went with it: the **Words** section is named per page (`Words (home)`, `Words (lesson 1)`) so one block can
+hold several pages without a title landing on the wrong one, and the **localhost gate was dropped**, so the panel
+shows on the hosted preview the way the landing page's already does — the whole point of an Export button is that
+someone else can send their picks back. One line, easily put back.
+
+Checked with `node --check`. **Not seen in a browser** — the user previews it.

@@ -1,5 +1,6 @@
 <!doctype html>
-<!-- The free Qaida, Lesson 1 (QAIDA-BUILD.md, step 1). No recordings and no whiteboard yet. The design is recorded
+<!-- The free Qaida, Lesson 1 (QAIDA-BUILD.md, steps 1-3): the letters, sound, and the tracing board. No real
+     recordings yet, so every letter plays the stand-in and the page says so. The design is recorded
      in design-system/quran-landing/pages/qaida.md. The data- attributes on <html> are the look; the options panel
      (qaida-options.js) changes them for tryouts. -->
 <html lang="en"
@@ -27,6 +28,8 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&family=Scheherazade+New&display=swap">
   <link rel="stylesheet" href="qaida.css">
   <script src="shell.js" defer></script>
+  <script src="audio.js" defer></script>
+  <script src="trace.js" defer></script>
   <script src="qaida.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
@@ -49,6 +52,16 @@
       <a class="crumb" href="./" data-words="Top bar: where you are">Free Qaida</a>
     </div>
     <div class="tools">
+      <!-- Sound on or off, kept on this device. Nothing ever plays by itself; this is for studying in company. -->
+      <button class="tool mute" type="button" aria-pressed="false"
+              data-off="Turn the sound off" data-on="Turn the sound on"
+              data-words-attr="data-off|Sound button, when sound is on;data-on|Sound button, when sound is off">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
+          <path class="waves" d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10" />
+          <path class="cross" d="M16 9.5l5 5M21 9.5l-5 5" />
+        </svg>
+      </button>
       <button class="tool open-settings" type="button" aria-haspopup="dialog">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M4 8h8.5M17.5 8H20M4 16h2.5M11.5 16H20" />
@@ -109,12 +122,39 @@
       <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="29" aria-valuenow="0">
         <span class="fill"></span>
       </div>
+      <!-- The recordings arrive a few at a time, so this says where they've got to rather than promising anything.
+           qaida.js hides it once every letter is recorded. -->
+      <p class="sound-note" hidden
+         data-none="No recordings yet — what you hear is a stand-in, not a voice saying the letter."
+         data-some="{done} of {total} letters recorded. The rest play a stand-in."
+         data-words-attr="data-none|Sound line, nothing recorded;data-some|Sound line, some recorded ({done} and {total} are filled in)"></p>
     </div>
 
     <section class="letters-wrap" aria-labelledby="letters-title">
       <h2 class="sr-only" id="letters-title" data-words="Heading over the letters (screen readers only)">The letters of this script</h2>
       <!-- Right to left, like the page of a Qaida. qaida.js adds the letters, grouped in shape families. -->
       <div class="letters" dir="rtl"></div>
+
+      <!-- The letter last tapped. A tile is itself a button, so its own buttons have to live outside it — and at
+           that size they'd crowd the letter anyway. Hidden until something has been tapped. -->
+      <div class="current" hidden>
+        <span class="current-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
+        <span class="current-name"></span>
+        <button class="button quiet current-hear" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
+            <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5" />
+          </svg>
+          <span data-words="Hear it again button">Hear it again</span>
+        </button>
+        <button class="button quiet current-trace" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
+            <path d="M14.5 6.5l3 3" />
+          </svg>
+          <span data-words="Trace it button">Trace it</span>
+        </button>
+      </div>
     </section>
 
     <footer class="lesson-end">
@@ -156,6 +196,34 @@
   </main>
 
   <p class="note" role="status"></p>
+
+  <!-- Trace the letter you have just learnt. No marking: a machine can't judge Arabic handwriting well enough to be
+       trusted, and a wrong "incorrect" teaches a student to doubt themselves. Compare by eye, as a Qaida asks. -->
+  <dialog class="tracer" aria-labelledby="tracer-title">
+    <div class="tracer-head">
+      <h2 class="tracer-title" id="tracer-title" data-template="Trace {name}"
+          data-words-attr="data-template|Tracing board: title ({name} is filled in)"></h2>
+      <button class="tool close-trace" type="button" aria-label="Close the board">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+    <div class="board">
+      <!-- The letter underneath is drawn rather than set as text, so trace.js can centre it on its ink. Half the
+           Arabic alphabet hangs below the line it sits on, and centring the text box leaves those letters low. -->
+      <canvas class="board-guide" aria-hidden="true"></canvas>
+      <canvas class="board-ink"></canvas>
+    </div>
+    <div class="board-tools">
+      <button class="link undo" type="button" data-words="Tracing board: undo">Undo</button>
+      <button class="link clear" type="button" data-words="Tracing board: clear">Clear</button>
+      <button class="link toggle-guide" type="button" aria-pressed="false"
+              data-hide="Hide the letter" data-show="Show the letter"
+              data-words-attr="data-hide|Tracing board: hide the letter;data-show|Tracing board: show the letter">Hide the letter</button>
+    </div>
+    <p class="board-hint" data-words="Tracing board: line at the bottom">Write over the letter with your finger, a mouse or a pen. Hide it and try again from memory. This needs something to draw with — a keyboard won’t do it.</p>
+  </dialog>
 
   <!-- First visit: script, names and grouping. Opens by itself the first time, and from Settings or Change after. -->
   <dialog class="chooser" aria-labelledby="chooser-title">

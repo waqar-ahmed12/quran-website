@@ -46,7 +46,7 @@
   };
   addText('Switch word, dark page', themeButton.dataset.toLight, switchWord('toLight'));
   addText('Switch word, light page', themeButton.dataset.toDark, switchWord('toDark'));
-  addOption('Scrolling down', { 'Bar stays': 'stays', 'Bar slides away': 'hides' }, 'hides', (v) => {
+  addOption('Scrolling down', { 'Bar stays': 'stays', 'Bar slides away': 'hides' }, 'stays', (v) => {
     root.dataset.topbarScroll = v;
     topbar.classList.remove('away'); // back in view; it slides away again at the next scroll down
   });
@@ -56,6 +56,19 @@
 
   addOption('Scroll hint', { Show: 'show', Hide: 'hide' }, 'show', (v) => (root.dataset.hint = v));
   addText('Scroll hint words', hint.textContent, (v) => (hint.textContent = v));
+
+  // The closed book has the hint above; the open one had nothing, and that is where visitors try to turn the page
+  // instead of scrolling on (the user, 2026-09-19). Three rows: the cue itself, its words, and what a sideways
+  // swipe gets in return.
+  const openHint = document.querySelector('.open-hint span');
+  addOption('Cue on the open book', { 'Words and line': 'both', 'Line only': 'line', Off: 'off' }, 'both', (v) => (root.dataset.openHint = v));
+  addText('Open-book cue words', openHint.textContent, (v) => (openHint.textContent = v));
+  addOption(
+    'If they swipe sideways',
+    { 'Nudge the page down': 'nudge', 'Flash the cue': 'flash', 'Do nothing': 'off' },
+    'nudge',
+    (v) => window.setSwipeAnswer(v),
+  );
 
   if (!matchMedia('(min-width: 1024px)').matches) return; // the sides only show on computers
 

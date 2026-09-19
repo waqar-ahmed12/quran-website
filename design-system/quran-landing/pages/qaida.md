@@ -19,7 +19,12 @@ Files:
 | `site/qaida/shell.js` | what both pages share: the saved state, the letters, the fourteen lessons, the first-visit choice, light/dark |
 | `site/qaida/home.js` | the home's cards and overall progress |
 | `site/qaida/qaida.js` | Lesson 1's tiles, peek and progress |
-| `site/qaida/qaida.css` | both pages |
+| `site/qaida/audio.js` | the manifest, the player, what has a recording |
+| `site/qaida/trace.js` | the tracing board |
+| `site/qaida/audio/manifest.json` | what has been recorded — the only thing that knows |
+| `site/qaida/audio/placeholder.wav` | the wordless stand-in, made by `make-placeholder-voice.js` at the project root |
+| `site/qaida/recordings.html`, `recordings.js` | **temporary** — the teacher's recording list |
+| `site/qaida/qaida.css` | every page |
 | `site/qaida/qaida-options.js` | **temporary** — the tryouts and the text fields, localhost only |
 
 Preview: `node serve.js`, then `http://localhost:8777/site/qaida/`.
@@ -121,6 +126,16 @@ wash**; lesson numbers shown *(default)* or hidden.
    د ذ · ر ز · س ش · ص ض · ط ظ · ع غ · ف ق · then one each), 8px apart inside a family and 10–20px between families.
 5. **End of lesson:** the star between two rules, a line, then two ways out: **← The lessons** (a quiet outline) and
    the **Lesson 2** button, locked until every letter has been seen. They stack, next lesson on top, under 420px.
+   **Two tokens place these buttons, and they are not the same thing** — a distinction Claude got wrong twice on
+   2026-09-18 before the user said plainly "i want that the buttons move up a bit":
+   - **`--end-gap`** (`clamp(0.5rem, 1.2vh, 0.875rem)`) is the space *above* them, on `.current` and `.lesson-end`.
+     Taking it out **moves the buttons up the screen**. This is the one that answers "they're at the edge".
+   - **`--page-foot`** (`clamp(1.5rem, 3vh, 2.5rem)`) is the room *below* them, on both pages' columns. More of it
+     only makes the page longer; the buttons don't move.
+
+   Both are sliders in the options panel, and each starts from what the live page actually measures rather than from
+   the stylesheet. Nothing overrides either: the short-window rules (`max-height: 740px`) tighten everything *above*
+   the letters and leave the end of the lesson to these two tokens.
 
 **Which letters** — the list follows the script (the user, 2026-09-18). 29 either way:
 - **Madani** — alphabet order: ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ء ي
@@ -167,6 +182,56 @@ number). **Under the title** *(default)* or **stays at the top** (sticks under t
 **Start again** — a gold text link; the first tap changes it to "Tap again to clear" for 3 s, so progress is never
 lost to one mis-tap. The home's "Start again" works the same way and clears every lesson.
 
+**The letter last tapped** — a strip under the grid: the letter in gold, its name, **Hear it again** and **Trace
+it**, both quiet 40px outlines. It exists because a tile is already a `<button>` and can't hold buttons of its own,
+and at tile size they would crowd the letter. Hidden until something is tapped, and emptied when the script changes.
+
+### Sound
+
+Nothing autoplays — browsers block it, and a student working in company wouldn't thank us. **Tapping a letter shows
+its name and plays it**, one sound at a time.
+
+The recordings arrive a few at a time, so **nothing assumes a file exists**. `audio/manifest.json` lists only what
+has been recorded; everything else has no recording, and the page says so rather than pretending:
+- a **speaker mark** in the tile's far corner appears *only* on letters that have a real recording;
+- one **line under the progress bar** — "No recordings yet — what you hear is a stand-in" or "7 of 29 letters
+  recorded" — which hides itself once they're all in;
+- a **mute switch** in the top bar, kept on the device like the theme, greying the speaker marks when it's off.
+
+**The stand-in is a wordless hum, never speech.** `QAIDA-CONTENT.md`'s rule is the teacher's own voice or a vetted
+reciter, never an AI voice, because a student believes what they hear. The user asked for "something resembling
+voice" rather than a beep, so `make-placeholder-voice.js` writes a WAV by hand: a buzz at a human pitch through two
+vowel formants, opening from "mm" to "ah". A human timbre that pronounces nothing.
+
+**Filenames are ASCII slugs** — `letters/alif.mp3` — because Arabic in a filename is fragile across Windows, git and
+the server. One recording serves both scripts: `shell.keyOf` already folds ک ہ ی onto ك ه ي.
+
+**The recording list** (`recordings.html`) is a working page for the teacher; nothing on the site links to it. It
+lists every clip wanted with what to say and what to call it, checks the folder for files, and writes out a
+ready-made manifest to paste. Removed at step 13 with the options panels.
+
+### The tracing board
+
+Opened from **Trace it** on the strip. A `<dialog>` with the letter drawn large and faint on cream — the same paper
+as the tiles, in both themes — and a canvas over it.
+
+- Draw with a finger, mouse or pen: pointer events, one code path, `touch-action: none` so a finger drawing doesn't
+  scroll the page under it. The stroke colour is the canvas's own `color`, so the ink follows the theme.
+- **Undo** (one stroke), **Clear**, and **Hide the letter** — which is the point of practising: trace it, then try it
+  from memory.
+- **No marking.** Handwriting recognition on Arabic isn't reliable enough, and a machine telling a student "wrong"
+  when they are right teaches them to distrust themselves. A printed Qaida asks them to compare by eye; so does this.
+- **The guide letter is centred on its ink, not on its text box.** ج ح خ ع غ ي carry most of their weight below the
+  line they sit on, so CSS centring left them sitting low in the board — the user spotted it on the first look
+  (2026-09-18). It is drawn onto its own canvas instead: `measureText` gives the ink's real bounds, the letter is
+  sized to fill about 72% of the board and placed so the middle of the ink is the middle of the square. The
+  lettering and the colour still come from CSS (`font-family: var(--font-letter)`), so it follows the chosen script
+  and theme, and it is measured again once the web font has actually arrived.
+- Changing the script **closes the board**: ك becomes ک, and a board showing a letter the lesson no longer holds
+  would be a lie. The lesson's strip empties for the same reason.
+- **Honest about keyboards:** tracing needs a pointer. The board opens, closes and is read normally from a keyboard,
+  and the line at the bottom says plainly that it needs something to draw with.
+
 ---
 
 ## 5. What both pages share
@@ -205,6 +270,7 @@ page's eight-pointed stars joined by lines, at 9%, fading down the page · **Pla
 | Bar fill | scaleX | 700 ms |
 | The last letter | bar sweep, dots pulse in turn, the star turns into place, the button unlocks | 600–2200 ms, **once** |
 | Choice panel | enter: rise + backdrop fade (500 / 300 ms); exit: fall + backdrop fade (260 ms) |
+| Tracing board | the same, a little quicker in (400 ms) |
 | Hovers, colours | | 200 ms |
 
 Only `transform`, `translate`, `scale` and `opacity` animate. **Reduced motion:** no arrival, no pulse or sweep, and
@@ -239,12 +305,16 @@ and 2026-09-18 and is kept only as a tryout.
 - **The fourteen lesson titles and lines** are Claude's, and every one has a field in Options → Lesson titles and
   lines. Titles for lessons 4–14 change with the student's choice of names (Fatha / Zabar, Sukoon / Jazam).
 - **Every other line of wording** is a stand-in with a field in Options → Words.
-- **Not built:** lessons 2–14, recordings, record-your-voice, whiteboard, tracing.
+- **Every recording** is missing. The player, the manifest and the recording list are built; not one real clip is in
+  yet, so every letter plays the wordless stand-in and the lesson says so. The teacher records gradually.
+- **Not built:** lessons 2–14, the recordings themselves, record-your-own-voice, the finish screen.
 
 ---
 
 ## 8. Checked and not checked
 
-Checked: every script passes `node --check`. **Not seen in a browser** — the user previews it. Things most worth a
-look: the fourteen cards at a phone width and at 1440, where Amiri Quran's letters sit vertically inside a tile, the
-Indo-Pak list with its two extra letters, and the chooser on a phone.
+Checked: every script passes `node --check`, and a script validates both letter lists (counts, no repeats, every
+name filled in, the families covering each list once). **Not seen or heard in a browser** — the user previews it.
+Things most worth a look: the fourteen cards at a phone width and at 1440, where Amiri Quran's letters sit vertically
+inside a tile, the chooser on a phone, **whether the stand-in hum sounds like a voice clearing its throat rather than
+a machine**, and **tracing with a finger on a real phone** — that the page doesn't scroll under the hand.

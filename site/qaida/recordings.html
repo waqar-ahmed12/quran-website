@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- The recording list: every clip the Qaida wants, and whether it has one. For the teacher, not for visitors —
+     nothing on the site links here. Remove it at step 12 with the options panel (QAIDA-BUILD.md). -->
+<html lang="en" data-bg="light" data-titlemark="none">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recording list · Free Qaida</title>
+  <meta name="theme-color" content="#1F1A18">
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      document.documentElement.dataset.theme = 'dark';
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&display=swap">
+  <link rel="stylesheet" href="qaida.css">
+  <script src="shell.js" defer></script>
+  <script src="audio.js" defer></script>
+  <script src="recordings.js" defer></script>
+</head>
+<body>
+  <div class="top-sentinel" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="where">
+      <a class="brand" href="./">
+        <svg class="mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
+          <rect x="-8" y="-8" width="16" height="16" />
+          <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+          <circle r="2" />
+        </svg>
+        <span class="name" translate="no">Alif to Ayah</span>
+      </a>
+      <span class="crumb">Recording list</span>
+    </div>
+    <div class="tools">
+      <button class="tool theme" type="button" aria-label="Switch to light mode">
+        <svg class="half" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="course-home">
+    <header class="lesson-head">
+      <div class="head-text">
+        <p class="eyebrow">For the teacher</p>
+        <h1>What still needs recording</h1>
+        <p class="lede">Record each line in your own voice, save it under the filename shown, and put it in
+          <code>site/qaida/audio/letters/</code>. Then press <strong>Check the folder</strong> below and paste the
+          result into <code>audio/manifest.json</code>. Add them a few at a time; the lesson uses whatever is there
+          and is honest about the rest.</p>
+        <p class="lede warn"><strong>Your voice or a reciter you trust — never a computer voice.</strong>
+          A student believes what they hear, and mispronunciation is the thing this whole Qaida teaches against.</p>
+      </div>
+    </header>
+
+    <div class="progress">
+      <div class="progress-row">
+        <p class="progress-text" id="recording-progress"></p>
+        <button class="link check" type="button">Check the folder</button>
+      </div>
+      <div class="bar" role="progressbar" aria-labelledby="recording-progress" aria-valuemin="0" aria-valuenow="0">
+        <span class="fill"></span>
+      </div>
+    </div>
+
+    <table class="list">
+      <caption class="sr-only">Every recording the Qaida wants</caption>
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Letter</th>
+          <th scope="col">Say</th>
+          <th scope="col">Save as</th>
+          <th scope="col">Got it?</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <section class="manifest-block" hidden>
+      <h2>Paste this into <code>audio/manifest.json</code></h2>
+      <p class="lede">This is the whole file. Replace what's in it.</p>
+      <div class="board-tools">
+        <button class="link copy" type="button" data-label="Copy it" data-done="Copied">Copy it</button>
+      </div>
+      <pre class="manifest-out" tabindex="0"></pre>
+    </section>
+
+    <footer class="home-end">
+      <p class="end-line">Lesson 1's letters only. Each later lesson adds its own rows here as it's built.</p>
+    </footer>
+  </main>
+
+  <p class="note" role="status"></p>
+</body>
+</html>

@@ -38,6 +38,10 @@
   --font-indopak: 'Noto Naskh Arabic', 'Scheherazade New', serif;
   --font-letter: var(--font-madani);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Two ways to place the buttons at the end of a lesson, both sliders in the options panel:
+     --end-gap moves them UP by taking space out above them; --page-foot leaves room BELOW them. */
+  --end-gap: clamp(0.5rem, 1.2vh, 0.875rem);
+  --page-foot: clamp(1.5rem, 3vh, 2.5rem);
   --topbar-h: 3.75rem;
   --gutter: clamp(1rem, 3.5vw, 2.5rem);
   --tile: clamp(4.25rem, 3.6rem + 1.8vw, 5.5rem);
@@ -338,11 +342,12 @@ a.crumb:hover {
   }
 }
 
-/* The lesson: centered column, 58rem max so the 18 shape families wrap into 4 balanced rows. */
+/* The lesson: centered column, 58rem max so the shape families wrap into 4 balanced rows. The foot is generous —
+   the way on to the next lesson shouldn't sit hard against the bottom of the window. */
 .lesson {
   max-width: 58rem;
   margin-inline: auto;
-  padding: clamp(0.75rem, 1.6vh, 1.25rem) var(--gutter) clamp(0.75rem, 1.8vh, 1.25rem);
+  padding: clamp(0.75rem, 1.6vh, 1.25rem) var(--gutter) var(--page-foot);
   box-sizing: border-box;
 }
 
@@ -865,7 +870,7 @@ a.crumb:hover {
   flex-direction: column;
   align-items: center;
   gap: clamp(0.35rem, 0.7vh, 0.5rem);
-  margin-top: clamp(1rem, 2.2vh, 1.75rem);
+  margin-top: var(--end-gap);
   text-align: center;
 }
 
@@ -1445,10 +1450,12 @@ a.crumb:hover {
   }
 }
 
+/* A short window — a laptop, or a browser with a lot of toolbars. Everything above the letters tightens up to leave
+   the letters as much room as possible. The foot is deliberately NOT tightened: the page scrolls at this height
+   anyway, so cramping the last thing on it buys nothing and leaves the two buttons against the edge. */
 @media (max-height: 740px) {
   .lesson {
     padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
   }
   .progress {
     margin-top: 0.4rem;
@@ -1458,10 +1465,6 @@ a.crumb:hover {
   }
   .letters {
     gap: 0.35rem clamp(0.5rem, 1.4vw, 1rem);
-  }
-  .lesson-end {
-    margin-top: 0.5rem;
-    gap: 0.35rem;
   }
   .button {
     min-height: 40px;
@@ -1528,7 +1531,7 @@ a.crumb:hover {
 .course-home {
   max-width: 58rem;
   margin-inline: auto;
-  padding: clamp(1rem, 2.5vh, 2rem) var(--gutter) clamp(2rem, 5vh, 3.5rem);
+  padding: clamp(1rem, 2.5vh, 2rem) var(--gutter) var(--page-foot);
   box-sizing: border-box;
 }
 
@@ -1726,6 +1729,322 @@ a.crumb:hover {
   transform: none;
 }
 
+/* Sound ---------------------------------------------------------------------------------------
+   Nothing ever plays by itself. The switch in the top bar turns it off for good, kept on the device. */
+.mute .cross {
+  display: none;
+}
+
+[data-muted='true'] .mute {
+  color: var(--color-muted-foreground);
+}
+
+[data-muted='true'] .mute .waves {
+  display: none;
+}
+
+[data-muted='true'] .mute .cross {
+  display: block;
+}
+
+/* A speaker in the tile's far corner, on the letters that have a real recording. No mark means no recording — the
+   tile still makes a sound, but it's the stand-in, and the line under the progress bar says so. */
+.mark-sound {
+  position: absolute;
+  top: 0.4375rem;
+  inset-inline-end: 0.4375rem;
+  display: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--tile-mark);
+  opacity: 0.75;
+}
+
+.letter[data-recorded] .mark-sound {
+  display: block;
+}
+
+[data-muted='true'] .mark-sound {
+  opacity: 0.3;
+}
+
+.mark-sound svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+.mark-sound .wave {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.sound-note {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+}
+
+/* The letter last tapped: hear it again, or trace it. A tile is itself a button, so these can't sit inside it. */
+.current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: var(--end-gap);
+}
+
+.current-glyph {
+  font-family: var(--font-letter);
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.current-name {
+  margin-inline-end: 0.25rem;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  color: var(--color-muted-foreground);
+}
+
+/* A button that doesn't ask for attention: the quiet outline used for "back", "hear it" and "trace it". */
+.button.quiet {
+  min-height: 40px;
+  padding: 0 1rem;
+  border-color: var(--line);
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+}
+
+.button.quiet:hover {
+  border-color: rgb(var(--rgb-accent) / 0.6);
+  background: rgb(var(--rgb-accent) / 0.08);
+  color: var(--color-accent);
+}
+
+/* The tracing board --------------------------------------------------------------------------- */
+.tracer {
+  width: min(34rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100svh - 2rem);
+  padding: clamp(1.25rem, 4vw, 1.75rem);
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-foreground);
+}
+
+.tracer::backdrop {
+  background: rgb(var(--rgb-background) / 0.8);
+}
+
+.tracer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.875rem;
+}
+
+.tracer-title {
+  margin: 0;
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  font-weight: 300;
+}
+
+.close-trace {
+  margin-right: -0.625rem;
+}
+
+/* A page of the book to write on: the same cream as the tiles, in both themes. */
+.board {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1.5px solid var(--paper-edge);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+/* The letter underneath. trace.js reads the lettering and the colour from here and draws it itself, so that it can
+   be centred on its ink: ج ح خ ع غ ي hang below the line they sit on, and centring a text box leaves them low. */
+.board-guide {
+  font-family: var(--font-letter);
+  color: var(--ink);
+  opacity: 0.16;
+  pointer-events: none;
+  transition: opacity 250ms ease;
+}
+
+.guide-off .board-guide {
+  opacity: 0;
+}
+
+.board canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.board-ink {
+  /* The stroke colour: trace.js reads this, so the writing follows the theme with everything else. */
+  color: var(--ink);
+  cursor: crosshair;
+  touch-action: none; /* a finger drawing must not scroll the page under it */
+}
+
+.board-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.link:disabled {
+  color: var(--color-muted-foreground);
+  text-decoration-color: transparent;
+  cursor: default;
+}
+
+.board-hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tracer[open] {
+    animation: rise 400ms var(--ease-out);
+  }
+
+  .tracer[open]::backdrop {
+    animation: fade 300ms ease;
+  }
+
+  .tracer.closing {
+    animation: fall 260ms cubic-bezier(0.32, 0, 0.67, 0) forwards;
+  }
+
+  .tracer.closing::backdrop {
+    animation: fade-out 260ms ease forwards;
+  }
+}
+
+/* The recording list (recordings.html) — a working page for the teacher, not part of the site. ---------------- */
+.lede.warn {
+  margin-top: 0.75rem;
+  color: var(--color-accent);
+}
+
+code {
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: rgb(var(--rgb-foreground) / 0.07);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.list {
+  width: 100%;
+  margin-top: clamp(1rem, 2.5vh, 1.5rem);
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.list th,
+.list td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.list th {
+  font-family: var(--font-display);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.list .num {
+  width: 2.5rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-foreground);
+}
+
+.list .glyph-cell {
+  width: 3rem;
+  font-family: var(--font-letter);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.list .file {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground);
+}
+
+.list [data-state='got'] .got {
+  color: var(--color-accent);
+}
+
+.list [data-state='missing'] .got {
+  color: var(--color-muted-foreground);
+}
+
+.manifest-block {
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.manifest-block h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.manifest-out {
+  max-height: 22rem;
+  margin: 0.75rem 0 0;
+  padding: 1rem;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgb(var(--rgb-foreground) / 0.04);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.manifest-out:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 559px) {
+  .list .say {
+    display: none; /* the letter and the filename are what matter on a phone */
+  }
+
+  .list th,
+  .list td {
+    padding: 0.5rem 0.4rem;
+  }
+}
+
 /* TRYOUT: the options panel (qaida-options.js), as on the home page. Delete with it. */
 [data-madani-font='scheherazade'] {
   --font-madani: 'Scheherazade New', 'Amiri Quran', serif;
@@ -1735,18 +2054,23 @@ a.crumb:hover {
   --font-indopak: 'Scheherazade New', 'Noto Naskh Arabic', serif;
 }
 
+/* Positioned to match the landing page's panel (site/styles.css): lifted clear of the Netlify preview badge, which
+   sits in the bottom-right corner and would otherwise cover the way in. */
 .tryout {
   position: fixed;
-  z-index: 20;
+  z-index: 10000; /* above badges and overlays */
   right: 12px;
-  bottom: 12px;
+  bottom: 64px;
   max-width: calc(100vw - 24px);
-  max-height: calc(100svh - 24px);
+  max-height: calc(100svh - 80px); /* scrolls inside itself on a phone */
   overflow-y: auto;
   padding: 10px 12px;
   border: 1px solid #3F3A37;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.78);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   font: 13px/1 system-ui, sans-serif;
   color: #e7e0d8;
 }
@@ -1814,4 +2138,48 @@ a.crumb:hover {
 .tryout input[type='text']:focus-visible {
   outline: 2px solid #d4af37;
   outline-offset: 1px;
+}
+
+/* Export / Import, as on the landing page (site/styles.css). It sits under the summary, above every section, so it
+   is always the first thing in the panel. */
+.tryout .tryout-io {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.tryout .tryout-io > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.tryout textarea {
+  width: 100%;
+  min-height: 6em;
+  padding: 6px 8px;
+  border: 1px solid #5c5048;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #f3ede6;
+  resize: vertical;
+  word-break: break-all;
+}
+
+.tryout textarea:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 1px;
+}
+
+.tryout .tryout-io-status {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 500;
+  min-height: 1.2em;
 }

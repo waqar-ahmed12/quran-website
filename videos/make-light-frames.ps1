@@ -15,7 +15,10 @@ param(
 
 # Which of the 192 exported frames the site uses.
 $held = @(1, 2, 3, 4, 84, 85)   # identical to the frame before: a pause in the video, like the dark footage's 39-40
-$settled = 131                  # the book is open and still by here; the rest is a light crossing the pages
+# The book is NOT flat yet at 131 — the right page is still lifted and the back cover still stands up, which is
+# where the site used to stop and rest (the user, 2026-09-19: "doesn't look fully open"). It keeps opening to 151,
+# the last frame of this shot before a light washes across the pages at 152-155.
+$settled = 151
 $every = 2                      # the light take runs about twice as long as the dark one for the same movement
 $w = 1280                       # the dark footage's size: 184 frames of 1920x1080 is ~1.5 GB of decoded bitmaps
 $h = 720
@@ -26,6 +29,9 @@ Add-Type -AssemblyName WindowsBase
 $usable = 0..$settled | Where-Object { $held -notcontains $_ }
 $frames = @()
 for ($k = 0; $k -lt $usable.Count; $k += $every) { $frames += $usable[$k] }
+# Taking every other frame can stop one short of the end. The last frame is the one the open book rests on, so it
+# always has to be the flattest one there is.
+if ($frames[-1] -ne $usable[-1]) { $frames += $usable[-1] }
 
 New-Item -ItemType Directory -Force -Path $Out | Out-Null
 Get-ChildItem -LiteralPath $Out -Filter 'f*.png' | Remove-Item -Force

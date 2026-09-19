@@ -20,4 +20,6 @@
 - The user prefers to run scripts themselves and paste the output: save the script, give one copy-paste command.
 - **Qaida work:** read `QAIDA-BUILD.md` (steps, skills, decisions) and `QAIDA-CONTENT.md`. End every reply about the
   Qaida with one line: current step, its skills, next step (the user asked, 2026-09-14).
+- **Building Lesson 2 (step 4)?** Read `docs/lesson-2/` first — the full specification, `README.md` in that folder
+  says the order. `docs/lesson-2/09-going-in-order.md` changes the whole Qaida, not just that lesson.
 - Preview with `node serve.js` → `http://localhost:8777/site/` (launch config "site"). Never `python -m http.server`.

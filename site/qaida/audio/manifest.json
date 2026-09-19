@@ -1,0 +1,6 @@
+{
+  "_read_me": "Every recording the Qaida has. Add a line when you add a file; anything not listed here simply has no recording yet, and the lesson says so. The teacher's own voice or a vetted reciter only, never an AI voice. Open the recordings page (site/qaida/recordings.html) to see what is still missing and to copy a ready-made version of this file.",
+  "_example": "\"letters\": { \"ا\": \"letters/alif.mp3\", \"ب\": \"letters/ba.mp3\" }",
+  "placeholder": "placeholder.wav",
+  "letters": {}
+}
