@@ -1,14 +1,16 @@
 <!doctype html>
-<!-- The free Qaida, the home: the fourteen lessons and how far the student has reached (QAIDA-BUILD.md, step 1).
-     The design is recorded in design-system/quran-landing/pages/qaida.md. The data- attributes on <html> are the
-     look; the options panel (qaida-options.js) changes them for tryouts. -->
+<!-- The free Qaida, Lesson 1 (QAIDA-BUILD.md, step 1). No recordings and no whiteboard yet. The design is recorded
+     in design-system/quran-landing/pages/qaida.md. The data- attributes on <html> are the look; the options panel
+     (qaida-options.js) changes them for tryouts. -->
 <html lang="en"
-      data-grouping="families" data-cards="quiet" data-bg="light" data-numbers="show"
-      data-titlemark="alif" data-titlemark-font="amiri" data-madani-font="amiri" data-indopak-font="noto">
+      data-tiles="paper" data-grouping="families" data-size="comfortable" data-peek="under" data-seenmark="dot"
+      data-arrive="stagger" data-progress="title" data-bar="line" data-track="show" data-titlemark="alif"
+      data-titlemark-font="amiri" data-bg="light" data-finish="settle" data-madani-font="amiri"
+      data-indopak-font="noto">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Free Qaida · Alif to Ayah</title>
+  <title>Lesson 1: The letters · Free Qaida</title>
   <meta name="theme-color" content="#1F1A18">
   <!-- Light or dark before the page draws: the choice made here or on the home page (same site, same storage),
        otherwise dark, like the home page. -->
@@ -25,14 +27,14 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&family=Scheherazade+New&display=swap">
   <link rel="stylesheet" href="qaida.css">
   <script src="shell.js" defer></script>
-  <script src="home.js" defer></script>
+  <script src="qaida.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
   <script src="qaida-options.js" defer></script>
 </head>
 <body>
   <div class="top-sentinel" aria-hidden="true"></div>
-  <a class="skip" href="#lessons" data-words="Skip link (keyboard only)">Skip to the lessons</a>
+  <a class="skip" href="#lesson" data-words="Skip link (keyboard only)">Skip to the lesson</a>
 
   <header class="topbar">
     <div class="where">
@@ -44,7 +46,7 @@
         </svg>
         <span class="name" translate="no" data-words="Top bar: site name">Alif to Ayah</span>
       </a>
-      <span class="crumb" data-words="Top bar: where you are">Free Qaida</span>
+      <a class="crumb" href="./" data-words="Top bar: where you are">Free Qaida</a>
     </div>
     <div class="tools">
       <button class="tool open-settings" type="button" aria-haspopup="dialog">
@@ -64,12 +66,19 @@
     </div>
   </header>
 
-  <main class="course-home">
+  <main class="lesson" id="lesson" tabindex="-1">
     <header class="lesson-head">
       <div class="head-text">
-        <p class="eyebrow" data-words="Small heading over the title">Free Qaida</p>
-        <h1 data-words="Page title">Fourteen lessons, from the letters up</h1>
-        <p class="lede" data-words="Line under the title">Start with the letters and work through to the marks. Nothing to sign up for and nothing to pay. Your place is kept on this device.</p>
+        <div class="course">
+          <p class="eyebrow" data-words="Lesson number">Lesson 1 of 14</p>
+          <!-- The whole Qaida at a glance: this lesson in gold, the other 13 to come. -->
+          <ol class="track" aria-hidden="true">
+            <li class="now"></li><li></li><li></li><li></li><li></li><li></li><li></li>
+            <li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+          </ol>
+        </div>
+        <h1 data-words="Lesson title">The letters</h1>
+        <p class="lede" data-words="Line under the title">Every letter, in the order of a printed Qaida. Tap a letter to see its name.</p>
         <!-- What the student chose on their first visit, and a way to change it. shell.js fills in the spans. -->
         <p class="setup"
            data-madani="Madani script" data-indopak="Indo-Pak script"
@@ -87,30 +96,29 @@
       <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">ا</span>
     </header>
 
-    <!-- How far through the whole Qaida, kept on this device. {done} and {total} are filled in by home.js. -->
+    <!-- How far the student has reached, kept on this device. {seen} and {total} are filled in by qaida.js. -->
     <div class="progress">
       <div class="progress-row">
-        <p class="progress-text" id="course-progress"
-           data-none="No lessons finished yet" data-template="{done} of {total} lessons finished"
-           data-all="All {total} lessons finished"
-           data-words-attr="data-none|Progress line, nothing finished;data-template|Progress line ({done} and {total} are filled in);data-all|Progress line, everything finished"></p>
-        <button class="link reset-all" type="button" hidden
-                data-label="Start again" data-confirm="Tap again to clear everything"
+        <p class="progress-text" id="progress-text"
+           data-template="{seen} of {total} letters seen" data-done="All {total} letters seen"
+           data-words-attr="data-template|Progress line ({seen} and {total} are filled in);data-done|Progress line, every letter seen"></p>
+        <button class="link reset" type="button" hidden
+                data-label="Start again" data-confirm="Tap again to clear"
                 data-words-attr="data-label|Start again link;data-confirm|Start again, asking to be sure"></button>
       </div>
-      <div class="bar" role="progressbar" aria-labelledby="course-progress" aria-valuemin="0" aria-valuemax="14" aria-valuenow="0">
+      <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="29" aria-valuenow="0">
         <span class="fill"></span>
       </div>
     </div>
 
-    <!-- home.js draws the fourteen lessons here, from the list in shell.js. -->
-    <ol class="lessons" id="lessons" tabindex="-1"
-        data-open="Open" data-locked="Finish the lesson before this one" data-finished="Finished"
-        data-progress="{seen} of {total} letters seen" data-soon="Not built yet"
-        data-standin="This lesson isn’t built yet." data-locked-note="Finish Lesson {n} first."
-        data-words-attr="data-open|Card: open lesson;data-locked|Card: locked lesson;data-finished|Card: finished lesson;data-progress|Card: letters seen ({seen} and {total} are filled in);data-soon|Card: lesson not built yet;data-standin|Note: lesson not built yet;data-locked-note|Note: locked lesson ({n} is filled in)"></ol>
+    <section class="letters-wrap" aria-labelledby="letters-title">
+      <h2 class="sr-only" id="letters-title" data-words="Heading over the letters (screen readers only)">The letters of this script</h2>
+      <!-- Right to left, like the page of a Qaida. qaida.js adds the letters, grouped in shape families. -->
+      <div class="letters" dir="rtl"></div>
+    </section>
 
-    <footer class="home-end">
+    <footer class="lesson-end">
+      <!-- The star and its rules draw into place once every letter has been seen. -->
       <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
         <line class="rule left" x1="-100" y1="0" x2="-24" y2="0" />
         <line class="rule right" x1="24" y1="0" x2="100" y2="0" />
@@ -120,7 +128,30 @@
           <circle r="2" />
         </g>
       </svg>
-      <p class="end-line" data-words="Line at the bottom">Work at your own pace. When you want a teacher listening, the one-to-one lessons are on the home page.</p>
+      <p class="end-line"
+         data-before="See every letter to open Lesson 2." data-after="Every letter seen. Lesson 2 is open."
+         data-words-attr="data-before|Last line, before every letter is seen;data-after|Last line, once every letter is seen"></p>
+      <div class="onward">
+        <a class="button back" href="./">
+          <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+          <span data-words="Back to the lessons button">The lessons</span>
+        </a>
+        <!-- Stand-in: Lesson 2 isn't built yet, so a click shows the note at the bottom of the screen. -->
+        <button class="button primary next" type="button" aria-disabled="true"
+                data-standin="Lesson 2 isn’t built yet."
+                data-words-attr="data-standin|Note: Lesson 2 not built yet">
+          <svg class="lock" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="5.5" y="10.5" width="13" height="9" rx="1.5" />
+            <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
+          </svg>
+          <span data-words="Next lesson button">Lesson 2: Letters out of order</span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
     </footer>
   </main>
 
@@ -180,7 +211,7 @@
         </div>
       </fieldset>
       <button class="button primary done" value="done"
-              data-first="Start" data-later="Done"
+              data-first="Start the lesson" data-later="Done"
               data-words-attr="data-first|Choice: button, first visit;data-later|Choice: button, later visits"></button>
     </form>
   </dialog>

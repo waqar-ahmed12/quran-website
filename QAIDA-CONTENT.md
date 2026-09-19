@@ -43,8 +43,24 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
 
 - **Script:** both Indo-Pak and Madani, with a switch. Wherever the two scripts write something differently, the
   lesson shows the chosen script's version.
-- **Names:** both, and the student picks: zabar, zair, paish, jazam, or fatha, kasra, damma, sukoon, each with its own
-  letter names. The teacher checks both lists of letter names on the page before launch.
+- **The letter list follows the script** *(the user, 2026-09-18)*. 29 either way. Lesson 1 teaches:
+  - **Madani** — alphabet order: ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ء ي
+  - **Indo-Pak** — the order of a printed Indo-Pak Qaida: ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ک ل م ن **و ہ**
+    ء ی — و before ه, and the Indo-Pak forms ک ہ ی. **Laam (ل) only: lam-alif (لا) is not taught as a letter of its
+    own** (the user, 2026-09-18).
+
+  Progress is kept as letters rather than positions, and ک ہ ی count as the same letters as ك ه ي, so switching
+  script costs the student nothing. *To confirm with the teacher:* the Indo-Pak order is Claude's reading of a
+  printed Qaida. A Noorani Qaida that also teaches پ چ ڈ ڑ ٹ ژ گ would be a different list again — those letters are
+  Urdu, not Qur'anic, so they are left out.
+- **Launch blocker:** the Indo-Pak script is set in Noto Naskh Arabic, which is not what a printed Indo-Pak Qaida
+  looks like. Google Fonts has no true Indo-Pak mushaf face; a licensed one (such as a KFGQPC IndoPak font) must
+  replace it before launch.
+- **Names:** both, and the student picks: zabar, zair, paish, jazam, or fatha, kasra, damma, sukoon.
+  **The letters keep their Arabic names in both sets** *(the user, 2026-09-18: "even in zabar zair paish, you have to
+  write in arabic the names, like baa and not be")* — Baa, Taa, Thaa, not Be, Te, Se. So the choice changes the
+  **marks**, and with them the titles of lessons 4–14 on the Qaida home. One list of letter names, which the teacher
+  checks before launch.
 - **Transliteration:** off; tapping a letter shows its name for a moment. Whether it stays once real words start is
   for a later pass.
 - **Progress bar:** shows how far the student has reached.

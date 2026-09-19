@@ -23,7 +23,10 @@
   --line: rgb(var(--rgb-foreground) / 0.12);
   /* "Paper" tiles: the cream of the open book's pages on the home page, with the same dark ink. */
   --paper: #EDE4D3;
-  --paper-edge: rgb(180 135 60 / 0.35); /* prominent warm edge framing the letter card */
+  /* How strongly the gold edge frames a tile. The slider in the options panel sets it; gold on cream is quiet by
+     nature, so the dark theme needs a brighter gold than the first draft's to read at all. */
+  --edge: 0.55;
+  --paper-edge: rgb(198 152 62 / var(--edge));
   --ink: #2B211B; /* 13:1 on the paper */
   --ink-muted: #5C4F45; /* 6:1 on the paper */
   --ink-accent: #A16207; /* the seen mark on paper, 3.8:1 */
@@ -54,7 +57,7 @@
   --color-surface: #FFFFFF;
   --line: rgb(var(--rgb-foreground) / 0.1);
   --paper: #FFFFFF;
-  --paper-edge: rgb(28 25 23 / 0.18);
+  --paper-edge: rgb(28 25 23 / calc(var(--edge) * 0.36));
   --ink: #1C1917;
   --ink-muted: #57534E;
   --ink-accent: #9A5F07;
@@ -228,13 +231,21 @@ body::before {
   rotate: 45deg;
 }
 
+/* Where you are. On a lesson page it's a link back to the list of lessons; on the list itself, plain text. */
 .crumb {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   font-size: 0.875rem;
   letter-spacing: 0.06em;
   white-space: nowrap;
   color: var(--color-muted-foreground);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+a.crumb:hover {
+  color: var(--color-foreground);
 }
 
 .crumb::before {
@@ -527,8 +538,15 @@ body::before {
   color: var(--color-muted-foreground);
 }
 
-.reset {
+.reset,
+.reset-all {
   font-size: 0.875rem;
+}
+
+.lessons:focus-visible,
+.lesson:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 6px;
 }
 
 .bar {
@@ -558,13 +576,14 @@ body::before {
   opacity: 0;
 }
 
-/* TRYOUT "Bar look: A step per letter": 29 short segments. */
+/* TRYOUT "Bar look: A step per letter": one short segment per letter. --total is set by qaida.js, because the two
+   scripts don't have the same number of letters (29 and 30). */
 [data-bar='steps'] .bar {
   height: 4px;
   border-radius: 0;
   background: none;
-  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / 29 - 3px), transparent calc(100% / 29 - 3px) calc(100% / 29));
-  mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / 29 - 3px), transparent calc(100% / 29 - 3px) calc(100% / 29));
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / var(--total, 29) - 3px), transparent calc(100% / var(--total, 29) - 3px) calc(100% / var(--total, 29)));
+  mask-image: repeating-linear-gradient(90deg, #000 0 calc(100% / var(--total, 29) - 3px), transparent calc(100% / var(--total, 29) - 3px) calc(100% / var(--total, 29)));
 }
 
 [data-bar='steps'] .bar::before {
@@ -609,24 +628,22 @@ body::before {
   gap: 0.5rem;
 }
 
+/* "Even grid": the families stop being groups, so every letter is the same distance from the next. Still the same
+   centred wrap as above, not a real grid — a grid leaves the last, part-full row against one edge. */
 [data-grouping='grid'] .letters {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--tile), 1fr));
-  justify-content: center;
-  gap: 0.625rem;
+  gap: clamp(0.45rem, 0.8vh, 0.65rem) 0.625rem;
 }
 
 [data-grouping='grid'] .family {
   display: contents;
 }
 
-[data-grouping='grid'] .letter {
-  width: auto;
-}
-
 /* A letter: a flat tile with a prominent, tactile edge, 8px corners. */
 .letter {
   --tile-bg: var(--paper);
+  /* The colour the name's scrim fades into. Not always --tile-bg: an outline tile is transparent, so its scrim has
+     to be the page behind it. */
+  --tile-scrim: var(--paper);
   --tile-ink: var(--ink);
   --tile-muted: var(--ink-muted);
   --tile-mark: var(--ink-accent);
@@ -635,8 +652,10 @@ body::before {
   display: grid;
   place-items: center;
   width: var(--tile);
-  aspect-ratio: 5 / 6;
-  padding: 0;
+  /* A little taller than it is wide, with a band of room kept free at the foot: ج ح خ ع غ م ي all hang below the
+     line they sit on, and the name rises into that space when the letter is tapped. */
+  aspect-ratio: 5 / 6.3;
+  padding: 0 0 0.625rem;
   overflow: hidden;
   border: 1.5px solid var(--tile-edge);
   border-radius: 8px;
@@ -656,6 +675,7 @@ body::before {
 
 [data-tiles='line'] .letter {
   --tile-bg: transparent;
+  --tile-scrim: var(--color-background);
   --tile-ink: var(--color-foreground);
   --tile-muted: var(--color-muted-foreground);
   --tile-mark: var(--color-accent);
@@ -664,6 +684,8 @@ body::before {
 
 [data-tiles='gold'] .letter {
   --tile-bg: rgb(var(--rgb-accent) / 0.06);
+  --tile-scrim: var(--color-background);
+  --tile-scrim: color-mix(in srgb, var(--color-accent) 6%, var(--color-background));
   --tile-ink: var(--color-accent);
   --tile-muted: var(--color-muted-foreground);
   --tile-mark: var(--color-accent);
@@ -719,9 +741,20 @@ body::before {
     translate 350ms var(--ease-out);
 }
 
-/* Name shows "Under the letter" (default): the letter steps up and shrinks a little, the name rises in beneath. */
+/* Name shows "Under the letter" (default): the letter steps up and shrinks, the name rises in beneath.
+   ج ح خ ع غ م ي all hang well below the line they sit on, so the lift alone isn't enough to clear the name — the
+   name carries a band of the tile's own colour, fading upward, and the tail disappears behind it. */
+[data-peek='under'] .name {
+  justify-self: stretch;
+  /* Back out through the tile's foot padding, so the band reaches the edge rather than stopping short of it. */
+  margin-bottom: -0.625rem;
+  padding: 0.75rem 0.2rem 0.4rem;
+  background: linear-gradient(to top, var(--tile-scrim) 58%, rgb(0 0 0 / 0));
+  text-align: center;
+}
+
 .letter.peek .glyph {
-  transform: translateY(-16%) scale(0.85);
+  transform: translateY(-20%) scale(0.75);
 }
 
 .letter.peek .name {
@@ -832,7 +865,7 @@ body::before {
   flex-direction: column;
   align-items: center;
   gap: clamp(0.35rem, 0.7vh, 0.5rem);
-  margin-top: clamp(0.625rem, 1.2vh, 1rem);
+  margin-top: clamp(1rem, 2.2vh, 1.75rem);
   text-align: center;
 }
 
@@ -879,13 +912,14 @@ body::before {
   filter: drop-shadow(0 0 6px rgb(var(--rgb-accent) / 0.5));
 }
 
-/* When completing the lesson: celebratory revolution */
-.just-finished .ornament .star {
+/* The moment the last letter is seen: the star turns into place. Three ways to finish, chosen in the options panel:
+   "Settles down" (default) plays this once and then everything rests · "Keeps glowing" leaves the star turning and the
+   button pulsing · "No fuss" does none of it. A page to study on shouldn't move forever (§1 of the design record). */
+:root:not([data-finish='none']) .just-finished .ornament .star {
   animation: star-revolution 2.2s cubic-bezier(0.2, 0.8, 0.25, 1) both;
 }
 
-/* Continuous subtle celestial rotation once completed */
-.complete:not(.just-finished) .ornament .star {
+[data-finish='glow'] .complete:not(.just-finished) .ornament .star {
   animation: star-celestial 28s linear infinite;
 }
 
@@ -997,6 +1031,41 @@ body::before {
   stroke-linejoin: round;
 }
 
+/* The two ways out of a lesson: back to the list, and on to the next one. They stack on a narrow screen. */
+.onward {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.625rem 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.back {
+  border-color: var(--line);
+  color: var(--color-muted-foreground);
+}
+
+.back:hover {
+  border-color: rgb(var(--rgb-accent) / 0.6);
+  background: rgb(var(--rgb-accent) / 0.08);
+  color: var(--color-accent);
+}
+
+.back .back-arrow {
+  transition: translate 300ms var(--ease-out);
+}
+
+.back:hover .back-arrow {
+  translate: -3px 0;
+}
+
+@media (max-width: 419px) {
+  .onward {
+    flex-direction: column-reverse;
+    align-self: stretch;
+  }
+}
+
 .next .lock,
 .next[aria-disabled='true'] .arrow {
   display: none;
@@ -1014,7 +1083,7 @@ body::before {
   translate: 3px 0;
 }
 
-/* When the lesson is completed: the button unlocks, illuminates in gold, and gently hints the user to move on */
+/* When the lesson is finished: the button unlocks and lights up in gold. */
 .complete .button.next {
   position: relative;
   border-color: var(--color-accent);
@@ -1022,14 +1091,22 @@ body::before {
   color: var(--color-background);
   font-weight: 500;
   box-shadow: 0 2px 14px rgb(var(--rgb-accent) / 0.35);
+}
+
+/* "Keeps glowing" only: it goes on pulsing and the arrow goes on nudging. */
+[data-finish='glow'] .complete .button.next {
   animation: hint-button 2.4s ease-in-out infinite;
 }
 
-.complete .button.next .arrow {
+[data-finish='glow'] .complete .button.next .arrow {
   animation: hint-arrow 1.6s ease-in-out infinite;
 }
 
-.just-finished .button.next {
+:root:not([data-finish='none']) .just-finished .button.next {
+  animation: next-unlocked-reveal 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
+}
+
+[data-finish='glow'] .just-finished .button.next {
   animation:
     next-unlocked-reveal 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both,
     hint-button 2.4s ease-in-out 1.6s infinite;
@@ -1042,8 +1119,9 @@ body::before {
   transform: translateY(-2px);
 }
 
+/* Hover has to beat the pulsing, so the animation stops rather than pausing on whatever frame it had reached. */
 .complete .button.next:hover .arrow {
-  animation-play-state: paused;
+  animation: none;
   transform: translateX(6px);
 }
 
@@ -1245,11 +1323,15 @@ body::before {
     inset 0 0 0 8px var(--color-accent);
 }
 
+/* The three letters sit at the start of their box — and the span is right-to-left, so "start" is the top right
+   corner, which is where the round mark sits. `padding-right` is physical, not writing-direction, so it's what keeps
+   the letters clear of it. */
 .sample {
   margin-bottom: 0.375rem;
+  padding-right: 2.25rem;
   font-size: 2.25rem;
   line-height: 1.5;
-  text-align: left;
+  text-align: start;
 }
 
 .sample.madani {
@@ -1321,13 +1403,19 @@ body::before {
     animation: fade-out 260ms ease forwards;
   }
 
-  .just-finished .letter .mark-seen {
+  :root:not([data-finish='none']) .just-finished .letter .mark-seen {
     animation: pulse 600ms ease-out backwards;
     animation-delay: calc(var(--i, 0) * 30ms);
   }
 
-  .just-finished .fill::after {
+  :root:not([data-finish='none']) .just-finished .fill::after {
     animation: shine 1200ms ease-in-out 300ms;
+  }
+
+  /* The lesson cards on the home rise in the same way the letters do, a little further apart. */
+  .lessons .lesson-card {
+    animation: rise 700ms var(--ease-out) backwards;
+    animation-delay: calc(120ms + var(--i, 0) * 30ms);
   }
 }
 
@@ -1343,13 +1431,16 @@ body::before {
   .just-finished .ornament .star,
   .complete .button.next,
   .complete .button.next .arrow,
+  .card,
+  .card-icon,
   .note {
     transition-duration: 0s !important;
     transition-delay: 0s !important;
     animation: none !important;
   }
 
-  .letter:hover {
+  .letter:hover,
+  .card:hover {
     transform: none;
   }
 }
@@ -1430,6 +1521,209 @@ body::before {
     opacity: 1;
     translate: 100% 0;
   }
+}
+
+/* The Qaida home: the fourteen lessons. The same column and the same head as a lesson page, so the two feel like one
+   book — but this page is a list to scan, not a page to sit on, so the cards are quiet and the numbers do the work. */
+.course-home {
+  max-width: 58rem;
+  margin-inline: auto;
+  padding: clamp(1rem, 2.5vh, 2rem) var(--gutter) clamp(2rem, 5vh, 3.5rem);
+  box-sizing: border-box;
+}
+
+.lessons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 0.625rem;
+  margin: clamp(1rem, 2.5vh, 1.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lesson-card {
+  display: flex;
+}
+
+/* One card: the number, what the lesson teaches, and a mark saying whether it can be opened. */
+.card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0 0.875rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  color: var(--color-foreground);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    transform 200ms ease;
+}
+
+[data-cards='paper'] .card {
+  border-color: var(--paper-edge);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+[data-cards='gold'] .card {
+  border-color: transparent;
+  background: rgb(var(--rgb-accent) / 0.06);
+}
+
+.card-n {
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  color: var(--color-accent);
+}
+
+[data-cards='paper'] .card-n {
+  color: var(--ink-accent);
+}
+
+[data-numbers='hide'] .card-n {
+  display: none;
+}
+
+.card-text {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.card-title {
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.card-lede {
+  font-size: 0.8125rem;
+  font-weight: 300;
+  line-height: 1.4;
+  color: var(--color-muted-foreground);
+  text-wrap: pretty;
+}
+
+[data-cards='paper'] .card-lede,
+[data-cards='paper'] .card-meta {
+  color: var(--ink-muted);
+}
+
+.card-meta {
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
+.card-icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--color-muted-foreground);
+  transition: translate 300ms var(--ease-out);
+}
+
+/* Open: gold, with an arrow that leans forward when pointed at. */
+[data-state='open'] .card-icon,
+[data-state='done'] .card-icon {
+  color: var(--color-accent);
+}
+
+[data-cards='paper'] [data-state='open'] .card-icon,
+[data-cards='paper'] [data-state='done'] .card-icon {
+  color: var(--ink-accent);
+}
+
+[data-state='done'] .card-icon {
+  fill: currentColor;
+  fill-opacity: 0.12;
+}
+
+[data-state='done'] .card-meta,
+[data-state='open'] .card-meta {
+  color: var(--color-accent);
+}
+
+[data-cards='paper'] [data-state='done'] .card-meta,
+[data-cards='paper'] [data-state='open'] .card-meta {
+  color: var(--ink-accent);
+}
+
+@media (hover: hover) {
+  [data-state='open'] .card:hover,
+  [data-state='done'] .card:hover {
+    border-color: rgb(var(--rgb-accent) / 0.6);
+    transform: translateY(-2px);
+  }
+
+  [data-state='open'] .card:hover .card-icon {
+    translate: 3px 0;
+  }
+}
+
+[data-state='open'] .card:active,
+[data-state='done'] .card:active {
+  transform: scale(0.995);
+}
+
+/* Not open yet: still reachable and still says why, but plainly not a way forward. */
+[data-state='locked'] .card {
+  color: var(--color-muted-foreground);
+  cursor: not-allowed;
+}
+
+[data-state='locked'] .card-title {
+  color: var(--color-muted-foreground);
+}
+
+[data-state='done'] .card {
+  border-color: rgb(var(--rgb-accent) / 0.4);
+}
+
+.home-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  text-align: center;
+}
+
+.home-end .end-line {
+  max-width: 38ch;
+  font-size: 0.9375rem;
+  color: var(--color-muted-foreground);
+}
+
+/* On the home the ornament is just a rule and a star, already at rest — nothing here is waiting to be finished. */
+.home-end .ornament {
+  opacity: 0.55;
+}
+
+.home-end .ornament .rule,
+.home-end .ornament .star {
+  opacity: 0.8;
+  transform: none;
 }
 
 /* TRYOUT: the options panel (qaida-options.js), as on the home page. Delete with it. */

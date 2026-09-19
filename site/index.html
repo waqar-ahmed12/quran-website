@@ -53,8 +53,9 @@
   <script src="footer-options.js" defer></script>
 </head>
 <body>
-  <!-- The top bar. The name is a stand-in until the site name is chosen, and both links are stand-ins until their
-       pages exist, as in the ending. About the teacher and Contact go at the bottom of the page only. -->
+  <!-- The top bar. The name is a stand-in until the site name is chosen. Free Qaida goes to the real page
+       (site/qaida/, 2026-09-18); One-to-one lessons is still a stand-in until that page exists. About the teacher and
+       Contact go at the bottom of the page only. -->
   <header class="topbar">
     <a class="brand" href="#top">
       <svg class="mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
@@ -65,7 +66,7 @@
       <span class="name">Alif to Ayah</span>
     </a>
     <nav aria-label="Main">
-      <a class="qaida" href="#qaida">Free Qaida</a>
+      <a class="qaida" href="qaida/">Free Qaida</a>
       <a class="lessons outlined" href="#lessons">One-to-one lessons</a>
       <!-- Light and dark. main.js keeps the label saying what a click does. -->
       <button class="theme" type="button" aria-label="Switch to light mode" data-to-light="Light" data-to-dark="Dark">
@@ -123,8 +124,8 @@
         </div>
       </div>
     </section>
-    <!-- Phase 5: the ending. Both links are stand-ins until the pages exist. At launch, point them at the real pages,
-         and hide the Qaida button if the Qaida isn't live yet. -->
+    <!-- Phase 5: the ending. Free Qaida goes to the real page (site/qaida/, 2026-09-18). One-to-one lessons is a
+         stand-in until that page exists; point it at the real page at launch. -->
     <section class="close" aria-labelledby="close-line">
       <!-- Decoration behind the words: a warm light, and a large gold star in thin lines that turns slowly. The
            shapes nest: two squares in a circle, an eight-pointed star in the circle touching them, a small circle
@@ -162,7 +163,7 @@
         <h2 id="close-line">Learn to read these pages for yourself.</h2>
         <div class="entry">
           <a class="button primary lessons" href="#lessons">One-to-one lessons</a>
-          <a class="button qaida" href="#qaida">Free Qaida</a>
+          <a class="button qaida" href="qaida/">Free Qaida</a>
         </div>
       </div>
       <!-- Stand-in: the headline, until the site name is chosen. -->
@@ -243,7 +244,7 @@
         <span class="name">Alif to Ayah</span>
       </a>
       <nav aria-label="Footer">
-        <a class="qaida" href="#qaida">Free Qaida</a>
+        <a class="qaida" href="qaida/">Free Qaida</a>
         <a class="lessons" href="#lessons">One-to-one lessons</a>
         <a href="#about">About the teacher</a>
         <a href="#contact">Contact</a>

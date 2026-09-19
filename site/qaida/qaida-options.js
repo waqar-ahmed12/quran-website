@@ -1,9 +1,13 @@
-// TEMPORARY, local preview only: looks to try, and a text field for every line Claude wrote on the Qaida page.
-// Once the user picks, set the picks as the data- attributes on <html> in index.html, then delete this file, its
-// <script> line and the TRYOUT part of qaida.css.
+// TEMPORARY, local preview only: looks to try, and a text field for every line Claude wrote on the Qaida pages.
+// Works on both the Qaida home and a lesson page. Once the user picks, set the picks as the data- attributes on
+// <html>, then delete this file, its <script> lines and the TRYOUT part of qaida.css.
 
 (() => {
-  if (!/^(localhost|[\d.]+)$/.test(location.hostname) || !window.qaida) return;
+  const shell = window.qaidaShell;
+  const lesson = window.qaida; // only on a lesson page
+  const home = window.qaidaHome; // only on the Qaida home
+  if (!/^(localhost|[\d.]+)$/.test(location.hostname) || !shell || (!lesson && !home)) return;
+
   const root = document.documentElement;
   const el = (tag, text = '') => {
     const node = document.createElement(tag);
@@ -73,45 +77,88 @@
   const text = (label, initial, pick) => {
     const row = el('div');
     const field = el('input');
-    Object.assign(field, { type: 'text', value: initial });
+    Object.assign(field, { type: 'text', value: initial == null ? '' : initial });
     field.setAttribute('aria-label', label);
     field.addEventListener('input', () => pick(field.value));
     row.append(el('span', label), field);
     group.append(row);
   };
 
-  section('Letters', true);
-  option('Letter tiles', { Paper: 'paper', Outline: 'line', 'Gold ink': 'gold' }, 'tiles');
-  option('Letters grouped', { 'In shape families': 'families', 'Even grid': 'grid' }, 'grouping', (v) => {
-    if (window.qaida && window.qaida.setGrouping) window.qaida.setGrouping(v);
-  });
-  option('Letter size', { Comfortable: 'comfortable', Large: 'large' }, 'size');
-  option('Name shows', { 'Under the letter': 'under', 'As a tag above': 'tag', 'Letter turns over': 'turn' }, 'peek');
-  slider('Name stays for', 0.8, 4, 0.1, qaida.peekMs / 1000, (v) => `${v.toFixed(1)} s`, (v) => qaida.setPeek(v * 1000));
-  option('Seen letters', { 'Gold dot': 'dot', 'Gold edge': 'edge', Both: 'both' }, 'seenmark');
-  option('Letters arrive', { 'One by one': 'stagger', 'All at once': 'all' }, 'arrive', () => qaida.replay());
+  const redraw = () => {
+    if (lesson) lesson.render();
+    if (home) home.render();
+  };
 
-  section('Progress and page');
-  option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
-  option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
-  option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
-  option('Big alif by the title', { 'Center': 'alif', 'Top': 'top', 'Watermark': 'watermark', 'Hide': 'none' }, 'titlemark');
-  option('Big alif font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', 'Scheherazade': 'scheherazade' }, 'titlemarkFont');
-  option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
-  actions('Try it', {
-    'See every letter': () => qaida.seeAll(),
-    'Clear progress': () => qaida.clear(),
-    'First-visit choice': () => qaida.showChooser(),
-  });
+  // How strong the gold edge around a tile (or a paper card) is. Gold on cream is quiet by nature, and it reads
+  // differently in the dark and the light theme, so it's a slider rather than a pick.
+  const edgeNow = Number(getComputedStyle(root).getPropertyValue('--edge')) || 0.55;
+  const edgeSlider = () =>
+    slider('Gold edge strength', 0, 1, 0.05, edgeNow, (v) => v.toFixed(2), (v) => root.style.setProperty('--edge', v));
+
+  if (lesson) {
+    section('Letters', true);
+    option('Letter tiles', { Paper: 'paper', Outline: 'line', 'Gold ink': 'gold' }, 'tiles');
+    option('Letters grouped', { 'In shape families': 'families', 'Even grid': 'grid' }, 'grouping', (v) => {
+      shell.state.grouping = v;
+      shell.save();
+      shell.renderSetup();
+    });
+    option('Letter size', { Comfortable: 'comfortable', Large: 'large' }, 'size');
+    edgeSlider();
+    option('Name shows', { 'Under the letter': 'under', 'As a tag above': 'tag', 'Letter turns over': 'turn' }, 'peek');
+    slider('Name stays for', 0.8, 4, 0.1, lesson.peekMs / 1000, (v) => `${v.toFixed(1)} s`, (v) => lesson.setPeek(v * 1000));
+    option('Seen letters', { 'Gold dot': 'dot', 'Gold edge': 'edge', Both: 'both' }, 'seenmark');
+    option('Letters arrive', { 'One by one': 'stagger', 'All at once': 'all' }, 'arrive', () => lesson.replay());
+
+    section('Progress and page');
+    option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
+    option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
+    option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
+    option('After the last letter', { 'Settles down': 'settle', 'Keeps glowing': 'glow', 'No fuss': 'none' }, 'finish');
+    option('Big alif by the title', { Center: 'alif', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
+    option('Big alif font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
+    option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
+    actions('Try it', {
+      'See every letter': () => lesson.seeAll(),
+      'Clear progress': () => lesson.clear(),
+      'First-visit choice': () => shell.askAgain(),
+    });
+  }
+
+  if (home) {
+    section('The lesson list', true);
+    option('Lesson cards', { Quiet: 'quiet', Paper: 'paper', 'Gold wash': 'gold' }, 'cards');
+    option('Lesson numbers', { Show: 'show', Hide: 'hide' }, 'numbers');
+    edgeSlider();
+    option('Big alif by the title', { Center: 'alif', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
+    option('Big alif font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
+    option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
+    actions('Try it', {
+      'Finish lesson 1': () => home.finishFirst(),
+      'Clear everything': () => home.clearAll(),
+      'First-visit choice': () => shell.askAgain(),
+    });
+  }
 
   section('Script and names');
   option('Madani lettering', { 'Amiri Quran': 'amiri', 'Scheherazade New': 'scheherazade' }, 'madaniFont');
   option('Indo-Pak lettering', { 'Noto Naskh Arabic': 'noto', 'Scheherazade New': 'scheherazade' }, 'indopakFont');
-  text('Letter names, fatha set (commas)', qaida.names.fatha.join(', '), (v) => qaida.setNames('fatha', v));
-  text('Letter names, zabar set (commas)', qaida.names.zabar.join(', '), (v) => qaida.setNames('zabar', v));
+  // One list: the letters keep their Arabic names whichever set of mark names the student picked.
+  text('Letter names (commas)', shell.namesText(), (v) => shell.setNames(v));
+
+  // The fourteen lesson titles and lines live in shell.js, so they get their fields here rather than in the markup.
+  // The title edited is the one for the set of names showing now.
+  if (home) {
+    section('Lesson titles and lines');
+    const set = shell.state.names === 'zabar' ? 'zabar' : 'fatha';
+    for (const entry of shell.LESSONS) {
+      text(`Lesson ${entry.n} title`, entry.title[set], (v) => home.setTitle(entry.n, v));
+      text(`Lesson ${entry.n} line`, entry.lede, (v) => home.setLede(entry.n, v));
+    }
+  }
 
   // Every line on the page: elements marked data-words edit their own text; data-words-attr lists attributes that
-  // qaida.js reads ("attribute|label;attribute|label").
+  // the page's script reads ("attribute|label;attribute|label").
   section('Words');
   for (const node of document.querySelectorAll('[data-words], [data-words-attr]')) {
     if (node.dataset.words) {
@@ -121,7 +168,7 @@
       const [attribute, label] = pair.split('|');
       text(label, node.getAttribute(attribute), (v) => {
         node.setAttribute(attribute, v);
-        qaida.render();
+        redraw();
       });
     }
   }
