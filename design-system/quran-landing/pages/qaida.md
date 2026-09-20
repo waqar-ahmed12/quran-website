@@ -19,6 +19,7 @@ Files:
 | `site/qaida/shell.js` | what both pages share: the saved state, the letters, the fourteen lessons, the first-visit choice, light/dark |
 | `site/qaida/home.js` | the home's cards and overall progress |
 | `site/qaida/qaida.js` | Lesson 1's tiles, peek and progress |
+| `site/qaida/lesson-3.html`, `lesson-3.js`, `shapes.js` | **Lesson 3** — letter shapes: the page, and its data layer (see §4b) |
 | `site/qaida/audio.js` | the manifest, the player, what has a recording |
 | `site/qaida/trace.js` | the tracing board |
 | `site/qaida/audio/manifest.json` | what has been recorded — the only thing that knows |
@@ -231,6 +232,48 @@ as the tiles, in both themes — and a canvas over it.
   would be a lie. The lesson's strip empties for the same reason.
 - **Honest about keyboards:** tracing needs a pointer. The board opens, closes and is read normally from a keyboard,
   and the line at the bottom says plainly that it needs something to draw with.
+
+---
+
+## 4b. Lesson 3 — `lesson-3.html` *(as built 2026-09-20, not yet seen in a browser)*
+
+Lesson 2's page with a **rail** and a **board** added between the head and the drill. Everything else — top bar, Board
+button, drill, tracer, chooser, footer — is copied from Lesson 2 unchanged. The full specification, and the list of where
+the build differs from it, is `docs/lesson-3/`.
+
+**The rail** — six buttons in a row under the head, in a real `<nav>` with an `<ol>`. Each has its number (Cinzel, gold when
+current), a sample letter in the chosen script, the group's name, a state in words (*Done*, *You're here*, *Comes later*) and
+a 2px gold fill for how much of the group is known. **Now**: gold number, gold edge, a gold line under it, `aria-current="page"`.
+**Done**: a gold hairline and a small gold star, which turns in **once** (600ms, and the class comes off again — the step-1
+`infinite` bug is on the record). **No group is ever disabled**: nothing is locked, and one opened out of turn shows a single
+line in the `.struggle` strip, once a visit. Below 560px the rail scrolls sideways with snap and drops the sample letter
+before the name.
+
+**The board** — a real `<table dir="rtl">` (caption, `th scope="col"`, `th scope="row"`), the teaching half, in a scrolling
+region that is focusable. The tiles are Lesson 1's `.letter`, at 3.5–5.25rem so four fit beside a name and none is under
+44px; tapping one peeks its position and plays the *letter's* recording. Columns are on its own / start / middle / end of a
+word — **two** columns (on its own, joined to the letter before) for the six that never join forward, since four would show
+two pairs of identical pictures. Each row ends with a joined-up example in a tile with no edge: the letter three times, or,
+for the six, flanked by ب so the gap after it shows. ء is a line of its own and is never asked about. Group 6 is the whole
+table: all 29 letters, the drill hidden, and an empty cell (a dash, and "No such shape" to a screen reader) where a shape
+does not exist. The letter's name sticks to the start edge below 900px. The form just missed keeps a gold edge until the
+next question. Rows leave in 150ms and arrive 35ms apart; none of it under reduced motion.
+
+**A joined shape is a letter with an invisible neighbour** (U+200D, ZERO WIDTH JOINER), never a presentation form and never
+tatweel. It is written `&#x200D;` in HTML and `String.fromCharCode(0x200D)` in script, never pasted. **Every element that
+holds one is `aria-hidden` and its container carries the name** ("Haa, middle of a word"), so a screen reader is never told
+"zero width joiner". "Write it" opens the tracer on the **isolated** letter, because a joiner draws a stray stroke.
+
+**Two progress numbers, each labelled.** The bar is the whole lesson ("12 of 68 shapes in the lesson"), the line under it is
+the open group ("3 of 21 in this group"). The engine overwrites the lesson's stored total with the group's, so the page puts
+the whole lesson's back after every change; the home reads that number.
+
+**Colour** — no new tokens. The wrong answer is what step 4 settled: gold against dim with a tick on the right one, never a
+failure colour and never colour alone.
+
+**Open:** whether the joined shapes render as joined shapes in both faces, both themes; whether ط ظ look alike enough that
+group 2's premise holds; the Indo-Pak column of the table (the face is a stand-in, so this is the lesson that is most wrong
+until a licensed face replaces it); every recording.
 
 ---
 

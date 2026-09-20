@@ -6,6 +6,11 @@ a text field in the options panel, so the answer is "look at it and pick", never
 **Ask them in plain words.** On 2026-09-19 three of Lesson 2's eight questions went unanswered because they were
 written in the build's own terms. Say what a thing *is* and show an example before asking about it.
 
+## Answered 2026-09-20 — §1 and §5
+
+**§1: split group 3 in two, and leave `target` at 3** (Claude's recommendation, taken by the user). **§5: "start / middle /
+end of a word"**, as drawn. Both are built; see "As built" in `README.md`. The text of §1 below is kept as the reasoning.
+
 ## The one to settle first
 
 ### 1. The lesson is too long
@@ -88,6 +93,8 @@ but vaguer. One text field either way; the teacher reads both on the page.
 | Question | Answer |
 |---|---|
 | The five bands, easy shapes first, table last | The user, 2026-09-20 |
+| Band 3 split in two, so **six groups**; `target` stays 3 | The user, 2026-09-20, from three options shown with their numbers |
+| Position names: start / middle / end **of a word** | The user, 2026-09-20 |
 | Mixed review inside the lesson | Every band keeps the others in the mix. Follows the user's 2026-09-19 rule |
 | Locks between bands | **None.** Nothing in the Qaida is locked. The user, 2026-09-19 |
 | Finishing the lesson | Reaching band 5 is the recommendation. Not a gate |

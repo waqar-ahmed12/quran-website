@@ -10,12 +10,25 @@ Qaida with one line: the current step, its skills, and the next step.
 
 ## Where we are
 
-**Steps 1–4 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing, and Lesson 2 with the
-practice engine (`practice.js`) that lessons 4–14 reuse. Step 4 has not been seen in a browser yet.
+**Steps 1–5 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing, Lesson 2 with the
+practice engine (`practice.js`) that lessons 4–14 reuse, and Lesson 3, letter shapes. Steps 4 and 5 have not been seen
+in a browser yet.
 
-**Step 5, Lesson 3, is specified but not built** (2026-09-20): `docs/lesson-3/`, in the same shape as
-`docs/lesson-2/`. It needs no change to `practice.js`. One thing is settled with the teacher before any code —
-`docs/lesson-3/09-open-questions.md` §1, the lesson's length.
+**Step 5, Lesson 3, is built** (2026-09-20): `docs/lesson-3/` is the specification and its `README.md` lists where the
+build differs. It needed no change to `practice.js`. **Six groups, not five** — the user split the big one in two.
+
+**Step 6, Lesson 4, is built, and not yet seen in a browser** (2026-09-20): `docs/lesson-4/` is the specification. The user
+said "please start building", which was taken as a yes to the recommendations in `docs/lesson-4/09-open-questions.md`: §1 answered by
+the pair's name (the sound format is built and switched off until there are recordings), §2 two parts. **Step 6 is not
+done**: lessons 5 and 6 are still to come, and the user has to preview Lesson 4 first.
+
+**Step 6, Lesson 5 (zair), is built, and not yet seen in a browser** (2026-09-20, the user: "please start building lesson 5"):
+`docs/lesson-5/` is the specification, and it holds only the *differences* from `docs/lesson-4/`; its `README.md` lists where
+the build differs. Lesson 5's mark sits *below* the letter, in the same strip as the dots below and the descenders, so
+**the first thing to look at is whether the mark renders attached, under the letter** (`docs/lesson-5/05` §4). The one
+thing genuinely new is that **Lesson 4's zabar items ride along as the wrong answers** — without them the lesson is
+answerable by noticing that a mark exists, which the student learnt last lesson. **Step 6 is still not done:** Lesson 6
+(paish) is to come, and the user has to preview lessons 4 and 5.
 
 ## Decisions
 
@@ -36,6 +49,7 @@ practice engine (`practice.js`) that lessons 4–14 reuse. Step 4 has not been s
 | "You seem ready" | **Four fifths of the letters known, and no missed letter still shaky** *(2026-09-19: "4 fifth without mistakes, if mistake, repeat the mistake and practice all letters" — Claude's reading)*. A mistake repeats the letter (more often, never straight away) and every letter stays in the mix |
 | A writing board | **In every lesson, always available** *(2026-09-19: "we don't know when someone would need to write")*. A **Board** button in every lesson's top bar opens a blank board; "Trace it" stays as the shortcut to a letter just missed. Every later lesson copies the button and the tracer dialog |
 | Wording | **Never harsh** *(2026-09-19)*. Plain, short, and a wrong answer says what the letter is and nothing more |
+| Lesson 3's length | **Split the big group in two, `target` stays 3** *(2026-09-20, from three options shown with their numbers)*. Six groups: 6 + 2 + 21 + 15 + 24 = 68 shapes, then the table. Position names: start / middle / end **of a word** |
 
 ## Steps
 
@@ -52,8 +66,8 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 2 | **Sound in Lesson 1.** The player, `audio/manifest.json`, the wordless stand-in, the mute switch, and the recording list at `recordings.html` | `ui-ux-pro-max`, `full-output-enforcement` | **Built, awaiting sign-off.** The teacher records gradually (2026-09-18) |
 | 3 | **Trace the letters** with a finger, mouse or pen, inside Lesson 1 | `minimalist-ui`, `high-end-visual-design` | **Built, awaiting sign-off.** Was step 9 |
 | 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Built, awaiting sign-off** (2026-09-19). Specified in `docs/lesson-2/`; `README.md` there lists where the code differs. Check: `node tools/qaida-check.js` |
-| 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | **Specified 2026-09-20, not built.** `docs/lesson-3/`; read `09-open-questions.md` §1 first — the lesson is too long as drawn, and that is settled before building |
-| 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-19: mixed review carries through **every** later lesson |
+| 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | **Built, awaiting sign-off** (2026-09-20). Six groups and a table; `docs/lesson-3/README.md` lists where the code differs. Checks: `node tools/qaida-check.js`, `node tools/qaida-lesson3-check.js`. **The joined shapes have not been seen rendering** — that is the first thing to look at |
+| 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 4 built 2026-09-20, awaiting the user's preview** (`docs/lesson-4/` is the spec; `README.md` there lists where the build differs). **Lesson 5 built 2026-09-20, awaiting the user's preview** (`docs/lesson-5/` — the differences only; it assumes `docs/lesson-4/`; `README.md` there lists where the build differs). Lesson 6 not started. One page file, `mark-lesson.js`, serves all three lessons. Mixed review carries through every later lesson (2026-09-19). Checks: `node tools/qaida-check.js`, `qaida-marks-check.js` (Lesson 4's page), `qaida-lesson5-check.js`, `qaida-lesson3-check.js` |
 | 7 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | |
 | 8 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-20: **jazam stays last**, after leen |
 | 9 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Each lesson adds its rows to the recording list as it's built |
@@ -180,6 +194,168 @@ The options panel has a "The drill" section, and every choice in it exports to `
 `node --check`. **Not seen in a browser** — the user previews it. **Not built:** `docs/lesson-2/09-going-in-order.md`
 (nothing locked, advice at the door), which the spec says to ask about. Lesson 2 opens from the home once Lesson 1 is finished.
 `design-system/quran-landing/pages/qaida.md` is **not yet updated**: it is written after the user has seen the page.
+
+### Step 5 built — Lesson 3, letter shapes
+
+*2026-09-20, after the user answered the two open questions that blocked it (length, and the position names).*
+
+**What exists.** `lesson-3.html`, `lesson-3.js` and `shapes.js`. The page is Lesson 2's page with a **rail of six groups**
+and a **board of shapes** above the drill: the board teaches, the drill tests. A joined shape is a letter with an invisible
+neighbour (U+200D), so every element holding one is `aria-hidden` and its container carries the name ("Haa, middle of a
+word"). The six groups — the six that never join forward, the two that never change, then tooth-and-tail in two halves, the
+shape-shifters, and the whole table — are an *order*, never locks: any group opens at any time and one opened out of turn is
+advised about once. The engine is `practice.js`, **unchanged**: the pool is always all 68 shapes and the open group is the
+`required` ones. Two progress numbers, each labelled: the bar is the whole lesson, the line under it is this group; the
+page re-asserts the lesson's total after the engine overwrites it with the group's. "Write it" opens the tracer on the
+isolated letter, not the joined shape.
+
+**Where it differs from `docs/lesson-3/`** — twelve points, in that folder's `README.md`. The three that matter most:
+six groups (the user's choice); the engine's `ready` event can't serve per-group readiness, so the page measures each group
+itself; and the lesson is marked finished when all five drilling groups are ready, not when the table is opened.
+
+**Also changed.** Lesson 2's Next is a real link to Lesson 3. The options panel gained a "Letter shapes" section (group,
+shapes drilled, wrong answers offered, what the board shows) that also prints what each group asks for, so the teacher can see
+the length instead of picturing it. Group 5 (24 shapes, about 60 right answers) is now the longest.
+
+**Checked.** `node tools/qaida-check.js` (the data layer: 68 and 101 shapes, both scripts, the ids, the group trick, mastery
+surviving a change of group) and `node tools/qaida-lesson3-check.js` (the page and the options panel in a hand-made DOM,
+including a full run through a group, the whole lesson, a change of script, and Start again) both pass, and so do the
+Lesson 2 page check and every `node --check`. **Not seen in a browser** — the user previews it. Look first at whether every
+joined shape renders as a joined shape (not a dotted circle, not the bare letter) in both faces and both themes: **ہ / ه,
+ع غ, ک / ك, م**, then the six that never join forward. Then whether ط ظ's four shapes look alike enough for group 2's premise
+(`docs/lesson-3/09` §3). `design-system/quran-landing/pages/qaida.md` describes the page but is the "as built, not yet seen" kind.
+
+### Step 6 built (Lesson 4 only) — the first mark
+
+*2026-09-20. The user: "please start building."*
+
+**Built.** `marks.js` (the data layer for every mark lesson: the marks table, the 29 items, the bare review letters, the
+two parts), `mark-lesson.js` (the page, driven by `<html data-mark>`; there is no `lesson-4.js`), `lesson-4.html`, a block
+in `qaida.css`, a "The mark" section in the options panel, and the `fatha` recording group in `audio.js`, `recordings.js`,
+`recordings.html` and `manifest.json` (recordings of the *sound* "ba", not the letter's name). `practice.js` did not change.
+The home shows Lesson 4 as a real link, and Lesson 3's Next reaches it.
+
+**The user's answers were taken from the recommendations, not asked.** §1: the student answers with the pair's name
+("Baa with zabar"); the by-ear format exists and switches on when a `fatha` recording does. §2: two parts, six letters
+(ب د ر س م ل) then all 29. Both are one row in the options panel from being changed.
+
+**Where it differs from the spec** (each is written where it happens, and is the user's to overrule):
+1. **Part 1 asks about part 1's letters only**, not "the other 23 at half weight" — the user's 2026-09-20 line on Lesson 3,
+   "i shouldn't be seeing the letters of other groups". The bare review letters are the mix.
+2. **No plain letters in the practice** (the user, 2026-09-20, after previewing: "don't add simple alphabets without symbols").
+   The "Letters from before" slider now starts at 0; it is still in the options panel, and "the same letter, with and
+   without the mark" needs it above 0. Also after the preview: a letter is not asked again until the others have had a
+   turn (`noRepeatWithin`), and the halo waits for a changed font to load and is measured again. What follows describes the
+   review *when it is switched on*: **review is capped by the part's size** (a third as many as it has letters; as many as it has letters when the wrong
+   answers are "the same letter, bare", so every letter has a twin). Eight bare letters beside six required ones were 53%
+   of the questions; now about 19% in part 1 and 17% in part 2.
+3. **`shell.masteredCount(4)` counts review letters too** (it counts every id the lesson holds), so the home's card can
+   read a little high. The home already clamps it to the total, and the page's own bar counts only the 29. Fixing it means
+   touching `shell.js`; not done.
+4. `data-titlemark` stays `"ba"` (the layout choice, as on Lesson 3) and the glyph is composed by the script.
+
+**Checked.** `node tools/qaida-check.js` (a Lesson 4 block: the counts, the ids, the glyph, no literal combining mark, the
+groups, the total re-assert, review, mastery across a change of group and script), `node tools/qaida-marks-check.js` (new:
+the real page and options in a hand-made DOM, including the name set switching with no reload), plus the Lesson 3 and Lesson 2
+page checks, all pass. **Not seen in a browser.** The blocking check is `docs/lesson-4/08` §5: does every marked letter
+render with the mark *attached* — **ا ء ط ظ ک ہ** and one dotted letter — in both faces and both themes. Then whether the halo
+sits on the mark, and whether "Write it" shows the mark in the guide. `design-system/quran-landing/pages/qaida.md` is not
+updated yet: it is written once the user has seen the page.
+
+### Step 6 built (Lesson 5) — the mark below
+
+*2026-09-20. The user: "please start building lesson 5." Taken as a yes to the recommendations in `docs/lesson-5/06`.*
+
+**Built.** `lesson-5.html` (Lesson 4's page with `data-mark="kasra"`, `data-distractors="which-mark"`, `data-board="trio"`
+and its own wording), and edits to `marks.js` (per-mark `first`, `sample` and `after`; `twinItems`; `which-mark`; `{other}`;
+`item.mark`), `mark-lesson.js` (`reviewPlan`, the trio, `data-sits`, verdicts that name what the letter really carries),
+`shell.js` (Lesson 5's row, and the `masteredCount` fix), `qaida.css` (one `[data-sits="below"]` block and the trio row),
+`qaida-options.js` (three rows), and `audio/manifest.json` (`"kasra": {}`). `practice.js` did not change. `recordings.html`
+lists the 29 kasra rows on its own (`built: true`).
+
+**What the lesson does that Lesson 4 did not.** The same letters with **zabar** ride along — as wrong answers, and asked in
+their own right (they are review: never required, never counted, never advice). A question about zair always has the same
+letter with zabar among the answers, so the student cannot pass by noticing that a mark is there; they have to look at
+whether it is above or below. The plain letters are the slider and start at 0 (the user, on Lesson 4). The board is a trio:
+the letter, with zabar, with zair.
+
+**Where it differs from `docs/lesson-5/`** — eleven points, in that folder's `README.md`. The ones that matter most: the
+`{other}` token in place of two-attribute pairs; the `masteredCount` fix (which also corrects Lesson 4's home card); the twins
+come to about 45% of part 1's questions and 35% of part 2's, not a third; and the halo is not allowed to spill out of the tile.
+
+**Checked.** `node --check` on every script; `node tools/qaida-check.js` (a Lesson 5 block: 46 checks on the data layer,
+including that every zair question has its zabar twin among the answers), the new `node tools/qaida-lesson5-check.js` (the
+real page and options in a hand-made DOM), `qaida-marks-check.js` (Lesson 4's page, unchanged apart from a flake fix) and
+`qaida-lesson3-check.js` all pass. **Not seen in a browser** — the user previews it, and `docs/lesson-5/05` §4 is the list. Look
+first at whether the mark renders *attached, under the letter* — **ب ي ج** (dots below), **ر و م ن ص ق** (tails), **ا**, **ء**,
+and **ط ظ**, which should be the cleanest — in both faces and both themes; then whether anything is clipped at the bottom of a
+tile, and whether the halo sits on the mark. `design-system/quran-landing/pages/qaida.md` is not updated: it is written once the
+user has seen the page.
+
+### Step 6 planned (Lesson 5) — the mark below
+
+*2026-09-20. The user: "please plan lesson 5, i guess that is the next lesson."*
+
+**Specified, not built.** `docs/lesson-5/` is **six files, not ten**, and it is deliberately thin: Lesson 5 is Lesson 4
+with a different stroke, `mark-lesson.js` already serves it through `<html data-mark="kasra">`, and `MARKS.kasra` was
+written on 2026-09-20 with the rest. A ten-file clone of `docs/lesson-4/` would be a second copy of a specification
+that is already right. The folder says so on its first line: read `docs/lesson-4/` in full, this holds the differences.
+
+**It should not be built yet.** Lesson 4 has not been seen in a browser, and its blocking check — does the mark render
+*attached* to the letter — is the same check here, in a harder place. U+0650 sits **below**, in the strip already
+occupied by the dots below (ب ي ج) and by every tail and bowl that crosses the line (ر و م ن ص ق). Building Lesson 5
+first would mean fixing the same fault twice, in two files.
+
+**The one thing that is genuinely new**, and the only part of the plan with real code in it: Lesson 4's contrast was
+*marked against bare*, and here that is worthless â€” a student who has done Lesson 4 can already see a stroke. The
+contrast that makes Lesson 5 a lesson is **above against below**, so **the zabar items ride along as the wrong
+answers**. That means a fourth `distractors` value (`which-mark`), review items that carry the *other* mark, and a
+`mark` field on every item so the page can tell whose it is. `practice.js` still does not change.
+
+**Six smaller findings**, each written where it happens: `GROUP_ONE` is shared and its six letters were chosen for a
+mark *above* (three of them are the worst letters for one below, so `first` becomes per-mark); `sits: 'below'` is
+declared and read by nothing; `titleMark` and `sampleOf` hardcode ب, which is the one letter with a dot where this
+mark goes; the board wants three columns, not two; and `shell.masteredCount`'s over-count (carried from Lesson 4,
+"as built" 3) grows from 8 stray ids to 33 and should be fixed in this step rather than carried again.
+
+**Four questions for the teacher**, none blocking: which six letters part 1 uses, how much of Lesson 4 rides along,
+whether the recordings would be easier taken letter-by-letter ("Baa, ba, bi, bu") than group-by-group, and the ones
+carried over from Lesson 4. `docs/lesson-5/06-open-questions.md`.
+
+Nothing was written to `site/`. `design-system/quran-landing/pages/qaida.md` is untouched: it is written after the
+code exists and the user has seen it.
+
+### Step 6 planned — Lesson 4, the first mark
+
+*2026-09-20. The user: "please plan the lesson 4."*
+
+**Specified, not built.** `docs/lesson-4/` holds ten files in the same shape as `docs/lesson-3/`: what the lesson
+teaches, the mark data, the pool and formats, the page, every line of wording, accessibility, the options panel, the
+file list and build order, and the open questions. `README.md` gives the read order.
+
+**Lesson 4 is the first of three, and the plan is built around that.** Lesson 5 (zair) and Lesson 6 (paish) are the
+same lesson with a different stroke, and lessons 7, 9 and 14 are marks again. So step 6 produces **`marks.js`** (the
+data layer, a table of marks, no DOM — `shapes.js`'s counterpart) and **`mark-lesson.js`** (the page, driven by
+`<html data-mark="fatha">`), with `lesson-4/5/6.html` as three thin pages. There is deliberately **no `lesson-4.js`**:
+`lesson-3.js` is 41KB, and copying it twice would be three places to fix every bug. `practice.js` still does not change.
+
+**Two things are new to the Qaida in this lesson.** The name set finally *does* something on a lesson page — the
+title, the rail and all 29 item names say zabar or fatha — so every such line is a `{mark}` token re-filled on
+`shell.onChange`. And **mixed review is load-bearing rather than a courtesy**: a pool where every item carries the mark
+can never ask "does this carry the mark?", so the bare letters riding along from Lesson 2 are both the review the user
+asked for and the only wrong answers that make the mark matter. They are chosen from the letters this student got
+wrong in Lesson 2.
+
+**Blocked on the user, and this is the whole point of the plan.** `09-open-questions.md` §1: lessons 2 and 3 were
+answered with a letter's *name*; Lesson 4 is about a *sound*, and the Qaida has no recordings and transliteration is
+switched off. The three ways out are laid out with examples — name the pair (buildable now, teaches seeing not
+reading), write the sound in English letters (real reading, but transliteration the user turned off, and ʿa / ḥa / ṣa
+are dishonest spellings), or by ear (the true Qaida way and the only one a screen reader can use — 29 new recordings,
+of the *sound* "ba", not the letter name "Baa"). Claude's recommendation: build the first, build the third alongside
+it switched off, never grade the second. §2 asks one part or two, with the numbers.
+
+Nothing was written to `site/`. `design-system/quran-landing/pages/qaida.md` is untouched: it is written after the
+code exists and the user has seen it.
 
 ### Step 4 planned, and Export settings added to the Qaida panel
 

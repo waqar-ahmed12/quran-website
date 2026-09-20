@@ -31,7 +31,6 @@
   const bar = $('.bar');
   const reset = $('.reset');
   const endLine = $('.end-line');
-  const next = $('.next');
   const soundNote = $('.sound-note');
   const groupsSource = $('[data-groups]');
 
@@ -387,8 +386,6 @@
     disarm();
     clear();
   });
-
-  next.addEventListener('click', () => shell.say(next.dataset.standin)); // stand-in until Lesson 3 exists
 
   // Sound ------------------------------------------------------------------------------------------
 

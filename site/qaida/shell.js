@@ -105,10 +105,13 @@
     { n: 2, title: { fatha: 'Letters out of order', zabar: 'Letters out of order' },
       lede: 'The same letters, shuffled, so each one is known cold.', href: 'lesson-2.html', built: true, progress: 'drill' },
     { n: 3, title: { fatha: 'Letter shapes', zabar: 'Letter shapes' },
-      lede: 'How a letter changes at the start, the middle and the end of a word.' },
-    { n: 4, title: { fatha: 'Fatha', zabar: 'Zabar' },
+      lede: 'How a letter changes at the start, the middle and the end of a word.',
+      href: 'lesson-3.html', built: true, progress: 'drill' },
+    // `cp` is the mark a lesson of marks teaches: its own items' ids end in it, and the home counts only those (see
+    // masteredCount), because the lesson's review (bare letters, the other mark's twins) is recorded under other ids.
+    { n: 4, title: { fatha: 'Fatha', zabar: 'Zabar' }, href: 'lesson-4.html', built: true, progress: 'drill', cp: 0x064E,
       lede: 'The short “a”, written above the letter.' },
-    { n: 5, title: { fatha: 'Kasra', zabar: 'Zair' },
+    { n: 5, title: { fatha: 'Kasra', zabar: 'Zair' }, href: 'lesson-5.html', built: true, progress: 'drill', cp: 0x0650,
       lede: 'The short “i”, written under the letter.' },
     { n: 6, title: { fatha: 'Damma', zabar: 'Paish' },
       lede: 'The short “u”, written above the letter.' },
@@ -280,11 +283,21 @@
   const drillOf = (n) => lessonState(n).drill || NO_DRILL;
 
   // How many items are known: those whose current run of right answers has reached the target. The target is the one
-  // the lesson wrote down, so the home counts the way the lesson does.
-  function masteredCount(n, target) {
+  // the lesson wrote down, so the home counts the way the lesson does. Only the lesson's own items count: a lesson of marks
+  // records its review too (a bare letter, or the other mark's twin), and Lesson 5 can hold as many review ids as its own.
+  // `ids` says exactly which; without it the lesson's row says (a mark lesson's own ids are one letter and its mark), and a
+  // lesson with no such row counts everything, as it always did.
+  function masteredCount(n, target, ids) {
     const drill = drillOf(n);
     const need = target || drill.target;
-    return Object.values(drill.streak).filter((run) => run >= need).length;
+    const entry = LESSONS.find((lessonRow) => lessonRow.n === n);
+    const suffix = entry && entry.cp ? String.fromCharCode(entry.cp) : '';
+    const wanted = ids ? new Set(ids) : null;
+    return Object.entries(drill.streak).filter(([id, run]) => {
+      if (run < need) return false;
+      if (wanted) return wanted.has(id);
+      return !suffix || (id.length === 2 && id.endsWith(suffix));
+    }).length;
   }
 
   // Right: a run goes up by one. Wrong: the run goes back to nothing. Returns the item's new run.

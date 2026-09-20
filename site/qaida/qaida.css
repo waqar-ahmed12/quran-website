@@ -1389,6 +1389,72 @@ a.crumb:hover {
   }
 }
 
+/* A phone: the whole choice fits the window, and the button that finishes it is always in view, so nobody has to scroll to
+   the bottom of a list to be done (the user, 2026-09-20). Two boxes across even here, and less space around them. */
+@media (max-width: 559px) {
+  .chooser form {
+    padding: 1.25rem 1rem 0;
+  }
+
+  .chooser h2 {
+    margin-top: 0.5rem;
+    font-size: 1.375rem;
+  }
+
+  .chooser .intro {
+    margin-top: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .chooser fieldset {
+    margin-top: 1rem;
+  }
+
+  .chooser .options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .option {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .option::after {
+    top: 0.625rem;
+    right: 0.625rem;
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .sample {
+    margin-bottom: 0.125rem;
+    padding-right: 1.75rem;
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .option-name {
+    padding-right: 1.25rem;
+    font-size: 0.9375rem;
+  }
+
+  .option-note {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  /* Pinned to the bottom of the panel, over a patch of its own colour, so the content slides under it. */
+  .chooser .done {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin: 1rem 0 0;
+    box-shadow: 0 0.75rem 0 0.75rem var(--color-surface);
+  }
+}
+
 /* Motion: letters rise in 35ms apart, the choice rises in, and when the last letter is seen, each seen dot pulses in
    turn and light sweeps the bar. None of it under reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
@@ -2131,6 +2197,822 @@ a.crumb:hover {
   color: var(--color-muted-foreground);
 }
 
+/* Lesson 3 — letter shapes ------------------------------------------------------------------------
+   The lesson's own parts: a rail of six groups, and a board of shapes above the drill. Everything else is Lesson 2's,
+   unchanged. No new colours: the rail and the board use the tile and the gold already here (qaida.md §1), and the wrong
+   answer stays gold against dim. docs/lesson-3/04. */
+
+/* The rail: an order, never a chain of locks. Every group is a real button; what marks the one you are in is a gold
+   number, a gold edge and a line under it, and its name in words, so it is never told by colour alone. */
+/* It follows the student down the page, under the top bar, so the shapes can be scrolled through and another group
+   chosen without going back up (the user, 2026-09-20). lesson-3.js measures its height into --rail-h so that anything the
+   page scrolls to stops below it. */
+.bands {
+  position: sticky;
+  top: calc(var(--topbar-h) - 1px);
+  z-index: 4;
+  margin: clamp(0.5rem, 1.2vh, 0.875rem) calc(-1 * var(--gutter)) 0;
+  padding: 0.5rem var(--gutter);
+  border-bottom: 1px solid var(--line);
+  background: rgb(var(--rgb-background) / 0.94);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+:root[data-band] {
+  scroll-padding-top: calc(var(--topbar-h) + var(--rail-h, 5.5rem) + 4.25rem);
+}
+
+/* The "progress bar stays at the top" tryout would sit on the rail; here the rail is what stays. */
+:root[data-band][data-progress='top'] .progress {
+  position: static;
+}
+
+.bands ol {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bands li {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.band {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'n glyph'
+    'name name'
+    'state star';
+  align-content: start;
+  gap: 0.125rem 0.5rem;
+  width: 100%;
+  height: 100%;
+  min-height: 44px;
+  padding: 0.625rem 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: none;
+  font: inherit;
+  text-align: start;
+  color: var(--color-muted-foreground);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+@media (hover: hover) {
+  .band:hover {
+    border-color: rgb(var(--rgb-accent) / 0.6);
+  }
+}
+
+.band-n {
+  grid-area: n;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  color: var(--color-muted-foreground);
+}
+
+/* Arabic letters rise and fall well outside the line they sit on, so the sample gets a tall line of its own and never
+   reaches the name below it. */
+.band-glyph {
+  grid-area: glyph;
+  align-self: start;
+  margin-top: -0.375rem;
+  font-family: var(--font-letter);
+  font-size: 1.375rem;
+  line-height: 1.9;
+  color: var(--color-foreground);
+}
+
+.band-name {
+  grid-area: name;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  color: var(--color-foreground);
+  text-wrap: balance;
+}
+
+.band-state {
+  grid-area: state;
+  align-self: end;
+  min-height: 1.2em;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+/* Done: a gold hairline and a small gold star. */
+.band-star {
+  grid-area: star;
+  align-self: end;
+  width: 0.875rem;
+  height: 0.875rem;
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.6;
+  scale: 0;
+  transition: scale 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.band[data-done] {
+  border-color: rgb(var(--rgb-accent) / 0.4);
+}
+
+.band[data-done] .band-star {
+  scale: 1;
+}
+
+/* Now: gold number, gold edge, a gold line under it. */
+.band[data-state='now'] {
+  border-color: rgb(var(--rgb-accent) / 0.7);
+  box-shadow: inset 0 -2px 0 var(--color-accent);
+}
+
+.band[data-state='now'] .band-n,
+.band[data-state='now'] .band-state {
+  color: var(--color-accent);
+}
+
+/* How much of the group is known: decorative, the numbers are in the text. */
+.band-bar {
+  position: absolute;
+  inset: auto 0.75rem 0.5rem;
+  height: 2px;
+  border-radius: 1px;
+  background: rgb(var(--rgb-foreground) / 0.1);
+  overflow: hidden;
+}
+
+.band-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform: scaleX(var(--p, 0));
+  transform-origin: left;
+  transition: transform 700ms var(--ease-out);
+}
+
+/* A group opened out of turn is told once, in the same strip the advice about a hard shape uses. */
+.band-advice {
+  margin: 0.75rem auto 0;
+}
+
+/* What each half of the lesson is for: a step, a heading and one line, so nobody has to guess that the second is an
+   exercise (the user, 2026-09-20). */
+.section-head {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  max-width: 36rem;
+  margin: 0 auto 0.75rem;
+  text-align: center;
+}
+
+.section-title {
+  margin: 0;
+  font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.section-title:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+.section-guide {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-wrap: balance;
+  color: var(--color-muted-foreground);
+}
+
+/* The two halves are told apart by space and a hairline. */
+.shapes + .drill {
+  margin-top: clamp(1.5rem, 3.5vh, 2.5rem);
+  padding-top: clamp(1.25rem, 3vh, 2rem);
+  border-top: 1px solid var(--line);
+}
+
+/* A joined shape hangs lower than a bare letter (ـق, ـي, ـع), so the question gets more room than Lesson 2's and the
+   answers never sit on the shape. Only Lesson 3 carries data-band. */
+:root[data-band] .prompt {
+  --prompt-size: clamp(4.5rem, 3.5rem + 5vw, 7rem);
+  min-height: calc(var(--prompt-size) * 1.9);
+}
+
+:root[data-band] .prompt-glyph {
+  line-height: 1.9;
+}
+
+/* Two numbers, so each says what it counts: the bar is the whole lesson, this line is the open group. */
+.band-line {
+  margin: 0.375rem 0 0;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-foreground);
+}
+
+@media (max-width: 559px) {
+  /* The rail scrolls sideways with the current group snapped into view; the sample letter goes before the name does. */
+  .bands ol {
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 0 var(--gutter) 0.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+  }
+
+  .bands li {
+    flex: 0 0 9rem;
+    scroll-snap-align: start;
+  }
+
+  .band-glyph {
+    display: none;
+  }
+}
+
+/* The board: the teaching half. A real table, so a screen reader is told the row and the column of every shape. It is
+   right to left, like the script, with the letter's name at the start edge. The tiles are Lesson 1's, a little smaller
+   so four fit beside a name; they are never smaller than 44px. */
+.shapes {
+  margin-top: clamp(0.75rem, 1.6vh, 1.25rem);
+}
+
+.shapes-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  padding: 0.25rem 0.25rem 0.5rem;
+  transition: opacity 250ms ease;
+}
+
+.shapes-scroll.leaving {
+  opacity: 0;
+  transition-duration: 150ms;
+}
+
+/* Only when the keyboard has really reached it. (It once also lit up whenever a group was chosen, and its top edge then
+   slid under the sticky headings for as long as the student scrolled: the heading has its own ring for that.) */
+.shapes-scroll:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+  border-radius: 8px;
+}
+
+/* The column headings, kept in view. A bar of its own under the rail (a heading inside a table that scrolls sideways
+   cannot stick), full-bleed like the rail, with each word set over its column by lesson-3.js. The table's own headings
+   are for a screen reader and are visually empty. */
+.shapes-heads {
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--rail-h, 5.5rem) - 2px);
+  z-index: 3;
+  height: 2.875rem;
+  margin: 0.25rem calc(-1 * var(--gutter)) 0;
+  padding: 0 var(--gutter);
+}
+
+/* The bar's own background reaches the edges of the window; the words are clipped to the width of the table's region. */
+.shapes-heads::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-bottom: 1px solid var(--line);
+  background: rgb(var(--rgb-background) / 0.94);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.shapes-heads-track {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.shapes-head {
+  position: absolute;
+  bottom: 0.4rem;
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-muted-foreground);
+  pointer-events: none;
+}
+
+/* The letters' own column is the one to read by: its heading is a touch stronger. */
+.shapes-head:first-child {
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.shapes-table {
+  --tile: clamp(3.5rem, 2.9rem + 2.4vw, 5.25rem);
+  margin-inline: auto;
+  border-collapse: separate;
+  border-spacing: 0.5rem 0.625rem;
+}
+
+:root[data-size='large'] .shapes-table {
+  --tile: clamp(4rem, 3.3rem + 2.6vw, 6rem);
+}
+
+.shapes-table th,
+.shapes-table td {
+  padding: 0;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* A tile is a block, so the cell's text-align does not centre it: without this it hugs the start edge of a column that a
+   long note (hamzah's line) has made wider, and the tiles sit off from the heading above them. */
+.shapes-table td > .letter {
+  margin-inline: auto;
+}
+
+/* Visually empty (the sticky bar above says these words), but it still gives each column its width. */
+.shapes-table thead th {
+  min-width: var(--tile);
+  height: 0;
+  line-height: 0;
+}
+
+.shapes-table tbody th {
+  padding-inline: 0.5rem; /* the same on both sides, so the name is centred under its heading */
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  text-align: center; /* under its own heading, as every other column is */
+  color: var(--color-foreground);
+}
+
+/* Where the table scrolls, the letter's name stays put at the start edge. */
+@media (max-width: 899px) {
+  .shapes-table thead th:first-child,
+  .shapes-table tbody th {
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    background: var(--color-background);
+  }
+}
+
+.shapes-table .name {
+  font-size: 0.75rem;
+  line-height: 1.15;
+  white-space: normal;
+  text-align: center;
+}
+
+/* The joined-up example: at the end of the row, in a tile with no edge, so it reads as an example and not a fifth form. */
+.shapes-table td.demo {
+  min-width: var(--tile);
+  white-space: nowrap;
+}
+
+.shapes-table td.demo .glyph {
+  font-family: var(--font-letter);
+  font-size: calc(var(--tile) * 0.5);
+  line-height: 1;
+  color: var(--color-foreground);
+}
+
+/* A shape that does not exist, said in words to a screen reader and as a dash to the eye. */
+.shapes-table td.none {
+  color: var(--color-muted-foreground);
+  opacity: 0.5;
+}
+
+.shapes-table td.hamzah {
+  padding-inline: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-align: start;
+  color: var(--color-muted-foreground);
+}
+
+/* A phone: nothing scrolls sideways (the user, 2026-09-20). The tiles are sized so a whole row fits the window: five across when
+   a letter's name has a line of its own above its shapes, and four beside the name in the table of every letter. Never under
+   44px, and the scroll stays only as a safety net for a very narrow window. */
+@media (max-width: 599px) {
+  .shapes-scroll {
+    padding-inline: 0.25rem;
+  }
+
+  .shapes-table,
+  :root[data-size='large'] .shapes-table {
+    --tile: clamp(2.75rem, calc((100vw - 2 * var(--gutter) - 2rem) / 5), 4.5rem);
+    border-spacing: 0.25rem 0.125rem;
+  }
+
+  .shapes-table[data-table='all'],
+  :root[data-size='large'] .shapes-table[data-table='all'] {
+    --tile: clamp(2.75rem, calc((100vw - 2 * var(--gutter) - 2rem - 4.5rem) / 4), 4.5rem);
+    border-spacing: 0.25rem 0.5rem;
+  }
+
+  .shapes-table[data-table='all'] tbody th {
+    width: 4.5rem;
+    padding-inline: 0.125rem;
+    font-size: 0.875rem;
+  }
+
+  .shapes-table td.demo .glyph {
+    font-size: calc(var(--tile) * 0.36);
+  }
+
+  /* Each letter's name, on its own line above its shapes. */
+  .shapes-table .name-row th {
+    padding: 0.75rem 0 0.125rem;
+    font-size: 0.9375rem;
+  }
+
+  .shapes-table[data-stacked] thead th:first-child,
+  .shapes-table[data-stacked] tbody th {
+    position: static;
+    background: none;
+  }
+}
+
+/* Said once, plainly, just above the button that leads to the exercise. */
+.shapes-hint {
+  max-width: 44ch;
+  margin: 1.25rem auto 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-foreground);
+}
+
+/* From looking to practising. */
+.shapes-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.practise .arrow {
+  transition: translate 300ms var(--ease-out);
+}
+
+.practise:hover .arrow {
+  translate: 0 3px;
+}
+
+.shapes-note {
+  max-width: 46ch;
+  margin: 0.5rem auto 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-muted-foreground);
+}
+
+/* The shape just missed keeps a gold edge, so the eye goes back to the teaching half and not only to the correction. */
+.letter[data-missed] {
+  border-color: var(--tile-mark);
+  box-shadow: inset 0 0 0 1.5px var(--tile-mark);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The rows arrive 35ms apart, as the answers do; a star turns in once, and only once. */
+  :root:not([data-arrive='all']) .shapes-table.arrive tbody tr {
+    animation: rise 700ms var(--ease-out) backwards;
+    animation-delay: calc(120ms + var(--i, 0) * 35ms);
+  }
+
+  .band.just-ready .band-star {
+    animation: star-turn 600ms var(--ease-out) backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .band,
+  .band-fill,
+  .band-star,
+  .shapes-scroll {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}
+
+@keyframes star-turn {
+  from {
+    rotate: -90deg;
+    scale: 0;
+  }
+}
+
+/* Lessons 4 to 6 — the mark ---------------------------------------------------------------------
+   One stylesheet block for every mark lesson. The rail, the step headings, the tiles and the drill are Lesson 3's and
+   Lesson 2's, unchanged; what is new is the board: the mark on its own, a letter with and without it, and the room a
+   marked letter needs above and below. No new colours. docs/lesson-4/04 §6. */
+
+.marks-board {
+  --tile: clamp(3.5rem, 2.9rem + 2.4vw, 5.25rem);
+  margin-top: clamp(0.75rem, 1.6vh, 1.25rem);
+  transition: opacity 250ms ease;
+}
+
+:root[data-size='large'] .marks-board {
+  --tile: clamp(4rem, 3.3rem + 2.6vw, 6rem);
+}
+
+.marks-board.leaving {
+  opacity: 0;
+  transition-duration: 150ms;
+}
+
+.marks-board + .drill {
+  margin-top: clamp(1.5rem, 3.5vh, 2.5rem);
+  padding-top: clamp(1.25rem, 3vh, 2rem);
+  border-top: 1px solid var(--line);
+}
+
+/* A marked letter is taller than a bare one, and seven letters hang below the line: the prompt needs room at both ends. */
+:root[data-mark] .prompt {
+  padding-block-start: 0.5rem;
+}
+
+/* The mark on its own, on the dotted circle a combining mark expects to sit on. */
+.mark-alone {
+  display: grid;
+  justify-items: center;
+  gap: 0.125rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.alone-glyph {
+  font-family: var(--font-letter);
+  font-size: clamp(3.5rem, 3rem + 3vw, 5rem);
+  line-height: 1.9;
+  color: var(--color-accent);
+}
+
+.alone-label,
+.alone-sits {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-foreground);
+}
+
+.alone-sits {
+  color: var(--color-muted-foreground);
+}
+
+/* One letter twice, then the whole group as pairs. */
+.pair-feature {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.mark-does {
+  max-width: 40ch;
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-foreground);
+}
+
+/* Right to left, like the script: the letter on its own is on the right, with the mark on the left, and the pairs run the same
+   way. The words under each stay left to right. */
+.pairs {
+  direction: rtl;
+}
+
+.pair {
+  display: flex;
+  direction: rtl;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.pair-cell {
+  direction: ltr;
+}
+
+.pair.feature {
+  --tile: clamp(5rem, 4rem + 4vw, 7.5rem);
+  gap: 0.875rem;
+}
+
+.pair-arrow {
+  align-self: center;
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-bottom: 1.25rem;
+  fill: none;
+  stroke: var(--color-muted-foreground);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  scale: -1 1; /* it points from the letter on the right to the marked one on the left */
+}
+
+.pair-cell {
+  display: grid;
+  justify-items: center;
+  gap: 0.375rem;
+}
+
+.pair-caption {
+  max-width: calc(var(--tile) * 1.5);
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-muted-foreground);
+}
+
+.pairs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+  gap: 1.25rem 0.75rem;
+  margin: 1.5rem auto 0;
+}
+
+.pairs[data-board='marked'] {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 7.5rem), 1fr));
+}
+
+/* A marked tile has the stroke above the letter, and the tails of ج ح خ ع غ م ي below it: room at both ends. */
+.mark-tile {
+  aspect-ratio: 5 / 6.6;
+  padding: 0.375rem 0 0.5rem;
+}
+
+.mark-tile .glyph {
+  line-height: 1.7;
+}
+
+.mark-tile.peek {
+  border-color: rgb(var(--rgb-accent) / 0.7);
+  transform: scale(1.04);
+}
+
+/* Pointing at the mark without touching the text: a soft ring over the top of the tile. A combining mark in a span of its
+   own can break its attachment to the letter in some faces, so the halo is drawn beside it (docs/lesson-4/04 §3b). */
+/* Sized and placed by mark-lesson.js from where the mark's ink really falls, so it fits every letter; hidden until it is. */
+.mark-tile .halo {
+  position: absolute;
+  display: none;
+  visibility: hidden;
+  border: 1.5px solid rgb(var(--rgb-accent) / 0.6);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+:root[data-point='halo'] .mark-tile .halo {
+  display: block;
+}
+
+.mark-tile .halo[data-placed] {
+  visibility: visible;
+}
+
+/* Marks where the text sits on its line, so the halo can be measured from it. Takes no room. */
+.glyph .baseline {
+  display: inline-block;
+  width: 0;
+  height: 0;
+}
+
+.mark-tile .tinted {
+  color: var(--color-accent);
+}
+
+.bare-under {
+  font-family: var(--font-letter);
+  font-size: 1.375rem;
+  line-height: 1.7;
+  color: var(--color-muted-foreground);
+}
+
+/* The mark goes with the letter wherever it sits: an example, in a tile with no edge, so it reads as one and not as a form. */
+.joined {
+  display: grid;
+  justify-items: center;
+  gap: 0.125rem;
+  margin: 1.5rem auto 0;
+  text-align: center;
+}
+
+.joined-glyph {
+  font-family: var(--font-letter);
+  font-size: clamp(2.75rem, 2.4rem + 1.6vw, 3.75rem);
+  line-height: 1.9;
+  color: var(--color-foreground);
+}
+
+.joined-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-foreground);
+}
+
+.joined-note {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-muted-foreground);
+}
+
+@media (max-width: 599px) {
+  .marks-board,
+  :root[data-size='large'] .marks-board {
+    --tile: clamp(2.75rem, 13vw, 3.75rem);
+  }
+
+  .pair.feature {
+    --tile: clamp(4rem, 20vw, 5.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The pairs arrive 35ms apart, as the rows of Lesson 3's table do. */
+  :root:not([data-arrive='all']) .pairs.arrive .pair {
+    animation: rise 700ms var(--ease-out) backwards;
+    animation-delay: calc(120ms + var(--i, 0) * 35ms);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marks-board,
+  .mark-tile {
+    transition-duration: 0s !important;
+    animation: none !important;
+  }
+}
+
+/* Lesson 5 — a mark below the letter ----------------------------------------------------------------
+   docs/lesson-5/02 §2 and 04 §7. The stroke lands in the strip that the dots below (ب ي ج) and every tail and bowl that
+   crosses the line (ر و م ن ص ق ع غ) already use, so a tile that was measured for a stroke above needs room at the bottom as
+   well as the top. Lesson 4's own tile rules above are untouched: this only applies when the page says the mark sits below.
+   Tall letters (ا ل ك ط) still need the top, so the room is added, not moved. */
+
+:root[data-sits='below'] .mark-tile {
+  aspect-ratio: 5 / 7.4;
+  padding: 0.375rem 0 0.875rem;
+}
+
+:root[data-sits='below'] .mark-tile .glyph {
+  line-height: 1.85;
+}
+
+/* The trio: the letter, then with the stroke of the lesson before, then with this one. Three tiles and two arrows in a row,
+   so a row needs more room than a pair, and the featured one is a little smaller than the pair's. */
+.pairs[data-board='trio'] {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19.5rem), 1fr));
+}
+
+.pair.trio {
+  gap: 0.25rem;
+}
+
+.pair.trio .pair-arrow {
+  width: 1rem;
+  height: 1rem;
+}
+
+.pair.feature.trio {
+  --tile: clamp(4rem, 3.25rem + 3.4vw, 6rem);
+  gap: 0.375rem;
+}
+
+@media (max-width: 599px) {
+  .pair.feature.trio {
+    --tile: clamp(3.25rem, 17vw, 4.5rem);
+  }
+}
+
 /* The tracing board--------------------------------------------------------------------------- */
 .tracer {
   width: min(34rem, calc(100vw - 2rem));
@@ -2349,6 +3231,10 @@ code {
 }
 
 /* TRYOUT: the options panel (qaida-options.js), as on the home page. Delete with it. */
+[data-madani-font='noto'] {
+  --font-madani: 'Noto Naskh Arabic', 'Amiri Quran', serif;
+}
+
 [data-madani-font='scheherazade'] {
   --font-madani: 'Scheherazade New', 'Amiri Quran', serif;
 }

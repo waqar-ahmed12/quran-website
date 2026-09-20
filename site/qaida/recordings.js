@@ -44,8 +44,8 @@
       tr.append(
         number,
         letter,
-        cell(row.name, 'say'),
-        cell(row.file || `letters/${row.slug}.mp3`, 'file'),
+        cell(row.say || row.name, 'say'),
+        cell(row.file || `${row.kind}/${row.slug}.mp3`, 'file'),
         cell(row.file ? 'yes' : 'not yet', 'got'),
       );
       body.append(tr);
@@ -78,7 +78,7 @@
     for (const row of rows) {
       if (row.file) continue; // already in the manifest
       for (const extension of EXTENSIONS) {
-        const path = `letters/${row.slug}.${extension}`;
+        const path = `${row.kind}/${row.slug}.${extension}`;
         // eslint-disable-next-line no-await-in-loop -- one at a time keeps the server calm and the order readable
         if (await exists(path)) {
           row.file = path;
@@ -95,14 +95,18 @@
   }
 
   function writeManifest() {
-    const letters = {};
-    for (const row of rows) if (row.file) letters[row.glyph] = row.file;
+    // One group per kind: the letters' names, then the sound of a letter with each mark that has a lesson.
+    const groups = { letters: {} };
+    for (const row of rows) {
+      if (!groups[row.kind]) groups[row.kind] = {};
+      if (row.file) groups[row.kind][row.glyph] = row.file;
+    }
     const manifest = {
       _read_me: 'Every recording the Qaida has. Add a line when you add a file; anything not listed here simply has'
         + ' no recording yet, and the lesson says so. The teacher’s own voice or a vetted reciter only, never an'
         + ' AI voice.',
       placeholder: 'placeholder.wav',
-      letters,
+      ...groups,
     };
     out.textContent = JSON.stringify(manifest, null, 2);
     block.hidden = false;

@@ -20,11 +20,15 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
    memorized page order. Catches students who can recite the alphabet in order but can't
    name a letter cold.
 3. **Letter shapes** — the user's "beginning shapes for the alphabets, slowly transitioning to the difficult shapes,
-   then shapes depending on whether in start, middle or end". **Confirmed by the user, 2026-09-20: five bands** —
-   the six that never join forward (ا د ذ ر ز و), then the two that never change (ط ظ), then tooth-and-tail
-   (ب ت ث ن ي س ش ص ض ف ق ل), then the shape-shifters (ج ح خ ع غ ه ك م), and finish with the full start / middle /
-   end table. Specified in full in `docs/lesson-3/`.
-4. **Zabar** — lesson + exercise.
+   then shapes depending on whether in start, middle or end". **Confirmed by the user, 2026-09-20: five bands, then made
+   six the same day** (the long third band split in two, to keep the lesson finishable) — the six that never join
+   forward (ا د ذ ر ز و), then the two that never change (ط ظ), then tooth-and-tail in two halves (ب ت ث ن ي س ش, then
+   ص ض ف ق ل), then the shape-shifters (ج ح خ ع غ ه ك م), and finish with the full start / middle / end table. Built;
+   specified in `docs/lesson-3/`, whose `README.md` lists where the build differs.
+4. **Zabar** — lesson + exercise. The first **mark**, and the first page where the student's choice of names changes
+   what is written on it. Specified 2026-09-20 in `docs/lesson-4/`, which also lays out `marks.js` and
+   `mark-lesson.js`, the two files lessons 5 and 6 reuse. **Blocked on `docs/lesson-4/09-open-questions.md` §1:** the
+   answer to "what does بَ say" is a sound, and the Qaida has no recordings and no transliteration.
 5. **Zair** — lesson + exercise. Exercise pool mixes in zabar review items; zair items are
    mandatory (must get right), review items aren't the gate.
 6. **Paish** — lesson + exercise. Exercise pool mixes in zabar + zair review; paish items

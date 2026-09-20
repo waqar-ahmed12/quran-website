@@ -1,19 +1,24 @@
 <!doctype html>
-<!-- The free Qaida, Lesson 2 (QAIDA-BUILD.md, step 4): the letters again, out of order, one question at a time. It
-     teaches nothing new; it finds out whether each letter is known cold. The engine is practice.js and the specification
-     is docs/lesson-2/. Built from lesson-1.html — the top bar, the head, the progress block, the tracing board and the
-     first-visit choice are copied from it. The data- attributes on <html> are the look; the options panel
-     (qaida-options.js) changes them for tryouts. -->
+<!-- The free Qaida, Lesson 3 (QAIDA-BUILD.md, step 5): letter shapes. How a letter changes when it joins the ones beside
+     it: on its own, at the start, in the middle and at the end, in six groups from the easy shapes to the hard ones, and
+     then the whole table. It teaches no marks and no words. The engine is practice.js, unchanged; the data layer is
+     shapes.js; the specification is docs/lesson-3/. Built from lesson-2.html — the top bar, the head, the drill, the tracing
+     board and the first-visit choice are copied from it. The data- attributes on <html> are the look; the options panel
+     (qaida-options.js) changes them for tryouts.
+
+     A joined shape is a letter with an invisible neighbour (U+200D, written here as &#x200D;), so every element that holds
+     one is aria-hidden and its container carries the name: a screen reader would otherwise say "zero width joiner". -->
 <html lang="en"
-      data-tiles="paper" data-size="comfortable" data-ask="glyph" data-choices="4"
-      data-distractors="family" data-advance="auto" data-miss="trace" data-arrive="stagger"
+      data-tiles="paper" data-size="comfortable" data-band="1" data-drilled="new" data-board="band"
+      data-ask="form" data-choices="4" data-distractors="position"
+      data-advance="auto" data-miss="trace" data-arrive="stagger" data-peek="under"
       data-progress="title" data-bar="line" data-track="show" data-finish="settle"
-      data-titlemark="ba" data-titlemark-font="amiri" data-bg="light" data-madani-font="amiri"
+      data-titlemark="ba" data-titlemark-font="amiri" data-bg="light" data-madani-font="noto"
       data-indopak-font="noto">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lesson 2: Letters out of order · Free Qaida</title>
+  <title>Lesson 3: Letter shapes · Free Qaida</title>
   <meta name="theme-color" content="#1F1A18">
   <!-- Light or dark before the page draws: the choice made here or on the home page (same site, same storage),
        otherwise dark, like the home page. -->
@@ -33,7 +38,8 @@
   <script src="audio.js" defer></script>
   <script src="trace.js" defer></script>
   <script src="practice.js" defer></script>
-  <script src="lesson-2.js" defer></script>
+  <script src="shapes.js" defer></script>
+  <script src="lesson-3.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
   <script src="qaida-options.js" defer></script>
@@ -95,15 +101,15 @@
     <header class="lesson-head">
       <div class="head-text">
         <div class="course">
-          <p class="eyebrow" data-words="Lesson number">Lesson 2 of 14</p>
+          <p class="eyebrow" data-words="Lesson number">Lesson 3 of 14</p>
           <!-- The whole Qaida at a glance: this lesson in gold, the other 13 to come. -->
           <ol class="track" aria-hidden="true">
-            <li></li><li class="now"></li><li></li><li></li><li></li><li></li><li></li>
+            <li></li><li></li><li class="now"></li><li></li><li></li><li></li><li></li>
             <li></li><li></li><li></li><li></li><li></li><li></li><li></li>
           </ol>
         </div>
-        <h1 data-words="Lesson title">Letters out of order</h1>
-        <p class="lede" data-words="Line under the title">The same letters, shuffled. Pick the right answer, and take all the time you like.</p>
+        <h1 data-words="Lesson title">Letter shapes</h1>
+        <p class="lede" data-words="Line under the title">How a letter changes when it joins the ones beside it.</p>
         <!-- What the student chose on their first visit, and a way to change it. shell.js fills in the spans. -->
         <p class="setup"
            data-madani="Madani script" data-indopak="Indo-Pak script"
@@ -118,36 +124,105 @@
           <button class="link open-settings" type="button" aria-haspopup="dialog"><span data-words="Settings line: change link">Change</span></button>
         </p>
       </div>
-      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">ب</span>
+      <!-- The lesson's subject in one glyph: the middle of a word, where a letter changes most. -->
+      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">&#x200D;&#x647;&#x200D;</span>
     </header>
 
-    <!-- How many letters are known, kept on this device. {known} and {total} are filled in by lesson-2.js. -->
+    <!-- The six groups. An order, never a chain of locks: every button works at any time, and a group opened out of turn
+         is advised once and then let through (docs/lesson-3/01 §1). lesson-3.js builds the buttons. -->
+    <nav class="bands" aria-label="The six groups of letter shapes"
+         data-band1="They never join forward" data-band2="They never change" data-band3="A tooth and a tail"
+         data-band4="Loops and tails" data-band5="They change the most" data-band6="The whole table"
+         data-band-done="Done" data-band-now="You’re here" data-band-later="Comes later"
+         data-band-label="Group {n}, {name}. {state}"
+         data-band-early="This group comes later. You can carry on if you like — each one builds on the one before."
+         data-band-announce="Group {n}, {name}."
+         data-band-announce-table="Group {n}, {name}."
+         data-words-attr="aria-label|Group rail: label;data-band1|Group 1 name;data-band2|Group 2 name;data-band3|Group 3 name;data-band4|Group 4 name;data-band5|Group 5 name;data-band6|Group 6 name;data-band-done|Group rail: a finished group;data-band-now|Group rail: the current group;data-band-later|Group rail: a later group;data-band-label|Group rail: what a screen reader hears ({n}, {name} and {state} are filled in);data-band-early|Advice: a group opened out of turn;data-band-announce|Announced for screen readers: a new group ({n} and {name} are filled in);data-band-announce-table|Announced for screen readers: the whole table ({n} and {name} are filled in)">
+      <ol></ol>
+    </nav>
+    <div class="struggle band-advice" hidden>
+      <p class="struggle-text"></p>
+    </div>
+    <p class="sr-only band-announce" role="status" aria-live="polite" aria-atomic="true"></p>
+
+    <!-- No counts on the page (the user, 2026-09-20: "68 shapes" and "21" produce stress). The bar is the whole lesson and
+         says how it is going in words; the line under it appears only when the open group is done. -->
     <div class="progress">
       <div class="progress-row">
         <p class="progress-text" id="progress-text"
-           data-template="{known} of {total} letters known" data-done="All {total} letters known"
-           data-words-attr="data-template|Progress line ({known} and {total} are filled in);data-done|Progress line, every letter known"></p>
+           data-stage0="Just starting" data-stage1="Getting going" data-stage2="Getting there"
+           data-stage3="Nearly there" data-stage4="All known"
+           data-words-attr="data-stage0|Progress line, nothing known yet;data-stage1|Progress line, a little known;data-stage2|Progress line, about half known;data-stage3|Progress line, most known;data-stage4|Progress line, every shape known"></p>
         <button class="link reset" type="button" hidden
                 data-label="Start again" data-confirm="Tap again to clear"
                 data-words-attr="data-label|Start again link;data-confirm|Start again, asking to be sure"></button>
       </div>
-      <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="29" aria-valuenow="0">
+      <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="68" aria-valuenow="0">
         <span class="fill"></span>
       </div>
-      <!-- Hearing practice needs the recordings, which arrive a few at a time. lesson-2.js hides this once they are all in. -->
+      <p class="band-line" hidden
+         data-done="All of this group"
+         data-words-attr="data-done|Progress line, every shape in this group known"></p>
+      <!-- A recording belongs to a letter and not to a shape. lesson-3.js hides this once they are all in. -->
       <p class="sound-note" hidden
-         data-none="Hearing practice opens when the recordings are in."
-         data-some="{done} of {total} letters recorded, so hearing practice is open for those."
-         data-words-attr="data-none|Sound line, nothing recorded;data-some|Sound line, some recorded ({done} and {total} are filled in)"></p>
+         data-none="Hearing practice opens when the recordings arrive."
+         data-some="Hearing practice is open for the letters that are recorded."
+         data-words-attr="data-none|Sound line, nothing recorded;data-some|Sound line, some recorded"></p>
     </div>
 
+    <!-- The teaching half: the shapes themselves. The drill below is the testing half. A real table, so a screen
+         reader gets the row and the column for every shape (docs/lesson-3/06 §2). lesson-3.js fills it. -->
+    <section class="shapes" aria-labelledby="shapes-title"
+             data-col-letter="Letter" data-col-isolated="On its own" data-col-initial="Start of a word"
+             data-col-medial="Middle of a word" data-col-final="End of a word" data-col-joined="Joined to the letter before"
+             data-demo="All three together" data-demo-gap="Between two letters"
+             data-demo-note="All three together: the same letter joined three times, read from the right. The first is its start shape, the middle one its middle shape, the last its end shape. It is not a word."
+             data-demo-note-gap="Between two letters: each letter sits between two baa, so you can see it join to the one before and not to the one after."
+             data-nofwd="These letters join to the one before them, never to the one after, so a gap follows each one."
+             data-hamzah="{name} never joins to anything, so it has only one shape."
+             data-nochange="These two barely change. Look how alike the four are."
+             data-none-cell="No such shape" data-caption="The shapes in this group, one letter to a row."
+             data-region="The shapes, scrolls sideways"
+             data-words-attr="data-col-letter|Board: column, the letter;data-col-isolated|Board: column, on its own;data-col-initial|Board: column, start of a word;data-col-medial|Board: column, middle of a word;data-col-final|Board: column, end of a word;data-col-joined|Board: column, joined to the letter before;data-demo|Board: last column heading, joining letters;data-demo-gap|Board: last column heading, letters that never join forward;data-demo-note|Board: what the last column shows, joining letters;data-demo-note-gap|Board: what the last column shows, letters that never join forward;data-nofwd|Board: note for the letters that never join forward;data-hamzah|Board: hamzah’s line ({name} is filled in);data-nochange|Board: note for the letters that barely change;data-none-cell|Board: an empty shape, for a screen reader;data-caption|Board: table caption, for a screen reader;data-region|Board: the scrolling area, for a screen reader">
+      <!-- Says what this half is for: the student looks here first, and is tested underneath. -->
+      <div class="section-head">
+        <p class="eyebrow" data-words="Board: step label">Step 1</p>
+        <h2 class="section-title shapes-title" id="shapes-title" tabindex="-1" data-words="Board: heading">Look at the shapes</h2>
+        <p class="section-guide" data-words="Board: guide line">Each row is one letter. Tap a shape to see where it sits in a word and to hear the letter.</p>
+      </div>
+      <!-- The column headings, kept in view while the shapes scroll under the rail. The real headings are in the table, for a screen reader; lesson-3.js sets these bars to sit over the columns. -->
+      <div class="shapes-heads" aria-hidden="true"><div class="shapes-heads-track"></div></div>
+      <div class="shapes-scroll" role="region" tabindex="0" aria-label="The shapes, scrolls sideways">
+        <table class="shapes-table" dir="rtl"></table>
+      </div>
+      <p class="shapes-note" hidden></p>
+      <!-- The order is a suggestion, not a lock: a student may go on, and is told that the exercise is what makes it stay. -->
+      <p class="shapes-hint"
+         data-words="Board: hint about moving on">You can move on to another group whenever you like, but do the exercise first: it is what makes the shapes stay.</p>
+      <!-- The way from looking to practising: the exercise is underneath, and this takes the student there. -->
+      <div class="shapes-actions">
+        <button class="button primary practise" type="button">
+          <span data-words="Board: practise button">Practise this group</span>
+          <svg class="arrow down" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 5v14M6 13l6 6 6-6" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
     <section class="drill" aria-labelledby="drill-title">
-      <h2 class="sr-only" id="drill-title" data-words="Heading over the questions (screen readers only)">Practice</h2>
+      <!-- Says what this half is for: it is an exercise, and nothing here is marked or timed. -->
+      <div class="section-head">
+        <p class="eyebrow" data-words="Practice: step label">Step 2</p>
+        <h2 class="section-title" id="drill-title" tabindex="-1" data-words="Practice: heading">Now practise</h2>
+        <p class="section-guide" data-words="Practice: guide line">This is an exercise. You will see a shape: pick which letter it is and where it sits. There is no timer, and a wrong answer only shows you the right one.</p>
+      </div>
 
       <!-- The question changes with every question, so the group of answers is named by it. -->
       <p class="ask" id="ask"
-         data-glyph="Which letter is this?" data-name="Which letter is {name}?" data-sound="Listen. Which letter is it?"
-         data-words-attr="data-glyph|Question: showing a letter;data-name|Question: giving a name ({name} is filled in);data-sound|Question: hearing a letter"></p>
+         data-glyph="Which letter is this, and where does it sit?" data-name="Which one is {name}?" data-sound="Listen, then pick the shape."
+         data-words-attr="data-glyph|Question: showing a shape;data-name|Question: giving a name ({name} is filled in);data-sound|Question: hearing a letter"></p>
       <div class="prompt" data-play="Play the sound"
            data-words-attr="data-play|Question: play button"></div>
       <div class="choices" role="group" aria-labelledby="ask"></div>
@@ -155,8 +230,8 @@
       <!-- Both live regions are here, empty, from the first paint: one inserted at the moment of its first message is
            not announced. -->
       <p class="verdict" role="status" aria-live="polite" aria-atomic="true"
-         data-right="Yes — that is {name}." data-wrong="That was {chosen}. This one is {name}."
-         data-error="There aren’t enough letters to ask a question yet."
+         data-right="Yes — {name}." data-wrong="That one is {chosen}. This is {name}."
+         data-error="There aren’t enough shapes to ask about here."
          data-words-attr="data-right|Answer: when right ({name} is filled in);data-wrong|Answer: when not ({chosen} and {name} are filled in);data-error|Answer line: nothing to ask"></p>
       <p class="sr-only announce" role="status" aria-live="polite"
          data-template="Question {n}."
@@ -174,12 +249,13 @@
           </svg>
           <span data-words="Hear it button">Hear it</span>
         </button>
+        <!-- "Write it", not "Trace it": what opens is the isolated letter, not the joined shape the question was about. -->
         <button class="button quiet trace" type="button" aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
             <path d="M14.5 6.5l3 3" />
           </svg>
-          <span data-words="Trace it button">Trace it</span>
+          <span data-words="Write it button">Write it</span>
         </button>
         <button class="button next-question" type="button">
           <span data-words="Next question button">Next</span>
@@ -194,26 +270,25 @@
       <div class="advice" role="status" aria-live="polite">
         <div class="struggle" hidden>
           <p class="struggle-text"
-             data-template="{name} is a tricky one, and that is completely normal. It can help to look at it again."
-             data-words-attr="data-template|Advice: one letter is hard ({name} is filled in)"></p>
+             data-template="{name} keeps catching you out. Worth looking at it again on the board above."
+             data-words-attr="data-template|Advice: one shape is hard ({name} is filled in)"></p>
           <div class="struggle-buttons">
-            <a class="button quiet back-to-1" href="lesson-1.html" data-words="Advice: go back to Lesson 1 button">Look at it in Lesson 1</a>
-            <button class="button quiet trace" type="button" aria-haspopup="dialog" data-words="Advice: trace it button">Trace it</button>
+            <button class="button quiet show-me" type="button" data-words="Advice: show me button">Show me</button>
+            <button class="button quiet trace" type="button" aria-haspopup="dialog" data-words="Advice: write it button">Write it</button>
           </div>
         </div>
         <p class="ready-note" hidden
-           data-template="You seem to know these well. Lesson 3 is ready when you are — or stay and keep practising."
-           data-words-attr="data-template|Advice: ready to move on"></p>
+           data-template="You seem to know this group. The next one is ready when you are."
+           data-template-lesson="That’s all of the shapes. The table below is yours to keep coming back to."
+           data-words-attr="data-template|Advice: a group is known;data-template-lesson|Advice: the whole lesson is known"></p>
       </div>
 
-      <p class="tally" hidden
-         data-template="{asked} questions so far · {toFix} to look at again" data-clear="{asked} questions so far"
-         data-words-attr="data-template|Session line ({asked} and {toFix} are filled in);data-clear|Session line, nothing to look at again ({asked} is filled in)"></p>
-
-      <!-- Which letters look alike, and so are offered as each other's wrong answers. It is a teaching decision, so it
-           is the teacher's to change: groups are separated by commas. -->
-      <span hidden data-groups="ب ت ث ن ي, ج ح خ ع غ, د ذ ر ز و, س ش ص ض, ط ظ, ف ق ك, ل ا, م ه, ء و"
-            data-words-attr="data-groups|Look-alike letters (groups, separated by commas)"></span>
+      <!-- The words for each position. They build every shape’s name, so a name is edited once and every name follows. -->
+      <span hidden
+            data-name-isolated="{name}, on its own" data-name-initial="{name}, start of a word"
+            data-name-medial="{name}, middle of a word" data-name-final="{name}, end of a word"
+            data-name-joined="{name}, joined"
+            data-words-attr="data-name-isolated|Position name, on its own ({name} is filled in);data-name-initial|Position name, start of a word;data-name-medial|Position name, middle of a word;data-name-final|Position name, end of a word;data-name-joined|Position name, joined to the letter before"></span>
     </section>
 
     <footer class="lesson-end">
@@ -228,7 +303,7 @@
         </g>
       </svg>
       <p class="end-line"
-         data-before="Take your time. Every letter gets easier with practice." data-after="You seem to know these. Lesson 3 is ready when you are."
+         data-before="Work through the six groups to finish the lesson." data-after="Every shape covered."
          data-words-attr="data-before|Last line, before the lesson says you seem ready;data-after|Last line, once it does"></p>
       <div class="onward">
         <a class="button back" href="./">
@@ -237,14 +312,16 @@
           </svg>
           <span data-words="Back to the lessons button">The lessons</span>
         </a>
-        <!-- Lesson 3 exists (step 5), so this is a real link. It is not locked: the lesson only recommends, and nothing
-             here is a gate. -->
-        <a class="button primary next" href="lesson-3.html">
-          <span data-words="Next lesson button">Lesson 3: Letter shapes</span>
+        <!-- Goes on to Lesson 4. Its title follows the student's choice of names, so lesson-3.js writes it. Not locked: the
+             lesson only recommends. -->
+        <button class="button primary next" type="button"
+                data-lead="Lesson {n}: {title}"
+                data-words-attr="data-lead|Next lesson button ({n} and {title} are filled in)">
+          <span></span>
           <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
-        </a>
+        </button>
       </div>
     </footer>
   </main>
@@ -252,7 +329,7 @@
   <p class="note" role="status"></p>
 
   <!-- The writing board. Opened from the top bar it is blank, for whatever someone needs to write down; opened from
-       "Trace it" it has the letter drawn faintly underneath. No marking either way: a machine can't judge Arabic
+       "Write it" it has the letter drawn faintly underneath. No marking either way: a machine can't judge Arabic
        handwriting well enough to be trusted, and a wrong "incorrect" teaches a student to doubt themselves. -->
   <dialog class="tracer" aria-labelledby="tracer-title">
     <div class="tracer-head">

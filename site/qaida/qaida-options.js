@@ -346,8 +346,115 @@
 
   // Lesson 2, the drill (docs/lesson-2/07-options-panel.md). Everything the teacher might want to look at and decide.
   if (lesson && lesson.kind === 'drill') {
+    // Lesson 3 (docs/lesson-3/07) is a drill too, with four rows of its own above the drill's. It says so by having a group.
+    const shapes = typeof lesson.setBand === 'function';
+    // Lessons 4 to 6 (docs/lesson-4/07) are drills too, with five rows of their own. They say so by having a part to open.
+    const marked = typeof lesson.setGroup === 'function';
+    const thing = shapes ? 'shape' : 'letter';
+
+    if (marked) {
+      section('The mark', true);
+      option('Part', { 'Meet the mark': '1', 'All the letters': '2' }, 'group', (v) => lesson.setGroup(Number(v)));
+
+      // Two parts or one decides how soon a student reaches something finished, so the panel prints what each asks for.
+      const costs = el('div');
+      const costsOut = el('output');
+      costs.append(el('span', 'What each part asks for'), costsOut);
+      group.append(costs);
+      const showCosts = () => {
+        const parts = lesson.groupCosts();
+        costsOut.textContent = `${parts.map((part) => `${part.n}: ${part.items} letters, ${part.answers} right`).join(' · ')}`
+          + ` — ${parts[parts.length - 1].items} letters in all`;
+      };
+      showCosts();
+      lesson.onCosts = showCosts;
+
+      // The mixed review (docs/lesson-4/03 §3). It is also where every "does this one carry the mark?" wrong answer comes from,
+      // so the row that asks for it is greyed out at nothing rather than allowed to make a drill with no contrast in it.
+      let pairButton = null;
+      const greyPair = (n) => {
+        if (!pairButton) return;
+        pairButton.disabled = n === 0;
+        pairButton.title = n === 0 ? 'Needs some letters from before: the same letter, bare, is the wrong answer' : '';
+      };
+      // A mark with another before it (Lesson 5 has zabar) is told apart from that one; the first mark has nothing to be told
+      // apart from, so it gets none of the rows about it (docs/lesson-5/04 §6).
+      const twinned = Boolean(lesson.hasOther);
+      slider(twinned ? 'Plain letters from before' : 'Letters from before', 0, 16, 1, lesson.review, (v) => String(v), (v) => {
+        root.dataset.review = String(v);
+        lesson.setReview(v);
+        greyPair(v);
+      });
+      group.lastElementChild.title = 'The bare letters that ride along, chosen from the ones Lesson 2 found hard'
+        + (twinned ? ' (and the ones Lesson 4 did)' : '') + '. Also where every "does this one carry the mark?" wrong answer comes from: '
+        + 'at 0 that question disappears.'
+        + (twinned ? ' This is only the plain letters: the other mark\'s letters are the row below, not this slider.' : '');
+      option('Wrong answers offered',
+        {
+          'A letter that looks like it': 'look-alike',
+          'The same letter, with and without the mark': 'mark-or-not',
+          ...(twinned ? { 'The same letter, with the other mark': 'which-mark' } : {}),
+          'Any letter': 'any',
+        },
+        'distractors', (v) => lesson.setDistractors(v));
+      pairButton = group.lastElementChild.querySelectorAll('button')[1];
+      greyPair(lesson.review);
+      if (twinned) {
+        group.lastElementChild.title = 'What each one makes the question. A look-alike: "which letter is this?". With and without the mark: '
+          + '"is there a mark at all?", which the student already learnt. With the other mark: "which mark is this, and where does it sit?", '
+          + 'which is what this lesson is for.';
+        option('The other mark riding along', { On: 'on', Off: 'off' }, 'twins', () => lesson.setTwins());
+        group.lastElementChild.title = 'On: the same letters with the earlier mark (zabar) are among the wrong answers and are asked in their own right, '
+          + 'about a third of the questions. Off turns this lesson back into the one before it with a different stroke: a student could pass '
+          + 'it by noticing that a mark is there.';
+      }
+      option('The board shows',
+        {
+          ...(twinned ? { 'The trio: letter, other mark, this mark': 'trio' } : {}),
+          'The pairs': 'pairs',
+          'Just the marked letters': 'marked',
+        },
+        'board', () => lesson.render());
+      option('Point at the mark', { 'A halo': 'halo', Nothing: 'none', 'Tint it': 'tint' }, 'point', () => lesson.render());
+    }
+
+    if (shapes) {
+      section('Letter shapes', true);
+      option('Group', { One: '1', Two: '2', Three: '3', Four: '4', Five: '5', 'The table': '6' }, 'band',
+        (v) => lesson.setBand(Number(v)));
+
+      // "Shapes drilled" decides whether the lesson can be finished, so the panel shows the numbers instead of asking
+      // the teacher to picture them: what each group asks for before it is ready.
+      const costs = el('div');
+      const costsOut = el('output');
+      costs.append(el('span', 'What each group asks for'), costsOut);
+      group.append(costs);
+      const showCosts = () => {
+        const totals = lesson.bandTotals();
+        const each = (count) => Math.ceil(count * lesson.readyAt - 1e-9) * lesson.target;
+        const drilled = totals.reduce((sum, count) => sum + count, 0);
+        costsOut.textContent = `${totals.slice(0, 5).map((count, i) => `${i + 1}: ${count} shapes, ${each(count)} right`).join(' · ')}`
+          + ` — ${drilled} shapes in all`;
+      };
+      showCosts();
+
+      option('Shapes drilled', { 'Only the new ones': 'new', 'All four positions': 'all' }, 'drilled', (v) => {
+        lesson.setDrilled(v);
+        showCosts();
+      });
+      option('Wrong answers offered', { 'Same position, another letter': 'position', 'Another shape of the same letter': 'same-letter', 'Any shape': 'any' },
+        'distractors', (v) => lesson.setDistractors(v));
+      option('The board shows', { 'This group': 'band', 'Every letter': 'all' }, 'board', () => lesson.render());
+      lesson.onCosts = showCosts;
+    }
+
     section('The drill', true);
-    option('Question', { 'Letter → name': 'glyph', 'Name → letter': 'name', 'Mix both': 'mix', 'Hear it → letter': 'sound' },
+    option('Question',
+      shapes
+        ? { 'Shape → name': 'form', 'Name → shape': 'name', 'Mix both': 'mix', 'Hear it → shape': 'sound' }
+        : marked
+          ? { 'Marked letter → name': 'mark', 'Name → marked letter': 'name', 'Mix both': 'mix', 'Hear it → marked letter': 'sound' }
+          : { 'Letter → name': 'glyph', 'Name → letter': 'name', 'Mix both': 'mix', 'Hear it → letter': 'sound' },
       'ask', (v) => lesson.setFormat(v));
     // Hearing needs a real recording of a letter, and none exist until the teacher's arrive. Off until then.
     const soundChoice = group.lastElementChild.querySelectorAll('button')[3];
@@ -358,19 +465,28 @@
       });
     }
     option('Answers to pick from', { Three: '3', Four: '4', Six: '6' }, 'choices', (v) => lesson.setChoices(Number(v)));
-    option('Wrong answers offered', { 'A look-alike among them': 'family', 'Any letter': 'any' }, 'distractors',
-      (v) => lesson.set({ familyFirst: v === 'family' }));
+    // Lesson 3 has its own three-way row, above.
+    // Lessons 3 and 4 have their own three-way rows, above.
+    if (!shapes && !marked) {
+      option('Wrong answers offered', { 'A look-alike among them': 'family', 'Any letter': 'any' }, 'distractors',
+        (v) => lesson.set({ familyFirst: v === 'family' }));
+    }
     option('After a right answer', { 'Move on by itself': 'auto', 'Wait for a tap': 'wait' }, 'advance');
     option('After a miss', { 'Offer Trace it': 'trace', 'Just the answer': 'plain' }, 'miss');
     option('Answers arrive', { 'One by one': 'stagger', 'All at once': 'all' }, 'arrive', () => lesson.replay());
-    slider('Right answers in a row to know a letter', 1, 3, 1, lesson.target, (v) => String(v), (v) => lesson.setTarget(v));
-    slider('Ready at (share of letters known)', 0.6, 1, 0.05, lesson.readyAt, (v) => `${Math.round(v * 100)}%`,
-      (v) => lesson.setReadyAt(v));
+    slider(`Right answers in a row to know a ${thing}`, 1, 3, 1, lesson.target, (v) => String(v), (v) => {
+      lesson.setTarget(v);
+      if (lesson.onCosts) lesson.onCosts();
+    });
+    slider(`Ready at (share of ${thing}s known)`, 0.6, 1, 0.05, lesson.readyAt, (v) => `${Math.round(v * 100)}%`, (v) => {
+      lesson.setReadyAt(v);
+      if (lesson.onCosts) lesson.onCosts();
+    });
     slider('Pause after a right answer', 0.4, 2.5, 0.1, lesson.pause / 1000, (v) => `${v.toFixed(1)} s`,
       (v) => lesson.setPause(v * 1000));
     actions('Try it', {
       'A new question': () => lesson.next(),
-      'Same letter, new answers': () => lesson.again(),
+      [`Same ${thing}, new answers`]: () => lesson.again(),
       'Know them all': () => lesson.masterAll(),
       'Clear progress': () => lesson.clear(),
       'First-visit choice': () => shell.askAgain(),
@@ -389,8 +505,9 @@
     option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
     option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
     option('When it says you seem ready', { 'Settles down': 'settle', 'Keeps glowing': 'glow', 'No fuss': 'none' }, 'finish');
-    option('Big baa by the title', { Center: 'ba', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
-    option('Big baa font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
+    const mark = shapes ? 'haa' : marked ? 'baa with its mark' : 'baa';
+    option(`Big ${mark} by the title`, { Center: 'ba', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
+    option(`Big ${mark} font`, { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
     option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
     gapSlider();
     footSlider();
@@ -414,7 +531,7 @@
 
   // One setting for both pages, so this section keeps its plain name and a pick made here carries across.
   section('Script and names');
-  option('Madani lettering', { 'Amiri Quran': 'amiri', 'Scheherazade New': 'scheherazade' }, 'madaniFont');
+  option('Madani lettering', { 'Amiri Quran': 'amiri', 'Noto Naskh Arabic': 'noto', 'Scheherazade New': 'scheherazade' }, 'madaniFont');
   option('Indo-Pak lettering', { 'Noto Naskh Arabic': 'noto', 'Scheherazade New': 'scheherazade' }, 'indopakFont');
   // One list: the letters keep their Arabic names whichever set of mark names the student picked.
   text('Letter names (commas)', shell.namesText(), (v) => shell.setNames(v));

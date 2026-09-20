@@ -74,22 +74,39 @@
 
   // Every letter the Qaida wants a recording of, and whether it has one. The recordings page lists this; the lesson
   // uses it to decide which tiles carry a speaker mark.
+  // The groups the Qaida wants, in order: the letters' names, then the SOUND of each letter with each mark whose lesson is
+  // built (docs/lesson-4/08 §3). marks.js is only there on the pages that load it, so it is looked at when asked, not before.
+  function groups() {
+    const list = [{ kind: 'letters', say: (name) => name }];
+    const marks = window.qaidaMarks;
+    if (!marks) return list;
+    for (const mark of Object.values(marks.MARKS)) {
+      if (!shell.LESSONS.some((lesson) => lesson.n === mark.lesson && lesson.built)) continue;
+      // Keyed by mark.audio and never by the student's chosen word for the mark: the recordings are global.
+      list.push({ kind: mark.audio, say: (name) => `The sound of ${name} with ${mark.names.fatha} — not its name` });
+    }
+    return list;
+  }
+
   function wanted() {
-    const seen = new Set();
     const rows = [];
-    for (const script of ['madani', 'indopak']) {
-      for (const [glyph, name] of shell.lettersOf(script)) {
-        const key = shell.keyOf(glyph);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        rows.push({
-          kind: 'letters',
-          key,
-          glyph: key,
-          name,
-          slug: SLUGS[key] || key,
-          file: (manifest.letters && manifest.letters[key]) || null,
-        });
+    for (const { kind, say } of groups()) {
+      const seen = new Set();
+      for (const script of ['madani', 'indopak']) {
+        for (const [glyph, name] of shell.lettersOf(script)) {
+          const key = shell.keyOf(glyph);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          rows.push({
+            kind,
+            key,
+            glyph: key,
+            name,
+            say: say(name),
+            slug: SLUGS[key] || key,
+            file: (manifest[kind] && manifest[kind][key]) || null,
+          });
+        }
       }
     }
     return rows;
