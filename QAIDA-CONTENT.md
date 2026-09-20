@@ -20,9 +20,10 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
    memorized page order. Catches students who can recite the alphabet in order but can't
    name a letter cold.
 3. **Letter shapes** — the user's "beginning shapes for the alphabets, slowly transitioning to the difficult shapes,
-   then shapes depending on whether in start, middle or end". *Claude's reading, to confirm at build step 3:* start
-   with the letters that barely change when joined (ا د ذ ر ز و), then the ones that only lose their tail
-   (ب ت ث ن ي), then the ones that change most (such as ع غ ه ك), and finish with the full start / middle / end table.
+   then shapes depending on whether in start, middle or end". **Confirmed by the user, 2026-09-20: five bands** —
+   the six that never join forward (ا د ذ ر ز و), then the two that never change (ط ظ), then tooth-and-tail
+   (ب ت ث ن ي س ش ص ض ف ق ل), then the shape-shifters (ج ح خ ع غ ه ك م), and finish with the full start / middle /
+   end table. Specified in full in `docs/lesson-3/`.
 4. **Zabar** — lesson + exercise.
 5. **Zair** — lesson + exercise. Exercise pool mixes in zabar review items; zair items are
    mandatory (must get right), review items aren't the gate.
@@ -96,8 +97,9 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
 
 ## Still open
 
-- **Jazam after leen (items 10–13 before 14)** — deliberate (leen memorized as a pattern
-  first, generalized to the jazam rule after), or should jazam move earlier so leen is
-  taught as "jazam on wow/yaa after zabar" instead of a standalone exception? Ask at build step 6.
+*(Both of the questions that stood here have been answered.)*
 
-*(**Interleaving scope** was the other one. Answered 2026-09-19 — see **Decided** above.)*
+- **Jazam after leen (items 10–13 before 14)** — **answered 2026-09-20: keep jazam last.** Leen is memorized as a
+  pattern first and jazam then generalizes the rule to any letter, which is also how a printed Qaida orders it.
+  The "Ask first" note on `QAIDA-BUILD.md` step 8 is settled.
+- **Interleaving scope** — answered 2026-09-19; see **Decided** above.

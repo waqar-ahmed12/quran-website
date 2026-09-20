@@ -13,6 +13,10 @@ Qaida with one line: the current step, its skills, and the next step.
 **Steps 1–4 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing, and Lesson 2 with the
 practice engine (`practice.js`) that lessons 4–14 reuse. Step 4 has not been seen in a browser yet.
 
+**Step 5, Lesson 3, is specified but not built** (2026-09-20): `docs/lesson-3/`, in the same shape as
+`docs/lesson-2/`. It needs no change to `practice.js`. One thing is settled with the teacher before any code —
+`docs/lesson-3/09-open-questions.md` §1, the lesson's length.
+
 ## Decisions
 
 | Question | Answer (the user, 2026-09-14) |
@@ -48,10 +52,10 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 2 | **Sound in Lesson 1.** The player, `audio/manifest.json`, the wordless stand-in, the mute switch, and the recording list at `recordings.html` | `ui-ux-pro-max`, `full-output-enforcement` | **Built, awaiting sign-off.** The teacher records gradually (2026-09-18) |
 | 3 | **Trace the letters** with a finger, mouse or pen, inside Lesson 1 | `minimalist-ui`, `high-end-visual-design` | **Built, awaiting sign-off.** Was step 9 |
 | 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Built, awaiting sign-off** (2026-09-19). Specified in `docs/lesson-2/`; `README.md` there lists where the code differs. Check: `node tools/qaida-check.js` |
-| 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | |
+| 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | **Specified 2026-09-20, not built.** `docs/lesson-3/`; read `09-open-questions.md` §1 first — the lesson is too long as drawn, and that is settled before building |
 | 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-19: mixed review carries through **every** later lesson |
 | 7 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | |
-| 8 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Ask first: jazam before or after leen? |
+| 8 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-20: **jazam stays last**, after leen |
 | 9 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Each lesson adds its rows to the recording list as it's built |
 | 10 | **Record your own voice** and play it back against the teacher's | `ui-ux-pro-max`, `minimalist-ui` | Only means something once the recordings are in |
 | 11 | **Finish screen:** a mark for each finished lesson, and a last screen pointing to one-to-one lessons | `minimalist-ui` | |
