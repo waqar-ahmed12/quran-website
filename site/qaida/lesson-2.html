@@ -1,17 +1,19 @@
 <!doctype html>
-<!-- The free Qaida, Lesson 1 (QAIDA-BUILD.md, steps 1-3): the letters, sound, and the tracing board. No real
-     recordings yet, so every letter plays the stand-in and the page says so. The design is recorded
-     in design-system/quran-landing/pages/qaida.md. The data- attributes on <html> are the look; the options panel
+<!-- The free Qaida, Lesson 2 (QAIDA-BUILD.md, step 4): the letters again, out of order, one question at a time. It
+     teaches nothing new; it finds out whether each letter is known cold. The engine is practice.js and the specification
+     is docs/lesson-2/. Built from lesson-1.html — the top bar, the head, the progress block, the tracing board and the
+     first-visit choice are copied from it. The data- attributes on <html> are the look; the options panel
      (qaida-options.js) changes them for tryouts. -->
 <html lang="en"
-      data-tiles="paper" data-grouping="families" data-size="comfortable" data-peek="under" data-seenmark="dot"
-      data-arrive="stagger" data-progress="title" data-bar="line" data-track="show" data-titlemark="alif"
-      data-titlemark-font="amiri" data-bg="light" data-finish="settle" data-madani-font="amiri"
+      data-tiles="paper" data-size="comfortable" data-ask="glyph" data-choices="4"
+      data-distractors="family" data-advance="auto" data-miss="trace" data-arrive="stagger"
+      data-progress="title" data-bar="line" data-track="show" data-finish="settle"
+      data-titlemark="ba" data-titlemark-font="amiri" data-bg="light" data-madani-font="amiri"
       data-indopak-font="noto">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lesson 1: The letters · Free Qaida</title>
+  <title>Lesson 2: Letters out of order · Free Qaida</title>
   <meta name="theme-color" content="#1F1A18">
   <!-- Light or dark before the page draws: the choice made here or on the home page (same site, same storage),
        otherwise dark, like the home page. -->
@@ -30,7 +32,8 @@
   <script src="shell.js" defer></script>
   <script src="audio.js" defer></script>
   <script src="trace.js" defer></script>
-  <script src="qaida.js" defer></script>
+  <script src="practice.js" defer></script>
+  <script src="lesson-2.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
   <script src="qaida-options.js" defer></script>
@@ -92,15 +95,15 @@
     <header class="lesson-head">
       <div class="head-text">
         <div class="course">
-          <p class="eyebrow" data-words="Lesson number">Lesson 1 of 14</p>
+          <p class="eyebrow" data-words="Lesson number">Lesson 2 of 14</p>
           <!-- The whole Qaida at a glance: this lesson in gold, the other 13 to come. -->
           <ol class="track" aria-hidden="true">
-            <li class="now"></li><li></li><li></li><li></li><li></li><li></li><li></li>
+            <li></li><li class="now"></li><li></li><li></li><li></li><li></li><li></li>
             <li></li><li></li><li></li><li></li><li></li><li></li><li></li>
           </ol>
         </div>
-        <h1 data-words="Lesson title">The letters</h1>
-        <p class="lede" data-words="Line under the title">Every letter, in the order of a printed Qaida. Tap a letter to see its name.</p>
+        <h1 data-words="Lesson title">Letters out of order</h1>
+        <p class="lede" data-words="Line under the title">The same letters, shuffled. Pick the right answer, and take all the time you like.</p>
         <!-- What the student chose on their first visit, and a way to change it. shell.js fills in the spans. -->
         <p class="setup"
            data-madani="Madani script" data-indopak="Indo-Pak script"
@@ -115,15 +118,15 @@
           <button class="link open-settings" type="button" aria-haspopup="dialog"><span data-words="Settings line: change link">Change</span></button>
         </p>
       </div>
-      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">ا</span>
+      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">ب</span>
     </header>
 
-    <!-- How far the student has reached, kept on this device. {seen} and {total} are filled in by qaida.js. -->
+    <!-- How many letters are known, kept on this device. {known} and {total} are filled in by lesson-2.js. -->
     <div class="progress">
       <div class="progress-row">
         <p class="progress-text" id="progress-text"
-           data-template="{seen} of {total} letters seen" data-done="All {total} letters seen"
-           data-words-attr="data-template|Progress line ({seen} and {total} are filled in);data-done|Progress line, every letter seen"></p>
+           data-template="{known} of {total} letters known" data-done="All {total} letters known"
+           data-words-attr="data-template|Progress line ({known} and {total} are filled in);data-done|Progress line, every letter known"></p>
         <button class="link reset" type="button" hidden
                 data-label="Start again" data-confirm="Tap again to clear"
                 data-words-attr="data-label|Start again link;data-confirm|Start again, asking to be sure"></button>
@@ -131,43 +134,90 @@
       <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="29" aria-valuenow="0">
         <span class="fill"></span>
       </div>
-      <!-- The recordings arrive a few at a time, so this says where they've got to rather than promising anything.
-           qaida.js hides it once every letter is recorded. -->
+      <!-- Hearing practice needs the recordings, which arrive a few at a time. lesson-2.js hides this once they are all in. -->
       <p class="sound-note" hidden
-         data-none="No recordings yet — what you hear is a stand-in, not a voice saying the letter."
-         data-some="{done} of {total} letters recorded. The rest play a stand-in."
+         data-none="Hearing practice opens when the recordings are in."
+         data-some="{done} of {total} letters recorded, so hearing practice is open for those."
          data-words-attr="data-none|Sound line, nothing recorded;data-some|Sound line, some recorded ({done} and {total} are filled in)"></p>
     </div>
 
-    <section class="letters-wrap" aria-labelledby="letters-title">
-      <h2 class="sr-only" id="letters-title" data-words="Heading over the letters (screen readers only)">The letters of this script</h2>
-      <!-- Right to left, like the page of a Qaida. qaida.js adds the letters, grouped in shape families. -->
-      <div class="letters" dir="rtl"></div>
+    <section class="drill" aria-labelledby="drill-title">
+      <h2 class="sr-only" id="drill-title" data-words="Heading over the questions (screen readers only)">Practice</h2>
 
-      <!-- The letter last tapped. A tile is itself a button, so its own buttons have to live outside it — and at
-           that size they'd crowd the letter anyway. Hidden until something has been tapped. -->
-      <div class="current" hidden>
-        <span class="current-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
-        <span class="current-name"></span>
-        <button class="button quiet current-hear" type="button">
+      <!-- The question changes with every question, so the group of answers is named by it. -->
+      <p class="ask" id="ask"
+         data-glyph="Which letter is this?" data-name="Which letter is {name}?" data-sound="Listen. Which letter is it?"
+         data-words-attr="data-glyph|Question: showing a letter;data-name|Question: giving a name ({name} is filled in);data-sound|Question: hearing a letter"></p>
+      <div class="prompt" data-play="Play the sound"
+           data-words-attr="data-play|Question: play button"></div>
+      <div class="choices" role="group" aria-labelledby="ask"></div>
+
+      <!-- Both live regions are here, empty, from the first paint: one inserted at the moment of its first message is
+           not announced. -->
+      <p class="verdict" role="status" aria-live="polite" aria-atomic="true"
+         data-right="Yes — that is {name}." data-wrong="That was {chosen}. This one is {name}."
+         data-error="There aren’t enough letters to ask a question yet."
+         data-words-attr="data-right|Answer: when right ({name} is filled in);data-wrong|Answer: when not ({chosen} and {name} are filled in);data-error|Answer line: nothing to ask"></p>
+      <p class="sr-only announce" role="status" aria-live="polite"
+         data-template="Question {n}."
+         data-words-attr="data-template|Announced for screen readers: a new question ({n} is filled in)"></p>
+
+      <!-- Under an answer, not a panel over it: a panel would take the keyboard and hide the choices the student is
+           learning from. It is a strip because a choice is itself a button and cannot hold buttons of its own. -->
+      <div class="after" hidden>
+        <span class="after-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
+        <span class="after-name"></span>
+        <button class="button quiet hear" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
             <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5" />
           </svg>
-          <span data-words="Hear it again button">Hear it again</span>
+          <span data-words="Hear it button">Hear it</span>
         </button>
-        <button class="button quiet current-trace" type="button" aria-haspopup="dialog">
+        <button class="button quiet trace" type="button" aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
             <path d="M14.5 6.5l3 3" />
           </svg>
           <span data-words="Trace it button">Trace it</span>
         </button>
+        <button class="button next-question" type="button">
+          <span data-words="Next question button">Next</span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
       </div>
+
+      <!-- Advice, never a block. Both lines are for the teacher to read first: they are what a beginner who is
+           finding this hard will see. -->
+      <div class="advice" role="status" aria-live="polite">
+        <div class="struggle" hidden>
+          <p class="struggle-text"
+             data-template="{name} is a tricky one, and that is completely normal. It can help to look at it again."
+             data-words-attr="data-template|Advice: one letter is hard ({name} is filled in)"></p>
+          <div class="struggle-buttons">
+            <a class="button quiet back-to-1" href="lesson-1.html" data-words="Advice: go back to Lesson 1 button">Look at it in Lesson 1</a>
+            <button class="button quiet trace" type="button" aria-haspopup="dialog" data-words="Advice: trace it button">Trace it</button>
+          </div>
+        </div>
+        <p class="ready-note" hidden
+           data-template="You seem to know these well. Lesson 3 is ready when you are — or stay and keep practising."
+           data-words-attr="data-template|Advice: ready to move on"></p>
+      </div>
+
+      <p class="tally" hidden
+         data-template="{asked} questions so far · {toFix} to look at again" data-clear="{asked} questions so far"
+         data-words-attr="data-template|Session line ({asked} and {toFix} are filled in);data-clear|Session line, nothing to look at again ({asked} is filled in)"></p>
+
+      <!-- Which letters look alike, and so are offered as each other's wrong answers. It is a teaching decision, so it
+           is the teacher's to change: groups are separated by commas. -->
+      <span hidden data-groups="ب ت ث ن ي, ج ح خ ع غ, د ذ ر ز و, س ش ص ض, ط ظ, ف ق ك, ل ا, م ه, ء و"
+            data-words-attr="data-groups|Look-alike letters (groups, separated by commas)"></span>
     </section>
 
     <footer class="lesson-end">
-      <!-- The star and its rules draw into place once every letter has been seen. -->
+      <!-- The star and its rules draw into place once the lesson says you seem ready. -->
       <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
         <line class="rule left" x1="-100" y1="0" x2="-24" y2="0" />
         <line class="rule right" x1="24" y1="0" x2="100" y2="0" />
@@ -178,8 +228,8 @@
         </g>
       </svg>
       <p class="end-line"
-         data-before="See every letter to open Lesson 2." data-after="Every letter seen. Lesson 2 is open."
-         data-words-attr="data-before|Last line, before every letter is seen;data-after|Last line, once every letter is seen"></p>
+         data-before="Take your time. Every letter gets easier with practice." data-after="You seem to know these. Lesson 3 is ready when you are."
+         data-words-attr="data-before|Last line, before the lesson says you seem ready;data-after|Last line, once it does"></p>
       <div class="onward">
         <a class="button back" href="./">
           <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -187,25 +237,25 @@
           </svg>
           <span data-words="Back to the lessons button">The lessons</span>
         </a>
-        <!-- Lesson 2. It doesn't go until every letter has been seen (qaida.js), and says why when tapped early. -->
-        <a class="button primary next" href="lesson-2.html" aria-disabled="true">
-          <svg class="lock" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <rect x="5.5" y="10.5" width="13" height="9" rx="1.5" />
-            <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
-          </svg>
-          <span data-words="Next lesson button">Lesson 2: Letters out of order</span>
+        <!-- Stand-in: Lesson 3 isn't built yet, so a click shows the note at the bottom of the screen. It is not
+             locked: the lesson only recommends, and nothing here is a gate. -->
+        <button class="button primary next" type="button"
+                data-standin="Lesson 3 isn’t built yet."
+                data-words-attr="data-standin|Note: Lesson 3 not built yet">
+          <span data-words="Next lesson button">Lesson 3: Letter shapes</span>
           <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
-        </a>
+        </button>
       </div>
     </footer>
   </main>
 
   <p class="note" role="status"></p>
 
-  <!-- Trace the letter you have just learnt. No marking: a machine can't judge Arabic handwriting well enough to be
-       trusted, and a wrong "incorrect" teaches a student to doubt themselves. Compare by eye, as a Qaida asks. -->
+  <!-- The writing board. Opened from the top bar it is blank, for whatever someone needs to write down; opened from
+       "Trace it" it has the letter drawn faintly underneath. No marking either way: a machine can't judge Arabic
+       handwriting well enough to be trusted, and a wrong "incorrect" teaches a student to doubt themselves. -->
   <dialog class="tracer" aria-labelledby="tracer-title">
     <div class="tracer-head">
       <h2 class="tracer-title" id="tracer-title" data-template="Trace {name}" data-free="Writing board"

@@ -172,14 +172,13 @@
     renderProgress();
   });
 
-  next.addEventListener('click', () => {
-    if (next.getAttribute('aria-disabled') === 'true') {
-      endLine.classList.remove('nudge');
-      void endLine.offsetWidth;
-      endLine.classList.add('nudge');
-      return;
-    }
-    shell.say(next.dataset.standin); // stand-in until Lesson 2 exists
+  // A link to Lesson 2. Until every letter has been seen it doesn't go, and the line above it says why.
+  next.addEventListener('click', (event) => {
+    if (next.getAttribute('aria-disabled') !== 'true') return;
+    event.preventDefault();
+    endLine.classList.remove('nudge');
+    void endLine.offsetWidth;
+    endLine.classList.add('nudge');
   });
 
   // Sound ------------------------------------------------------------------------------------
@@ -234,6 +233,7 @@
 
   // For the options panel (qaida-options.js).
   window.qaida = {
+    kind: 'letters', // the options panel builds its rows from this: a drill lesson has different ones
     render,
     replay,
     get peekMs() {

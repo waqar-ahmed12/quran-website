@@ -98,10 +98,12 @@
   // Only lesson 1 is built; the rest say so when tapped.
 
   const LESSONS = [
+    // `progress` says how the home counts a lesson: 'letters' seen, or a 'drill' of letters known. Declared here so the
+    // home never has to test a lesson's number.
     { n: 1, title: { fatha: 'The letters', zabar: 'The letters' },
-      lede: 'All the letters, in the order of a printed Qaida.', href: 'lesson-1.html', built: true },
+      lede: 'All the letters, in the order of a printed Qaida.', href: 'lesson-1.html', built: true, progress: 'letters' },
     { n: 2, title: { fatha: 'Letters out of order', zabar: 'Letters out of order' },
-      lede: 'The same letters, shuffled, so each one is known cold.' },
+      lede: 'The same letters, shuffled, so each one is known cold.', href: 'lesson-2.html', built: true, progress: 'drill' },
     { n: 3, title: { fatha: 'Letter shapes', zabar: 'Letter shapes' },
       lede: 'How a letter changes at the start, the middle and the end of a word.' },
     { n: 4, title: { fatha: 'Fatha', zabar: 'Zabar' },
@@ -129,11 +131,49 @@
   ];
 
   // What the student chose and how far they've reached, on this device only (no accounts) ------
-  // { v, script, names, grouping, chosen, lessons: { "1": { seen: ["ا", …], done: false } } }
+  // { v, script, names, grouping, chosen, muted,
+  //   lessons: { "1": { seen: ["ا", …], done: false, drill: { total, target, right, wrong, streak } } } }
+  // `drill` belongs to the practice engine (practice.js): lifetime right and wrong answers and the current run of right
+  // answers, each a map from an item's id to a count. Lesson 1 never has one, so it stays empty there.
 
   const blank = () => ({
     v: 1, script: 'madani', names: 'fatha', grouping: 'families', chosen: false, muted: false, lessons: {},
   });
+
+  const DRILL_TARGET = 3; // right answers in a row that make an item known, until the lesson says otherwise
+
+  // Maps are built without a prototype: JSON.parse makes a real own "__proto__" key, and putting one on an ordinary
+  // object hits the prototype setter instead of making a key.
+  const emptyDrill = () => ({
+    total: 0, target: DRILL_TARGET, right: Object.create(null), wrong: Object.create(null), streak: Object.create(null),
+  });
+
+  // This comes out of localStorage, which an older version of this file, another script on the origin or a damaged
+  // profile may have written, so every part of it is checked and capped.
+  const counts = (raw) => {
+    const out = Object.create(null);
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
+    let kept = 0;
+    for (const [id, n] of Object.entries(raw)) {
+      if (kept >= 400) break;
+      if (typeof id !== 'string' || id.length < 1 || id.length > 24 || id === '__proto__') continue;
+      if (typeof n !== 'number' || !Number.isFinite(n) || n < 0) continue;
+      out[id] = Math.min(Math.floor(n), 9999);
+      kept += 1;
+    }
+    return out;
+  };
+
+  function readDrill(value) {
+    const raw = value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    return {
+      total: Number.isInteger(raw.total) && raw.total >= 0 && raw.total <= 999 ? raw.total : 0,
+      target: Number.isInteger(raw.target) && raw.target >= 1 && raw.target <= 9 ? raw.target : DRILL_TARGET,
+      right: counts(raw.right),
+      wrong: counts(raw.wrong),
+      streak: counts(raw.streak),
+    };
+  }
 
   function read() {
     let saved = null;
@@ -157,15 +197,17 @@
       const seen = saved.seen
         .filter((i) => Number.isInteger(i) && i >= 0 && i < MADANI.length)
         .map((i) => MADANI[i][0]);
-      state.lessons['1'] = { seen: [...new Set(seen)], done: false };
+      state.lessons['1'] = { seen: [...new Set(seen)], done: false, drill: emptyDrill() };
       return state;
     }
 
     if (saved.lessons && typeof saved.lessons === 'object') {
       for (const [key, value] of Object.entries(saved.lessons)) {
         if (!/^\d+$/.test(key) || !value || typeof value !== 'object') continue;
-        const seen = Array.isArray(value.seen) ? value.seen.filter((g) => typeof g === 'string') : [];
-        state.lessons[key] = { seen: [...new Set(seen)], done: value.done === true };
+        const seen = Array.isArray(value.seen)
+          ? value.seen.filter((g) => typeof g === 'string' && g.length <= 24).slice(0, 400)
+          : [];
+        state.lessons[key] = { seen: [...new Set(seen)], done: value.done === true, drill: readDrill(value.drill) };
       }
     }
     return state;
@@ -184,12 +226,20 @@
   // How far, lesson by lesson -----------------------------------------------------------------
 
   // Reading a lesson never creates it: the home asks about all fourteen, and thirteen of them have nothing to say.
-  const NOTHING = Object.freeze({ seen: Object.freeze([]), done: false });
+  const NO_DRILL = Object.freeze({
+    total: 0,
+    target: DRILL_TARGET,
+    right: Object.freeze(Object.create(null)),
+    wrong: Object.freeze(Object.create(null)),
+    streak: Object.freeze(Object.create(null)),
+  });
+  const NOTHING = Object.freeze({ seen: Object.freeze([]), done: false, drill: NO_DRILL });
   const lessonState = (n) => state.lessons[String(n)] || NOTHING;
 
   function ownState(n) {
     const key = String(n);
-    if (!state.lessons[key]) state.lessons[key] = { seen: [], done: false };
+    if (!state.lessons[key]) state.lessons[key] = { seen: [], done: false, drill: emptyDrill() };
+    if (!state.lessons[key].drill) state.lessons[key].drill = emptyDrill();
     return state.lessons[key];
   }
 
@@ -222,6 +272,51 @@
     if (lesson === NOTHING) return;
     lesson.seen = [];
     lesson.done = false;
+    lesson.drill = emptyDrill();
+    save();
+  }
+
+  // The practice engine's record of a drill lesson (practice.js). Reading never creates anything.
+  const drillOf = (n) => lessonState(n).drill || NO_DRILL;
+
+  // How many items are known: those whose current run of right answers has reached the target. The target is the one
+  // the lesson wrote down, so the home counts the way the lesson does.
+  function masteredCount(n, target) {
+    const drill = drillOf(n);
+    const need = target || drill.target;
+    return Object.values(drill.streak).filter((run) => run >= need).length;
+  }
+
+  // Right: a run goes up by one. Wrong: the run goes back to nothing. Returns the item's new run.
+  function recordAnswer(n, id, right) {
+    const drill = ownState(n).drill;
+    const bump = (map) => {
+      map[id] = Math.min((map[id] || 0) + 1, 9999);
+    };
+    if (right) {
+      bump(drill.right);
+      bump(drill.streak);
+    } else {
+      bump(drill.wrong);
+      drill.streak[id] = 0;
+    }
+    save();
+    return drill.streak[id];
+  }
+
+  function setDrillTotal(n, total, target) {
+    const drill = ownState(n).drill;
+    if (drill.total === total && drill.target === target) return;
+    drill.total = total;
+    drill.target = target;
+    save();
+  }
+
+  // The student's work on the drill and nothing else: what they have seen and whether the lesson is done stay.
+  function clearDrill(n) {
+    const lesson = lessonState(n);
+    if (lesson === NOTHING) return;
+    lesson.drill = emptyDrill();
     save();
   }
 
@@ -437,6 +532,11 @@
     seenCount,
     markSeen,
     clearLesson,
+    drillOf,
+    masteredCount,
+    recordAnswer,
+    setDrillTotal,
+    clearDrill,
     isDone,
     setDone,
     isOpen,

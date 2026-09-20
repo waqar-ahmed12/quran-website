@@ -111,6 +111,12 @@ button:focus-visible {
   white-space: nowrap;
 }
 
+/* The hidden attribute has to win over a class that sets display (.link, .current, .after …). Without this, the
+   browser's own "hidden means none" loses to any author rule and the element stays on screen. */
+[hidden] {
+  display: none !important;
+}
+
 /* Behind everything, fixed while the page scrolls: a soft gold light at the top (default), or the home page's
    eight-pointed stars in faint lines, fading out down the page. Never busy: this is a page to study on. */
 body::before {
@@ -643,8 +649,10 @@ a.crumb:hover {
   display: contents;
 }
 
-/* A letter: a flat tile with a prominent, tactile edge, 8px corners. */
-.letter {
+/* What a tile is made of. A letter on Lesson 1 and an answer on Lesson 2 (.choice) share these, so the Paper / Outline /
+   Gold ink tryout — and the look chosen in the end — governs both without stating it twice. */
+.letter,
+.choice {
   --tile-bg: var(--paper);
   /* The colour the name's scrim fades into. Not always --tile-bg: an outline tile is transparent, so its scrim has
      to be the page behind it. */
@@ -653,6 +661,10 @@ a.crumb:hover {
   --tile-muted: var(--ink-muted);
   --tile-mark: var(--ink-accent);
   --tile-edge: var(--paper-edge);
+}
+
+/* A letter: a flat tile with a prominent, tactile edge, 8px corners. */
+.letter {
   position: relative;
   display: grid;
   place-items: center;
@@ -678,7 +690,8 @@ a.crumb:hover {
     box-shadow 250ms ease;
 }
 
-[data-tiles='line'] .letter {
+[data-tiles='line'] .letter,
+[data-tiles='line'] .choice {
   --tile-bg: transparent;
   --tile-scrim: var(--color-background);
   --tile-ink: var(--color-foreground);
@@ -687,7 +700,8 @@ a.crumb:hover {
   --tile-edge: var(--line);
 }
 
-[data-tiles='gold'] .letter {
+[data-tiles='gold'] .letter,
+[data-tiles='gold'] .choice {
   --tile-bg: rgb(var(--rgb-accent) / 0.06);
   --tile-scrim: var(--color-background);
   --tile-scrim: color-mix(in srgb, var(--color-accent) 6%, var(--color-background));
@@ -1392,6 +1406,22 @@ a.crumb:hover {
     animation-delay: 80ms;
   }
 
+  /* Lesson 2: the question arrives with the page; the answers rise in 40ms apart (on arrival and on "replay", not on
+     every question — between questions it is the quick cross-fade in .drill below, so a fast drill stays fast). */
+  .drill > .ask,
+  .drill > .prompt {
+    animation: rise 800ms var(--ease-out) 120ms backwards;
+  }
+
+  :root:not([data-arrive='all']) .choices.arrive .choice {
+    animation: rise 700ms var(--ease-out) backwards;
+    animation-delay: calc(120ms + var(--i, 0) * 40ms);
+  }
+
+  .after:not([hidden]) {
+    animation: rise-small 300ms var(--ease-out) backwards;
+  }
+
   .chooser[open] {
     animation: rise 500ms var(--ease-out);
   }
@@ -1438,13 +1468,18 @@ a.crumb:hover {
   .complete .button.next .arrow,
   .card,
   .card-icon,
-  .note {
+  .note,
+  .choice,
+  .choices,
+  .prompt,
+  .after {
     transition-duration: 0s !important;
     transition-delay: 0s !important;
     animation: none !important;
   }
 
   .letter:hover,
+  .choice:hover,
   .card:hover {
     transform: none;
   }
@@ -1475,6 +1510,13 @@ a.crumb:hover {
   from {
     opacity: 0;
     translate: 0 12px;
+  }
+}
+
+@keyframes rise-small {
+  from {
+    opacity: 0;
+    translate: 0 8px;
   }
 }
 
@@ -1828,7 +1870,268 @@ a.crumb:hover {
   color: var(--color-accent);
 }
 
-/* The tracing board --------------------------------------------------------------------------- */
+/* Lesson 2 — the drill --------------------------------------------------------------------------
+   One question at a time: a line asking, the letter (or the name, or a Play button), and the answers. Calm on
+   purpose: no timer, no score, no red. What tells a right answer from the rest is gold against dim, a tick, and — always —
+   a sentence, so nothing is told by colour alone and nothing tells a student off (qaida.md §1, docs/lesson-2/04). */
+.drill {
+  display: grid;
+  justify-items: center;
+  gap: clamp(0.625rem, 1.4vh, 1rem);
+  max-width: 38rem;
+  margin: clamp(0.75rem, 2vh, 1.5rem) auto 0;
+}
+
+.ask {
+  min-height: 1.5em;
+  margin: 0;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.1875rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: rgb(var(--rgb-foreground) / 0.82);
+}
+
+/* The question fades out and the new one in (150ms and 250ms). lesson-2.js adds .leaving only when motion is allowed. */
+.prompt,
+.choices {
+  transition: opacity 250ms ease;
+}
+
+.leaving .prompt,
+.leaving .choices {
+  opacity: 0;
+  transition-duration: 150ms;
+}
+
+/* The same height for every letter, so the answers below it don't jump about between questions. */
+.prompt {
+  --prompt-size: clamp(5.5rem, 4rem + 6vw, 8.5rem);
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: calc(var(--prompt-size) * 1.35);
+}
+
+.prompt-glyph {
+  font-family: var(--font-letter);
+  font-size: var(--prompt-size);
+  line-height: 1.35;
+  color: var(--color-accent);
+}
+
+.prompt-name {
+  font-size: clamp(2.5rem, 2rem + 3vw, 4rem);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+}
+
+.button.play {
+  min-height: 56px;
+  padding: 0 2rem;
+  font-size: 1rem;
+}
+
+/* Two across on a narrow screen and one row on a wide one; lesson-2.js says how many for the number of answers. */
+.choices {
+  --cols: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: 0.625rem;
+  width: 100%;
+}
+
+@media (min-width: 560px) {
+  .choices {
+    grid-template-columns: repeat(var(--cols-wide, 4), minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+}
+
+/* An answer. Its colours are the tile's (see .letter above), so the look chosen for the letters governs these too. */
+.choice {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  padding: 0.5rem 0.5rem 0.75rem;
+  border: 1.5px solid var(--tile-edge);
+  border-radius: 8px;
+  background: var(--tile-bg);
+  font: inherit;
+  color: var(--tile-ink);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 250ms ease,
+    opacity 200ms ease;
+}
+
+.choice[data-face='glyph'] {
+  min-height: calc(var(--tile) * 1.15);
+}
+
+.choice-glyph {
+  font-family: var(--font-letter);
+  font-size: calc(var(--tile) * 0.58);
+  line-height: 1.4;
+}
+
+.choice-name {
+  font-size: 1.0625rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+@media (hover: hover) {
+  .choice:not([aria-disabled='true']):hover {
+    border-color: rgb(var(--rgb-accent) / 0.6);
+    box-shadow: var(--lift);
+    transform: translateY(-2px);
+  }
+}
+
+.choice:not([aria-disabled='true']):active {
+  transform: scale(0.97);
+  transition-duration: 100ms;
+}
+
+.choice[aria-disabled='true'] {
+  cursor: default;
+}
+
+/* After an answer: the right one lights gold with a tick; the one chosen, if it was not it, keeps a dashed edge; the
+   rest step back. Never a failure colour, and never colour alone. */
+.choice[data-verdict='right'] {
+  border-color: var(--tile-mark);
+  box-shadow: inset 0 0 0 1.5px var(--tile-mark), 0 0 12px rgb(var(--rgb-accent) / 0.3);
+}
+
+.choice[data-verdict='right']::after {
+  content: '';
+  position: absolute;
+  top: 0.4rem;
+  inset-inline-end: 0.6rem;
+  width: 0.375rem;
+  height: 0.7rem;
+  border: solid var(--tile-mark);
+  border-width: 0 2px 2px 0;
+  rotate: 45deg;
+}
+
+.choice[data-verdict='wrong'] {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.choice[data-verdict='dim'] {
+  opacity: 0.4;
+}
+
+.verdict {
+  min-height: 1.6em; /* kept, so the strip and the lines below don't jump when it fills */
+  margin: 0;
+  font-size: 1rem;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Under an answer, not a panel over it: a panel would take the keyboard and hide the choices being learnt from. */
+.after {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.after-glyph {
+  font-family: var(--font-letter);
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.after-name {
+  margin-inline-end: 0.25rem;
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  color: var(--color-muted-foreground);
+}
+
+/* After a right answer the strip is only the way on. */
+.after[data-kind='right'] .after-glyph,
+.after[data-kind='right'] .after-name,
+.after[data-kind='right'] .hear,
+.after[data-kind='right'] .trace,
+[data-miss='plain'] .after .trace {
+  display: none;
+}
+
+.next-question .arrow {
+  transition: translate 300ms var(--ease-out);
+}
+
+.next-question:hover .arrow {
+  translate: 3px 0;
+}
+
+/* The two pieces of advice. Advice, never a block: they sit under the question and nothing waits on them. */
+.advice {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.struggle {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  max-width: 34rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.struggle-text,
+.ready-note {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.struggle-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.ready-note {
+  max-width: 34rem;
+  color: var(--color-accent);
+  text-align: center;
+}
+
+/* The quiet session line: what has been asked so far, and what is still to look at again. */
+.tally {
+  margin: 0;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-foreground);
+}
+
+/* The tracing board--------------------------------------------------------------------------- */
 .tracer {
   width: min(34rem, calc(100vw - 2rem));
   max-width: none;

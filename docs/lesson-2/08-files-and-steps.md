@@ -3,13 +3,17 @@
 Line numbers are as of **2026-09-19**, commit `998bf4a` plus the Export row. **Check each anchor before you edit
 it** — the surrounding code is what matters, not the number.
 
-## 1. New files — three
+## 1. New files — four
 
 | File | What |
 |---|---|
 | `site/qaida/practice.js` | the engine. No DOM, no storage. `02-practice-engine.md` |
 | `site/qaida/lesson-2.js` | the pool, the confusables table, the board, `window.qaida` |
 | `site/qaida/lesson-2.html` | the page. Built from `lesson-1.html`, `04-page-and-design.md` §1 |
+| `tools/qaida-check.js` | added at build: `node tools/qaida-check.js` checks the engine and storage with no browser |
+
+`trace.js` was also edited (it was "no edit" below): the blank writing board, opened from the **Board** button that
+every lesson's top bar now carries. Lesson 1 got the button too.
 
 ## 2. Edited files
 

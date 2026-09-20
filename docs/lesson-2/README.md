@@ -8,6 +8,28 @@ It is **not** a design record. The design record is `design-system/quran-landing
 *after* the code exists and the user has seen it — the same way step 1 was done. When you finish building, update
 that file to describe what is actually there, and update `QAIDA-BUILD.md`'s status table and step log.
 
+## Status — built 2026-09-19, awaiting the user's sign-off
+
+`practice.js`, `lesson-2.js` and `lesson-2.html` exist, with the storage, home, options panel and CSS edits of
+`08-files-and-steps.md`. **`node tools/qaida-check.js` runs the engine and storage checks** (pool, questions, the
+missed-letter rule, ready, storage validation, the engine's boundaries). It has not been seen in a browser. Where the
+code differs from this folder, **the code wins**, and the differences are these:
+
+- **The user's answers changed defaults:** three right answers in a row (`target: 3`), ready at four fifths with no
+  missed letter still shaky (`readyAt: 0.8`, `clean: true`), and softer wording. See `10-open-questions.md`.
+- **A Board button in the top bar of every lesson** (not in the original spec): a blank writing board, always
+  available. `trace.js` has a free mode; every later lesson copies the button and the tracer dialog from `lesson-2.html`.
+- **`.ask` is a `<p>`, not an `<h2>`** (`04` and `06` disagreed; `04` wins, so the heading order stays h1 → h2). The
+  group of answers is still named by it.
+- **Next after a miss is a full `.button`**, not `.button.quiet`, so the way on is the plainest thing in the strip.
+- **The choices only stagger in on arrival and on "replay"**; between questions it is the 150 / 250 ms cross-fade
+  alone, so a fast drill stays fast.
+- **Lesson 2's Next (to Lesson 3) is never locked**: the lesson only recommends. It says "not built yet" when tapped.
+- **The look-alike table is an attribute** (`data-groups`), because only the attribute path re-deals the question.
+- **A global `[hidden] { display: none !important }`** was added. Without it, any class that sets `display` (`.link`,
+  `.current`) ignored the attribute; this also fixes Lesson 1's "Start again" and its empty strip.
+- **`09-going-in-order.md` is not built.** Lesson 2 opens from the home once Lesson 1 is finished, as before.
+
 ## What Lesson 2 is, in a paragraph
 
 The same 29 letters as Lesson 1, shown **out of order**, one question at a time. It catches the student who can

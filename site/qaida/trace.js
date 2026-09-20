@@ -4,6 +4,10 @@
 // deliberately no marking: handwriting recognition on Arabic is unreliable, and a machine telling a student "wrong"
 // when they are right teaches them to distrust themselves. A printed Qaida asks the child to compare by eye, and so
 // does this.
+//
+// The same board is also on every lesson as a blank one, opened from the "Board" button in the top bar (the user,
+// 2026-09-19: "we don't know when someone would need to write"). Blank means no guide letter, so it can never give
+// away the answer to a question in a drill.
 
 (() => {
   const shell = window.qaidaShell;
@@ -13,6 +17,7 @@
   const $ = (selector) => panel.querySelector(selector);
 
   const title = $('.tracer-title');
+  const hint = $('.board-hint');
   const guide = $('.board-guide');
   const canvas = $('.board-ink');
   const undoButton = $('.undo');
@@ -22,6 +27,8 @@
   const guideContext = guide.getContext('2d');
 
   let letter = '';
+  let free = false; // the blank board from the top bar, with no letter underneath
+  let scratch = []; // what was written on the blank board, kept until Clear or a reload so a stray tap outside is harmless
 
   let strokes = []; // each stroke is a list of points, so Undo can drop the last one
   let drawing = null;
@@ -201,14 +208,22 @@
     closeTimer = setTimeout(finishClosing, 300);
   }
 
+  // With a letter: trace it. With nothing: the blank board.
   function open(glyph, name) {
     opener = document.activeElement;
-    strokes = [];
+    letter = glyph || '';
+    free = !letter;
+    strokes = free ? scratch : [];
     box = null; // measured once the panel is on screen, in fit()
-    letter = glyph;
-    title.textContent = (title.dataset.template || '{name}').replaceAll('{name}', name);
+    title.textContent = free
+      ? title.dataset.free || 'Writing board'
+      : (title.dataset.template || '{name}').replaceAll('{name}', name);
+    // The line at the bottom says what this board is for. (Older markup carries it as plain text; leave that be.)
+    const line = free ? hint && hint.dataset.free : hint && hint.dataset.trace;
+    if (line) hint.textContent = line;
     panel.classList.remove('guide-off', 'closing');
     closing = false;
+    guideButton.hidden = free; // nothing to hide on a blank board
     guideButton.setAttribute('aria-pressed', 'false');
     guideButton.textContent = guideButton.dataset.hide;
     if (!panel.open) panel.showModal();
@@ -227,12 +242,16 @@
   panel.addEventListener('close', () => {
     panel.classList.remove('closing');
     closing = false;
+    if (free) scratch = strokes; // Clear swaps the list for a new one, so keep whichever is current
     strokes = [];
     if (opener && opener.isConnected) opener.focus();
     opener = null;
   });
 
   for (const button of panel.querySelectorAll('.close-trace')) button.addEventListener('click', close);
+
+  // The blank board, from the button in the top bar of every lesson.
+  for (const button of document.querySelectorAll('.open-board')) button.addEventListener('click', () => open());
 
   // A click on the dimmed page around the board closes it, the same as the first-visit panel.
   panel.addEventListener('click', (event) => {

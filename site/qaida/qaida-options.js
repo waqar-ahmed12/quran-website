@@ -297,7 +297,9 @@
     slider('Space above the buttons', 0, 6, 0.25, now, show, (v) => root.style.setProperty('--end-gap', `${v}rem`));
   };
 
-  if (lesson) {
+  // Lesson 1 shows a page of letter tiles; Lesson 2 is a drill and has different rows. `kind` tells them apart, so a
+  // drill lesson never gets a slider for "how long a name stays" that would do nothing.
+  if (lesson && lesson.kind !== 'drill') {
     section('Letters', true);
     option('Letter tiles', { Paper: 'paper', Outline: 'line', 'Gold ink': 'gold' }, 'tiles');
     option('Letters grouped', { 'In shape families': 'families', 'Even grid': 'grid' }, 'grouping', (v) => {
@@ -322,6 +324,7 @@
     });
     actions('Tracing board', {
       'Open it on alif': () => window.qaidaTrace && window.qaidaTrace.open('ا', 'Alif'),
+      'Open the blank board': () => window.qaidaTrace && window.qaidaTrace.open(),
     });
 
     section('Progress and page');
@@ -339,6 +342,58 @@
       'Clear progress': () => lesson.clear(),
       'First-visit choice': () => shell.askAgain(),
     });
+  }
+
+  // Lesson 2, the drill (docs/lesson-2/07-options-panel.md). Everything the teacher might want to look at and decide.
+  if (lesson && lesson.kind === 'drill') {
+    section('The drill', true);
+    option('Question', { 'Letter → name': 'glyph', 'Name → letter': 'name', 'Mix both': 'mix', 'Hear it → letter': 'sound' },
+      'ask', (v) => lesson.setFormat(v));
+    // Hearing needs a real recording of a letter, and none exist until the teacher's arrive. Off until then.
+    const soundChoice = group.lastElementChild.querySelectorAll('button')[3];
+    if (window.qaidaAudio) {
+      window.qaidaAudio.ready.then(() => {
+        soundChoice.disabled = lesson.sound === 0;
+        soundChoice.title = soundChoice.disabled ? 'Opens when the recordings are in' : '';
+      });
+    }
+    option('Answers to pick from', { Three: '3', Four: '4', Six: '6' }, 'choices', (v) => lesson.setChoices(Number(v)));
+    option('Wrong answers offered', { 'A look-alike among them': 'family', 'Any letter': 'any' }, 'distractors',
+      (v) => lesson.set({ familyFirst: v === 'family' }));
+    option('After a right answer', { 'Move on by itself': 'auto', 'Wait for a tap': 'wait' }, 'advance');
+    option('After a miss', { 'Offer Trace it': 'trace', 'Just the answer': 'plain' }, 'miss');
+    option('Answers arrive', { 'One by one': 'stagger', 'All at once': 'all' }, 'arrive', () => lesson.replay());
+    slider('Right answers in a row to know a letter', 1, 3, 1, lesson.target, (v) => String(v), (v) => lesson.setTarget(v));
+    slider('Ready at (share of letters known)', 0.6, 1, 0.05, lesson.readyAt, (v) => `${Math.round(v * 100)}%`,
+      (v) => lesson.setReadyAt(v));
+    slider('Pause after a right answer', 0.4, 2.5, 0.1, lesson.pause / 1000, (v) => `${v.toFixed(1)} s`,
+      (v) => lesson.setPause(v * 1000));
+    actions('Try it', {
+      'A new question': () => lesson.next(),
+      'Same letter, new answers': () => lesson.again(),
+      'Know them all': () => lesson.masterAll(),
+      'Clear progress': () => lesson.clear(),
+      'First-visit choice': () => shell.askAgain(),
+    });
+    actions('Sound and writing', {
+      'Play the stand-in': () => window.qaidaAudio && window.qaidaAudio.play('letters', 'ا'),
+      'Stop': () => window.qaidaAudio && window.qaidaAudio.stop(),
+      'Open the blank board': () => window.qaidaTrace && window.qaidaTrace.open(),
+    });
+
+    section('Progress and page');
+    option('Letter tiles', { Paper: 'paper', Outline: 'line', 'Gold ink': 'gold' }, 'tiles');
+    option('Letter size', { Comfortable: 'comfortable', Large: 'large' }, 'size');
+    edgeSlider();
+    option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
+    option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
+    option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
+    option('When it says you seem ready', { 'Settles down': 'settle', 'Keeps glowing': 'glow', 'No fuss': 'none' }, 'finish');
+    option('Big baa by the title', { Center: 'ba', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
+    option('Big baa font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
+    option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
+    gapSlider();
+    footSlider();
   }
 
   if (home) {

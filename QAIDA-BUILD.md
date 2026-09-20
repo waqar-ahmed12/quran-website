@@ -10,7 +10,8 @@ Qaida with one line: the current step, its skills, and the next step.
 
 ## Where we are
 
-**Steps 1–3 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing.
+**Steps 1–4 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing, and Lesson 2 with the
+practice engine (`practice.js`) that lessons 4–14 reuse. Step 4 has not been seen in a browser yet.
 
 ## Decisions
 
@@ -27,6 +28,10 @@ Qaida with one line: the current step, its skills, and the next step.
 | Finishing a drill lesson | **A recommendation, not a gate** *(2026-09-19)*: "a recommendation that you seem okay, let's move on". A missed letter **comes back more often but never straight away**; one missed repeatedly earns "go back and look at it again" — advice, never a block |
 | Mixed review | **Every later lesson mixes in** earlier material *(2026-09-19)*. The lesson's own items are the gate; review items ride along and never are. Answers the "ask first" on steps 6 and 8 |
 | Skipping ahead | **Allowed** *(2026-09-19)*: "if the user wanted to skip they can, but they should also be advised that if they are new, it is recommended to go with the flow". **Nothing is locked.** A lesson out of turn advises once, then lets them through. Overrules step 1's locks — see `docs/lesson-2/09-going-in-order.md` |
+| A letter is "known" | **Three right answers in a row** *(2026-09-19: "i guess three")* |
+| "You seem ready" | **Four fifths of the letters known, and no missed letter still shaky** *(2026-09-19: "4 fifth without mistakes, if mistake, repeat the mistake and practice all letters" — Claude's reading)*. A mistake repeats the letter (more often, never straight away) and every letter stays in the mix |
+| A writing board | **In every lesson, always available** *(2026-09-19: "we don't know when someone would need to write")*. A **Board** button in every lesson's top bar opens a blank board; "Trace it" stays as the shortcut to a letter just missed. Every later lesson copies the button and the tracer dialog |
+| Wording | **Never harsh** *(2026-09-19)*. Plain, short, and a wrong answer says what the letter is and nothing more |
 
 ## Steps
 
@@ -42,7 +47,7 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 1 | **The Qaida page, Lesson 1 and the Qaida home.** The 14 lessons (only lesson 1 open) and the progress bar; a first-visit choice of script, names and grouping, changeable any time; Lesson 1, the letters, tap to peek; progress kept on this device; the landing page's look, light and dark; an options panel with tryouts and a text field for every line | `minimalist-ui`, `ui-ux-pro-max`, `full-output-enforcement` | **Built, awaiting sign-off** |
 | 2 | **Sound in Lesson 1.** The player, `audio/manifest.json`, the wordless stand-in, the mute switch, and the recording list at `recordings.html` | `ui-ux-pro-max`, `full-output-enforcement` | **Built, awaiting sign-off.** The teacher records gradually (2026-09-18) |
 | 3 | **Trace the letters** with a finger, mouse or pen, inside Lesson 1 | `minimalist-ui`, `high-end-visual-design` | **Built, awaiting sign-off.** Was step 9 |
-| 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Specified in `docs/lesson-2/`** (2026-09-19) — read it before building. Not built |
+| 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Built, awaiting sign-off** (2026-09-19). Specified in `docs/lesson-2/`; `README.md` there lists where the code differs. Check: `node tools/qaida-check.js` |
 | 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | |
 | 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-19: mixed review carries through **every** later lesson |
 | 7 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | |
@@ -142,6 +147,35 @@ centred on its **ink**, measured with `measureText`, so every letter sits in the
 shape. The lettering and colour still come from CSS, so it follows the script and the theme.
 
 Checked with `node --check`. **Not seen in a browser** — the user previews it.
+
+### Step 4 built — Lesson 2 and the practice engine
+
+*2026-09-19, after the user answered the open questions ("i guess start building").*
+
+**What exists.** `practice.js` is the drill engine: no DOM, no storage of its own, and it doesn't know its items are
+letters or that sound exists. `lesson-2.html` and `lesson-2.js` are its first customer: a letter (or a name) and
+answers to pick from, one question at a time, no timer, no score, no red. A missed letter comes back **more often but
+never straight away** (a weighted draw, not a queue); one missed again and again earns "look at it in Lesson 1" advice;
+and at **four fifths known with nothing missed still shaky** the page says *you seem to know these* and marks the
+lesson finished — a recommendation, and the drill carries on. Storage gained a validated `drill` per lesson; the home
+counts "N of 29 letters known" for it by declaring `progress: 'drill'` on the lesson rather than testing its number.
+
+**The user's answers** are in the Decisions table above and in `docs/lesson-2/10-open-questions.md`. Three of the eight
+questions weren't understood ("choices per question", "trace", "screen readers"): ask in plain words next time.
+
+**The board.** The user asked for a writing board in every lesson. `trace.js` gained a blank mode, opened from a **Board**
+button now in the top bar of Lessons 1 and 2 (and every later lesson, by copying the markup). It has no guide letter, so it
+can never give away a drill answer, and what is written stays until Clear or a reload.
+
+**Also changed.** Lesson 1's Next is a real link to Lesson 2. A global `[hidden]` rule was missing, so any element whose class
+set `display` ignored the attribute: by the CSS cascade, Lesson 1's "Start again" and its empty letter strip would have shown
+before anything was tapped. Fixed for both lessons; not confirmed in a browser.
+The options panel has a "The drill" section, and every choice in it exports to `setting.txt`.
+
+**Checked.** `node tools/qaida-check.js` runs 50 checks on the engine and storage, with no browser, and all pass; every script passes
+`node --check`. **Not seen in a browser** — the user previews it. **Not built:** `docs/lesson-2/09-going-in-order.md`
+(nothing locked, advice at the door), which the spec says to ask about. Lesson 2 opens from the home once Lesson 1 is finished.
+`design-system/quran-landing/pages/qaida.md` is **not yet updated**: it is written after the user has seen the page.
 
 ### Step 4 planned, and Export settings added to the Qaida panel
 

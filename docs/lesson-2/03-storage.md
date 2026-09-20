@@ -26,6 +26,8 @@ lessons: {
     done: false,                  // unchanged meaning: the lesson called setDone
     drill: {
       total:  29,                 // required items in the pool; written by drill.start()
+      target: 3,                  // right answers in a row that make an item known; written with `total`, so the
+                                  //   home counts "known" the way the lesson does (added at build, 2026-09-19)
       right:  { "ا": 3, "ب": 1 }, // lifetime right answers, by item id
       wrong:  { "ب": 2 },         // lifetime wrong answers, by item id
       streak: { "ا": 2 }          // consecutive right since the last miss — the mastery test
@@ -115,10 +117,10 @@ Five thin functions, all saving through the existing `save()`:
 
 ```js
 drillOf(n)                     // -> the frozen empty drill if nothing is saved; never creates
-masteredCount(n, target = 2)   // ids in drill.streak with value >= target
+masteredCount(n, target)       // ids in drill.streak with value >= target (default: the drill's own stored target)
 recordAnswer(n, id, right)     // right ? right[id]++, streak[id]++ : wrong[id]++, streak[id] = 0
                                //   saves, and returns the new streak
-setDrillTotal(n, total)        // written once, by drill.start()
+setDrillTotal(n, total, target) // by drill.start(), and again when the pool or the target changes
 clearDrill(n)                  // wipes drill; keeps seen and done
 ```
 

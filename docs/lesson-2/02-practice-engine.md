@@ -15,13 +15,15 @@ shell.js → audio.js → trace.js → practice.js → lesson-2.js → qaida-opt
 
 1. **No DOM.** The engine never creates, reads or writes an element. The page asks it for a question and tells it
    what was answered; everything visible is `lesson-2.js`'s job.
-2. **No storage of its own.** It reads and writes progress **through `qaidaShell`** (see `03-storage.md`), and asks
-   `qaidaAudio` what recordings exist. It never touches `localStorage` and never knows the key `qaida` exists.
+2. **No storage of its own.** It reads and writes progress **through `qaidaShell`** (see `03-storage.md`). It never
+   touches `localStorage` and never knows the key `qaida` exists.
 
-It also must not know that its items are letters. `family` is an opaque tag; `glyph` is a string to display.
+It also must not know that its items are letters, **or that sound exists**. `family` is an opaque tag; `glyph` is a
+string to display; and whether a format can be asked of an item is the format's own `available(item)`, which the
+*lesson* writes (it is where `qaidaAudio.has(...)` is called). *As built, `practice.js` never mentions `qaidaAudio`;
+`tools/qaida-check.js` fails if it ever does.*
 
-Guard clause, matching `qaida.js:6-7`: if `window.qaidaShell` is missing, return without publishing. Tolerate
-`window.qaidaAudio` being absent — sound formats simply report themselves unavailable.
+Guard clause, matching `qaida.js:6-7`: if `window.qaidaShell` is missing, return without publishing.
 
 ## 2. The item
 
@@ -32,7 +34,8 @@ The one object lessons 2 through 14 all speak.
   id:       'ا',       // required. Stable, unique-in-pool. Mastery is stored under this.
   glyph:    'ا',       // required. What is shown, in the student's chosen script. Later: 'بَ', or a word.
   name:     'Alif',    // required. The answer in words, LTR.
-  family:   'f0',      // optional. Items sharing a family are look-alikes; distractors prefer them.
+  family:   ['f0'],    // optional. A tag or a LIST of tags. Items sharing any tag are look-alikes; distractors prefer
+                       //   them. A list, because و looks like two different groups (built 2026-09-19).
   audio:    { kind: 'letters', glyph: 'ا' },  // optional. Passed straight to qaidaAudio.play / .has
   required: true,      // optional, default true. false = a review item, not part of the gate.
   traceable: true,     // optional, default Boolean(glyph) && glyph.length <= 2. Offers "Trace it".
@@ -103,8 +106,9 @@ and a factory costs nothing extra now.
 | `items` | — | **required.** Array of items (§2). Replaceable later with `setItems`. |
 | `formats` | — | **required.** Array of format descriptors (§3), in preference order. |
 | `choices` | `4` | buttons per question. Clamped to `[2, 6]` and to the pool size. |
-| `target` | `2` | consecutive right answers that master an item. |
-| `readyAt` | `1` | fraction of required items that must be known before `ready` fires. `1` = all of them. |
+| `target` | `3` | consecutive right answers that master an item. **The user, 2026-09-19: "three".** |
+| `readyAt` | `0.8` | fraction of required items that must be known before `ready` fires. **The user: "four fifths".** `1` = all of them. |
+| `clean` | `true` | `ready` also needs `toFix === 0`: no letter that was missed is still shaky. **The user: "without mistakes".** |
 | `strugglingAt` | `3` | lifetime misses on one item before it is reported as struggling. |
 | `familyFirst` | `true` | force at least one same-family distractor when one exists. |
 | `cooldown` | `2` | questions a just-missed item sits out before it can return. |
@@ -118,7 +122,9 @@ and a factory costs nothing extra now.
 drill.start()            // read mastery from shell, write drill.total, emit the first question. Idempotent.
 drill.question           // getter: the current question, or null
 drill.answer(choiceId)   // -> verdict. A second call on the same question returns the same verdict and does nothing.
-drill.next()             // advance. No-op while the current question is unanswered.
+drill.next(skip = false) // advance. No-op while the current question is unanswered — unless `skip`, which is for the
+                         //   options panel: a new question to look at, leaving no mark on the letter.
+drill.settings           // getter: { choices, target, readyAt, familyFirst } as the drill is running now
 drill.again()            // re-ask the current item, choices freshly shuffled (options panel only)
 drill.progress()         // -> progress object, §8
 drill.struggling()       // -> [item, …], required items with lifetime wrong >= strugglingAt and streak < target
@@ -244,9 +250,12 @@ drill.progress() -> {
   right: 33,     // this session
   wrong: 8,      // this session
   toFix: 3,      // required items with lifetime wrong > 0 and streak < target
-  ready: false,  // known / total >= readyAt
+  ready: false,  // known / total >= readyAt, and (with `clean`) toFix === 0
 }
 ```
+
+`ready` fires once per visit, when an answer takes the lesson over the line. A student who **arrives** already ready is
+not congratulated again: `start()` reads it off `progress()` and stays quiet.
 
 `known` is what the progress bar counts — not questions answered. **It can go down**, because missing a letter you
 had mastered un-masters it. That is honest, it is rare (you have to miss something you had twice confirmed), and a

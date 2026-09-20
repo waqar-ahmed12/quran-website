@@ -16,23 +16,33 @@ Every string below is a **stand-in**. The teacher checks them all before launch.
 
 `{placeholders}` are filled in by `lesson-2.js` with `replaceAll`, the way `qaida.js:141` already does.
 
+**The user asked, 2026-09-19: "don't make wordings harsh."** These are the softened lines as built. The first drafts
+said "keeps catching you out" and "to fix"; both are gone. Nothing below tells the student they are wrong.
+
 | Element | Attribute | Text |
 |---|---|---|
 | `.ask` | `data-glyph` | `Which letter is this?` |
 | `.ask` | `data-name` | `Which letter is {name}?` |
 | `.ask` | `data-sound` | `Listen. Which letter is it?` |
-| `.verdict` | `data-right` | `Right — {name}.` |
-| `.verdict` | `data-wrong` | `That one is {chosen}. This is {name}.` |
+| `.verdict` | `data-right` | `Yes — that is {name}.` |
+| `.verdict` | `data-wrong` | `That was {chosen}. This one is {name}.` |
+| `.verdict` | `data-error` | `There aren’t enough letters to ask a question yet.` |
 | `.progress-text` | `data-template` | `{known} of {total} letters known` |
 | `.progress-text` | `data-done` | `All {total} letters known` |
-| `.tally` | `data-template` | `{asked} questions · {wrong} to fix` |
+| `.tally` | `data-template` | `{asked} questions so far · {toFix} to look at again` |
+| `.tally` | `data-clear` | `{asked} questions so far` |
+| `.announce` (screen readers) | `data-template` | `Question {n}.` |
+| `.prompt` | `data-play` | `Play the sound` |
 | `.sound-note` | `data-none` | `Hearing practice opens when the recordings are in.` |
-| `.sound-note` | `data-some` | `{done} of {total} letters recorded.` |
-| `.end-line` | `data-before` | `Keep going until these come without thinking.` |
+| `.sound-note` | `data-some` | `{done} of {total} letters recorded, so hearing practice is open for those.` |
+| `.end-line` | `data-before` | `Take your time. Every letter gets easier with practice.` |
 | `.end-line` | `data-after` | `You seem to know these. Lesson 3 is ready when you are.` |
 | `.reset` | `data-label` | `Start again` |
 | `.reset` | `data-confirm` | `Tap again to clear` |
 | `.next` | `data-standin` | `Lesson 3 isn’t built yet.` |
+| `.tracer-title` | `data-free` | `Writing board` |
+| `.board-hint` | `data-free` | `Write whatever you need — a letter, a word, a mark. Nothing is saved or marked. This needs something to draw with — a keyboard won’t do it.` |
+| `.board-hint` | `data-trace` | the tracing line from Lesson 1, unchanged |
 
 ## 2. The two pieces of advice
 
@@ -44,7 +54,7 @@ told off stops.
 
 | Element | Attribute | Text |
 |---|---|---|
-| `.struggle` | `data-template` | `{name} keeps catching you out. It might be worth looking at it again.` |
+| `.struggle-text` | `data-template` | `{name} is a tricky one, and that is completely normal. It can help to look at it again.` |
 | `.struggle .back-to-1` | `data-words` | `Look at it in Lesson 1` |
 | `.struggle .trace` | `data-words` | `Trace it` |
 
@@ -52,7 +62,7 @@ told off stops.
 
 | Element | Attribute | Text |
 |---|---|---|
-| `.ready-note` | `data-template` | `You seem to know these. Lesson 3 is ready when you are — or stay and keep practising.` |
+| `.ready-note` | `data-template` | `You seem to know these well. Lesson 3 is ready when you are — or stay and keep practising.` |
 
 The second half of that sentence matters: the drill stays open, and the student is told so. Nothing is taken away.
 
@@ -73,8 +83,8 @@ Each of these is the element's own text.
 | `.onward .back` | `Back to the lessons button` |
 | `.onward .next` | `Lesson 3 button` |
 
-Plus every string copied in from `lesson-1.html` — the top bar, the tracer dialog and the chooser dialog all carry
-their tags already. Copy them with the markup; don't strip them.
+Plus `Top bar: writing board button` (`Board`), and every string copied in from `lesson-1.html` — the top bar, the
+tracer dialog and the chooser dialog all carry their tags already. Copy them with the markup; don't strip them.
 
 ## 4. One more, genuinely new
 
@@ -83,11 +93,13 @@ which wrong answers a student is offered. It gets a field like any other line �
 `lesson-2.js` reads, one line, groups separated by commas:
 
 ```html
-<span hidden data-words="Look-alike letters (groups, commas)">ب ت ث ن ي, ج ح خ ع غ, د ذ ر ز و, س ش ص ض, ط ظ, ف ق ك, ل ا, م ه, ء و</span>
+<span hidden data-groups="ب ت ث ن ي, ج ح خ ع غ, د ذ ر ز و, س ش ص ض, ط ظ, ف ق ك, ل ا, م ه, ء و"
+      data-words-attr="data-groups|Look-alike letters (groups, separated by commas)"></span>
 ```
 
-Editing it must re-shuffle the current question's choices, so the teacher can see the effect immediately — the
-`data-words-attr` path in `qaida-options.js` already calls `redraw()` for exactly this reason.
+It is carried as an **attribute**, not as text, on purpose: only the `data-words-attr` path in `qaida-options.js` calls
+`redraw()`, and editing the table must re-deal the current question so the teacher sees the effect immediately.
+`lesson-2.js` re-reads it on every `render()` and rebuilds the pool when it has changed.
 
 ## 5. Wording rules carried over
 

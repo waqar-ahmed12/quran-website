@@ -42,10 +42,17 @@
       if (done) meta = words.finished;
       else if (!open) meta = words.locked;
       else if (!built) meta = words.soon;
-      else if (n === 1) {
-        const seen = shell.seenCount(1);
+      else if (entry.progress === 'letters') {
+        const seen = shell.seenCount(n);
         meta = seen > 0
           ? words.progress.replaceAll('{seen}', seen).replaceAll('{total}', letters)
+          : words.open;
+      } else if (entry.progress === 'drill') {
+        // How many are known out of how many the lesson asks about, as the lesson last wrote it down.
+        const total = shell.drillOf(n).total || letters;
+        const known = Math.min(shell.masteredCount(n), total);
+        meta = known > 0
+          ? words.known.replaceAll('{known}', known).replaceAll('{total}', total)
           : words.open;
       }
 
