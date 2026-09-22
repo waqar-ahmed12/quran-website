@@ -30,6 +30,15 @@ thing genuinely new is that **Lesson 4's zabar items ride along as the wrong ans
 answerable by noticing that a mark exists, which the student learnt last lesson. **Step 6 is still not done:** Lesson 6
 (paish) is to come, and the user has to preview lessons 4 and 5.
 
+**Step 7, saying it out loud, is specified and not built** (2026-09-22, the user: *"i wanted to have a way to record
+audio, so that the student could play back and match his pronounciation with the audio. i want it in every lesson,
+because thats important"*): `docs/your-voice/` is the specification. It **was step 10** and moved to step 7 for one
+reason — lessons 6–14 are not written yet, and a thing that has to be in every lesson is cheaper to be born with than
+retrofitted fourteen times. **The recommended order is this step, then Lesson 6**, so Lesson 6 is copied from a page
+that already has it. **The catch is in `docs/your-voice/09` §1:** `audio/manifest.json` is empty, so there is nothing
+for a student to match *against* until the teacher records the 29 letter names — one sitting, and it covers lessons
+1, 2 and 3 at once.
+
 ## Decisions
 
 | Question | Answer (the user, 2026-09-14) |
@@ -49,6 +58,7 @@ answerable by noticing that a mark exists, which the student learnt last lesson.
 | "You seem ready" | **Four fifths of the letters known, and no missed letter still shaky** *(2026-09-19: "4 fifth without mistakes, if mistake, repeat the mistake and practice all letters" — Claude's reading)*. A mistake repeats the letter (more often, never straight away) and every letter stays in the mix |
 | A writing board | **In every lesson, always available** *(2026-09-19: "we don't know when someone would need to write")*. A **Board** button in every lesson's top bar opens a blank board; "Trace it" stays as the shortcut to a letter just missed. Every later lesson copies the button and the tracer dialog |
 | Wording | **Never harsh** *(2026-09-19)*. Plain, short, and a wrong answer says what the letter is and nothing more |
+| Saying it out loud | **In every lesson** *(2026-09-22: "i want it in every lesson, because thats important")*. The student records their own voice and plays it against the teacher's. **Never scored** — the same rule as the tracing board, for a stronger reason — and **it never leaves the device**. `docs/your-voice/` |
 | Lesson 3's length | **Split the big group in two, `target` stays 3** *(2026-09-20, from three options shown with their numbers)*. Six groups: 6 + 2 + 21 + 15 + 24 = 68 shapes, then the table. Position names: start / middle / end **of a word** |
 
 ## Steps
@@ -68,10 +78,10 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Built, awaiting sign-off** (2026-09-19). Specified in `docs/lesson-2/`; `README.md` there lists where the code differs. Check: `node tools/qaida-check.js` |
 | 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | **Built, awaiting sign-off** (2026-09-20). Six groups and a table; `docs/lesson-3/README.md` lists where the code differs. Checks: `node tools/qaida-check.js`, `node tools/qaida-lesson3-check.js`. **The joined shapes have not been seen rendering** — that is the first thing to look at |
 | 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 4 built 2026-09-20, awaiting the user's preview** (`docs/lesson-4/` is the spec; `README.md` there lists where the build differs). **Lesson 5 built 2026-09-20, awaiting the user's preview** (`docs/lesson-5/` — the differences only; it assumes `docs/lesson-4/`; `README.md` there lists where the build differs). Lesson 6 not started. One page file, `mark-lesson.js`, serves all three lessons. Mixed review carries through every later lesson (2026-09-19). Checks: `node tools/qaida-check.js`, `qaida-marks-check.js` (Lesson 4's page), `qaida-lesson5-check.js`, `qaida-lesson3-check.js` |
-| 7 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | |
-| 8 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-20: **jazam stays last**, after leen |
-| 9 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Each lesson adds its rows to the recording list as it's built |
-| 10 | **Record your own voice** and play it back against the teacher's | `ui-ux-pro-max`, `minimalist-ui` | Only means something once the recordings are in |
+| 7 | **Say it and listen back:** the student records their own voice and plays it against the teacher's, **in every lesson** | `ui-ux-pro-max`, `minimalist-ui` | **Specified 2026-09-22 in `docs/your-voice/`, not built.** *Was step 10;* moved here at the user's request — *"i want it in every lesson, because thats important"* — so lessons 6–14 are born with it instead of being retrofitted |
+| 8 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | Was step 7 |
+| 9 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Was step 8. Answered 2026-09-20: **jazam stays last**, after leen |
+| 10 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Was step 9. Each lesson adds its rows to the recording list as it's built |
 | 11 | **Finish screen:** a mark for each finished lesson, and a last screen pointing to one-to-one lessons | `minimalist-ui` | |
 | 12 | **Polish:** spacing, lettering, motion | `high-end-visual-design` | |
 | 13 | **Audit and connect:** keyboard, screen readers, phones, MASTER.md's checklist; options panels and `recordings.html` removed; a licensed Indo-Pak font in place of the Noto Naskh stand-in | `web-design-guidelines` | The landing page's three Free Qaida links were pointed at `qaida/` early, 2026-09-18 |
@@ -291,6 +301,50 @@ first at whether the mark renders *attached, under the letter* — **ب ي ج** 
 and **ط ظ**, which should be the cleanest — in both faces and both themes; then whether anything is clipped at the bottom of a
 tile, and whether the halo sits on the mark. `design-system/quran-landing/pages/qaida.md` is not updated: it is written once the
 user has seen the page.
+
+### Step 7 planned — say it and listen back
+
+*2026-09-22. The user: "i wanted to have a way to record audio, so that the student could play back and match his
+pronounciation with the audio. i want it in every lesson, because thats important."*
+
+**Specified, not built.** `docs/your-voice/` is ten files in the shape of `docs/lesson-4/`; its `README.md` gives the
+read order and `09-open-questions.md` is the one to read first. Nothing was written to `site/`.
+
+**It was step 10 and is now step 7** (old steps 7, 8 and 9 each move down one; steps 11–13 keep their numbers, so the
+options panels and `recordings.html` still go at step 13). The reason is the one that pulled sound and tracing forward
+on 2026-09-18: lessons 6–14 are not written, and a thing that must be in *every* lesson is one block copied into nine
+new pages if it is built now, or a retrofit of fourteen if it is built at the end. **Recommended order: this, then
+Lesson 6** — Lesson 6 is a thin page that `mark-lesson.js` already serves, so it costs nothing to let it be born with
+the block.
+
+**What it is.** A `<dialog class="echo">` and `voice.js`, built the way `trace.js` is: a top-bar **Say it** button in
+every lesson, a second one beside **Hear it** on whatever letter is in front of you, and a panel with two lanes — the
+teacher and you — a big record button, and "One after the other". `practice.js`, `shell.js`, `marks.js` and
+`shapes.js` do not change; lessons 2, 3 and the three mark lessons gain one handler each beside their existing
+`.hear` one, so `mark-lesson.js`'s single line covers lessons 4, 5 **and 6**.
+
+**Three rules it is built under**, each written where it happens:
+1. **Nothing is scored.** No percentage, no tick, no "try again". The honest tools for scoring pronunciation would be
+   wrong most often on exactly ع ح ق ص ض ط ظ ء — the letters a beginner most needs encouragement through — and it is
+   the same rule `trace.js` already lives under, for a stronger reason. Two waveforms drawn the same way are allowed,
+   because they show length and stress without making a claim; a row in the options panel turns them off.
+2. **It never leaves the device.** IndexedDB, not `localStorage` (which is where the student's progress lives, and one
+   oversized clip would lose it). No upload, no endpoint, no `fetch` in either new file — and the check script asserts
+   that by reading them.
+3. **The microphone is asked for once, on a tap**, never on load, and every track is stopped and the `AudioContext`
+   closed on stop and on close. A recording indicator still lit after the panel closes is the first item on the user's
+   preview checklist.
+
+**The catch, and it is the whole of `09-open-questions.md` §1.** `audio/manifest.json` is still empty — `letters: {}`,
+`fatha: {}`, `kasra: {}` — so there is nothing to match *against*. Half the feature (record, hear yourself, keep it)
+works with an empty manifest; the half the user described does not. The ask is small and specific: **the 29 letter
+names, one sitting**, which turns it on across lessons 1, 2 and 3 at once. The teacher's lane then appears per letter
+with no release, exactly as `audio.js` already works.
+
+**Five questions, none blocking**, each with a recommendation that is built and is one row from being changed:
+where the button lives, whether a student can send a recording to the teacher (**recommended: no** — and if ever,
+"save it to my device", not an upload), whether the advice strip gets one, whether the letter tiles get a second mark,
+and whether the recordings are easier taken letter by letter than lesson by lesson.
 
 ### Step 6 planned (Lesson 5) — the mark below
 

@@ -18,7 +18,7 @@ before asking about it.
 | No red for a wrong answer | **"Okay"** | `04-page-and-design.md` §5 |
 | "Trace it" after a miss | Asked what a trace is (writing over a faint letter, step 3). Which led to the next row | |
 | **A writing board in every lesson** | **"Add a board in every lesson — we don't know when someone would need to write."** A **Board** button in the top bar of every lesson opens a blank board at any time; "Trace it" after a miss stays as a shortcut to the letter just missed. **Every later lesson copies the button and the tracer dialog from `lesson-2.html`** | `trace.js` free mode; `.open-board` |
-| Screen readers | The user did not know the term (software that reads a page aloud, used by blind and low-vision people). **Claude's call:** nothing switches automatically; the "hear it, pick the letter" format is built and opens for everyone once recordings exist; revisit at step 9 | `06-accessibility.md` §6 |
+| Screen readers | The user did not know the term (software that reads a page aloud, used by blind and low-vision people). **Claude's call:** nothing switches automatically; the "hear it, pick the letter" format is built and opens for everyone once recordings exist; revisit at step 10 (was step 9 until 2026-09-22) | `06-accessibility.md` §6 |
 | Wording | **"Don't make wordings harsh."** All of it rewritten softer; see `05-wording.md`. The user reads them once they can see them | every line has a text field |
 
 ## Still open

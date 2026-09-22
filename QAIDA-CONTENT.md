@@ -105,5 +105,5 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
 
 - **Jazam after leen (items 10–13 before 14)** — **answered 2026-09-20: keep jazam last.** Leen is memorized as a
   pattern first and jazam then generalizes the rule to any letter, which is also how a printed Qaida orders it.
-  The "Ask first" note on `QAIDA-BUILD.md` step 8 is settled.
+  The "Ask first" note on `QAIDA-BUILD.md` step 9 (was step 8 until 2026-09-22) is settled.
 - **Interleaving scope** — answered 2026-09-19; see **Decided** above.

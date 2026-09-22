@@ -37,7 +37,7 @@ every lesson's top bar now carries. Lesson 1 got the button too.
 
 **No edit at all:** `trace.js`, `audio.js`, `recordings.js`, `recordings.html`, `audio/manifest.json`. Lesson 2
 wants **no new recordings** — it reuses `kind: 'letters'`, and one clip already serves both scripts because
-`shell.keyOf` folds ک ہ ی onto ك ه ي. Worth saying out loud, because `QAIDA-BUILD.md` step 9 says each lesson adds
+`shell.keyOf` folds ک ہ ی onto ك ه ي. Worth saying out loud, because `QAIDA-BUILD.md` step 10 (was step 9 until 2026-09-22) says each lesson adds
 its rows to the recording list, and this one does not.
 
 ## 3. Records to update when the code exists
