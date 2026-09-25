@@ -32,8 +32,17 @@ qalqalah, etc.), and connected reading are a later pass — not in this document
 5. **Zair** — lesson + exercise. Exercise pool mixes in zabar review items; zair items are
    mandatory (must get right), review items aren't the gate.
 6. **Paish** — lesson + exercise. Exercise pool mixes in zabar + zair review; paish items
-   mandatory.
-7. **Tanween** — fathatain / kasratain / dammatain.
+   mandatory. Specified 2026-09-21 in `docs/lesson-6/`, which holds only what is new on top of `docs/lesson-4/` and
+   `docs/lesson-5/`. The mixing-in is the lesson: paish sits in the **same place** as zabar and differs only in shape,
+   so a pool of paish alone is answerable by last lesson's skill. `docs/lesson-6/06` §0 asks whether to build it before
+   lessons 4 and 5 have been previewed.
+7. **Tanween** — fathatain / kasratain / dammatain, or do zabar / do zair / do paish. Specified 2026-09-21 in
+   `docs/lesson-7/`, which holds only what is new on top of lessons 4–6. One idea, three shapes: **the mark
+   written twice adds an *n*** (بَ "ba" → بً "ban"), so it teaches no new place and no new stroke, and it doubles
+   as the revision of lessons 4–6. The first lesson with **more than one mark**, one per part, then all the
+   letters. The two scripts' difference here is **font-only** — same three code points, stacked in Indo-Pak and
+   side by side in Madani — so it cannot show until the Indo-Pak font blocker above is fixed.
+   `docs/lesson-7/06` §0 says it should not be built until lessons 4, 5 and 6 have been previewed.
 8. **Zabar + alif** (madd — long aa).
 9. **Standing harakaat** — khari zabar, khari zair, ulta paish (diacritic-only forms of
    the same three long vowels, no full letter).

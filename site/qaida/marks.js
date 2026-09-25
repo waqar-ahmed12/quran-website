@@ -11,21 +11,23 @@
 (() => {
   // `first`: the six letters a student meets the mark on. They are chosen for THIS mark (docs/lesson-5/02 §3): the ones whose
   // shape stays out of its way. Above and below are not the same six. `sample` is the one letter that stands for the lesson
-  // in the title and on the rail. `after`: the mark this lesson is shown against, whose letters ride along as the wrong
-  // answers (docs/lesson-5/03 §2); the first mark has none.
+  // in the title and on the rail. `against`: the marks this lesson is shown against, in the order they were taught; their
+  // letters ride along as the wrong answers (docs/lesson-5/03 §2, docs/lesson-6/03 §1). The first mark has none, the third
+  // has two, and the FIRST of the list is the nearest contrast: paish's is zabar (same place, another shape), not the zair
+  // that happens to come just before it.
   const MARKS = {
     fatha: {
       id: 'fatha', cp: 0x064E, names: { fatha: 'fatha', zabar: 'zabar' }, sits: 'above', lesson: 4, audio: 'fatha',
-      first: ['ب', 'د', 'ر', 'س', 'م', 'ل'], sample: 'ب', after: null,
+      first: ['ب', 'د', 'ر', 'س', 'م', 'ل'], sample: 'ب', against: [],
     },
     kasra: {
       id: 'kasra', cp: 0x0650, names: { fatha: 'kasra', zabar: 'zair' }, sits: 'below', lesson: 5, audio: 'kasra',
       // None has a dot underneath and none dips below the line, so the mark sits in clear space. د is also in fatha's six.
-      first: ['ا', 'د', 'ت', 'ط', 'ك', 'ه'], sample: 'د', after: 'fatha',
+      first: ['ا', 'د', 'ت', 'ط', 'ك', 'ه'], sample: 'د', against: ['fatha'],
     },
     damma: {
       id: 'damma', cp: 0x064F, names: { fatha: 'damma', zabar: 'paish' }, sits: 'above', lesson: 6, audio: 'damma',
-      first: ['ب', 'د', 'ر', 'س', 'م', 'ل'], sample: 'ب', after: 'kasra',
+      first: ['ب', 'د', 'ر', 'س', 'م', 'ل'], sample: 'ب', against: ['fatha', 'kasra'],
     },
   };
 
@@ -42,12 +44,17 @@
   const cap = (text) => (text ? text[0].toUpperCase() + text.slice(1) : '');
   // {mark} zabar, {Mark} Zabar, {name} Baa. Anything else is left as written, so a stray brace shows itself.
   const fill = (text, values) => String(text || '').replace(/\{(\w+)\}/g, (whole, key) => (key in values ? values[key] : whole));
-  // {other} is the mark this one is shown against ("the same stroke as zabar"), in the student's own word for it.
-  const otherOf = (mark) => (mark.after ? MARKS[mark.after] : null);
+  // {other} is the mark this one is shown against ("the same stroke as zabar"), in the student's own word for it; {others} is all
+  // of them, "zabar and zair". The joiner is English and lives here so that one text field serves a line naming both.
+  const othersOf = (mark) => (mark.against || []).map((id) => MARKS[id]).filter(Boolean);
+  const otherOf = (mark) => othersOf(mark)[0] || null;
   function wordsFor(mark, shell) {
-    const other = otherOf(mark);
-    const otherName = other ? nameOf(other, shell) : '';
-    return { mark: nameOf(mark, shell), Mark: cap(nameOf(mark, shell)), other: otherName, Other: cap(otherName) };
+    const names = othersOf(mark).map((m) => nameOf(m, shell));
+    const list = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0] || '';
+    const first = names[0] || '';
+    return {
+      mark: nameOf(mark, shell), Mark: cap(nameOf(mark, shell)), other: first, Other: cap(first), others: list, Others: cap(list),
+    };
   }
 
   const TEMPLATES = { marked: '{name} with {mark}', bare: '{name}' };
@@ -106,31 +113,33 @@
   // against below (baa with zair against baa with zabar), and bare against marked is one the student already has (docs/lesson-5/03 §2). `keys` says
   // which letters, deterministically: the open part's own, so every item has its twin. They are review, never required, and
   // group 0, so sizes(), stats() and poolFor() never count them. The id ends in the other mark, so it cannot collide with an
-  // item of this lesson's or with a bare letter.
+  // item of this lesson's or with a bare letter. `marks` says which of the other marks to build from: the page decides (a lesson
+  // with two of them may want one twin per letter, docs/lesson-6/03 §4) and this builds what it is told. Default: all of them.
   function twinItems(shell, mark, options = {}) {
-    const { keys = [], templates = TEMPLATES, distractors = 'which-mark', looks = [] } = options;
-    const other = otherOf(mark);
-    if (!other || !keys.length) return [];
-    const words = wordsFor(other, shell);
+    const { keys = [], templates = TEMPLATES, distractors = 'which-mark', looks = [], marks: wanted = othersOf(mark) } = options;
+    if (!wanted.length || !keys.length) return [];
     const names = new Map(shell.lettersOf().map(([glyph, name]) => [shell.keyOf(glyph), { glyph, name }]));
-    return keys.filter((key) => names.has(key)).map((key) => {
-      const { glyph, name } = names.get(key);
-      return {
-        id: key + String.fromCharCode(other.cp),
-        glyph: glyphOf(glyph, other),
-        name: fill(templates.marked, { ...words, name }),
-        family: familyFor(key, distractors, looks),
-        audio: { kind: other.audio, glyph }, // the other mark's SOUND, "ba", not the letter's name
-        required: false,
-        traceable: true,
-        base: glyph,
-        key,
-        letterName: name,
-        markName: words.mark, // the OTHER mark's word: the verdict names what the letter actually carries
-        marked: true,
-        mark: other.id,
-        group: 0,
-      };
+    return wanted.flatMap((other) => {
+      const words = wordsFor(other, shell);
+      return keys.filter((key) => names.has(key)).map((key) => {
+        const { glyph, name } = names.get(key);
+        return {
+          id: key + String.fromCharCode(other.cp),
+          glyph: glyphOf(glyph, other),
+          name: fill(templates.marked, { ...words, name }),
+          family: familyFor(key, distractors, looks),
+          audio: { kind: other.audio, glyph }, // the other mark's SOUND, "ba", not the letter's name
+          required: false,
+          traceable: true,
+          base: glyph,
+          key,
+          letterName: name,
+          markName: words.mark, // the OTHER mark's word: the verdict names what the letter actually carries
+          marked: true,
+          mark: other.id,
+          group: 0,
+        };
+      });
     });
   }
 
@@ -148,15 +157,15 @@
     };
     prefer.forEach(take);
 
-    // Mixed review reaches back two lessons (docs/lesson-5/03 §2): the letters missed in Lesson 2, and, when this mark has
-    // one before it, the letters missed there. That lesson's ids are the letter and its mark, so a letter is the first character.
-    const before = mark && otherOf(mark) ? shell.drillOf(otherOf(mark).lesson) : null;
-    const suffix = mark && otherOf(mark) ? String.fromCharCode(otherOf(mark).cp) : '';
+    // Mixed review reaches back (docs/lesson-5/03 §2, docs/lesson-6/03 §6): the letters missed in Lesson 2, and, when this mark
+    // has others before it, the letters missed in each of those lessons. Their ids are the letter and its mark, so a letter is
+    // the first character.
+    const earlier = (mark ? othersOf(mark) : []).map((m) => ({ rec: shell.drillOf(m.lesson), suffix: String.fromCharCode(m.cp) }));
     const shaky = (rec, id) => (rec.wrong[id] || 0) > 0 && (rec.streak[id] || 0) < (rec.target || 3);
     const hard = keys
       .map((key, i) => {
         let wrong = shaky(record, key) ? record.wrong[key] : 0;
-        if (before && shaky(before, key + suffix)) wrong += before.wrong[key + suffix];
+        for (const { rec, suffix } of earlier) if (shaky(rec, key + suffix)) wrong += rec.wrong[key + suffix];
         return { key, i, wrong };
       })
       .filter((entry) => entry.wrong > 0)
@@ -238,15 +247,15 @@
     return { total, known, toFix, ready };
   }
 
-  // The board: one row per letter of the group, the bare letter beside the marked one. `other` is the same letter with the
-  // mark this lesson is shown against (empty for the first mark), so the board can show where the stroke moved.
+  // The board: one row per letter of the group, the bare letter beside the marked one. `others` is the same letter with each mark
+  // this lesson is shown against, in the order they were taught (empty for the first mark), so the board can show the family.
   function boardRows(shell, mark, group) {
-    const other = otherOf(mark);
+    const others = othersOf(mark);
     return shell.lettersOf()
       .filter(([glyph]) => inGroup(shell.keyOf(glyph), group, mark))
       .map(([glyph, name]) => ({
         key: shell.keyOf(glyph), glyph, name, marked: glyphOf(glyph, mark), joined: joinedOf(glyph, mark),
-        other: other ? glyphOf(glyph, other) : '',
+        others: others.map((m) => ({ id: m.id, glyph: glyphOf(glyph, m), name: nameOf(m, shell) })),
       }));
   }
 
@@ -260,7 +269,7 @@
 
   window.qaidaMarks = {
     MARKS, TEMPLATES, GROUP_ONE, COUNT, DRILLING,
-    markOf, otherOf, nameOf, glyphOf, aloneOf, joinedOf, wordsFor, fill, cap,
+    markOf, otherOf, othersOf, nameOf, glyphOf, aloneOf, joinedOf, wordsFor, fill, cap,
     inGroup, groupOf, allItems, twinItems, reviewItems, reviewKeys, poolFor, rename, sizes, stats, boardRows, sampleOf,
   };
 })();

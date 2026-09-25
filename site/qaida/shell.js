@@ -113,7 +113,7 @@
       lede: 'The short “a”, written above the letter.' },
     { n: 5, title: { fatha: 'Kasra', zabar: 'Zair' }, href: 'lesson-5.html', built: true, progress: 'drill', cp: 0x0650,
       lede: 'The short “i”, written under the letter.' },
-    { n: 6, title: { fatha: 'Damma', zabar: 'Paish' },
+    { n: 6, title: { fatha: 'Damma', zabar: 'Paish' }, href: 'lesson-6.html', built: true, progress: 'drill', cp: 0x064F,
       lede: 'The short “u”, written above the letter.' },
     { n: 7, title: { fatha: 'Tanween', zabar: 'Tanween' },
       lede: 'The doubled marks: an, in and un at the end of a word.' },

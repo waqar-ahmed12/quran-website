@@ -100,22 +100,45 @@
   const readyAt = () => (drill ? drill.settings.readyAt : 0.8);
   // A mark with nothing before it (the first) has no "other mark" to be told apart from, so which-mark falls back to the
   // look-alike wrong answers there instead of asking a question with no contrast in it.
+  const others = marks.othersOf(mark);
   const other = marks.otherOf(mark);
   const distractors = () => {
     const wanted = root.dataset.distractors;
     if (wanted === 'which-mark') return other ? 'which-mark' : 'look-alike';
     return ['mark-or-not', 'any'].includes(wanted) ? wanted : 'look-alike';
   };
-  // The other mark's letters ride along as wrong answers unless the teacher turns them off (docs/lesson-5/06 §2).
-  const twinsOn = () => Boolean(other) && root.dataset.twins !== 'off';
+  // The other marks' letters ride along as wrong answers unless the teacher turns them off (docs/lesson-5/06 §2).
+  //   alternate: one twin per letter, zabar or zair by turns, flipping between the parts, so the review stays the size
+  //              Lesson 5 measured (docs/lesson-6/03 §4). With only one other mark this is the same as `both`.
+  //   both:      every letter against every other mark. `on` is the old word for it and still works: it may be in a
+  //              teacher's exported setting.txt.
+  const twinMode = () => {
+    if (!others.length || root.dataset.twins === 'off') return 'off';
+    return root.dataset.twins === 'alternate' ? 'alternate' : 'both';
+  };
+  const twinsOn = () => twinMode() !== 'off';
   const reviewCount = () => {
     const n = Math.round(Number(root.dataset.review));
     // None unless the teacher asks: the user, 2026-09-20, "don't add simple alphabets without symbols". A plain letter is a
     // different question from the mark this lesson is about, and it was coming up as much as the marked ones.
     return Number.isFinite(n) ? Math.min(16, Math.max(0, n)) : 0;
   };
-  // The trio (the letter, the letter with the other mark, the letter with this one) needs an other mark to show.
-  const boardMode = () => (root.dataset.board === 'marked' ? 'marked' : root.dataset.board === 'trio' && other ? 'trio' : 'pairs');
+  // The trio (the letter, the letter with the other mark, the letter with this one) needs an other mark to show, and the quartet
+  // (all of the marks taught so far) needs two; a board asked for and not available falls back one step, so a value typed into
+  // another lesson's panel gives that lesson's own board rather than a broken one (docs/lesson-6/04 §3).
+  const boardMode = () => {
+    const wanted = root.dataset.board;
+    if (wanted === 'marked') return 'marked';
+    if (wanted === 'quad' && others.length > 1) return 'quad';
+    if ((wanted === 'quad' || wanted === 'trio') && other) return 'trio';
+    return 'pairs';
+  };
+  // An arrow before a tile says "and now with this mark". Three in a row is noise, so a quartet draws only the last, the mark
+  // the lesson is about, unless the teacher says otherwise. The trio and the pairs keep every arrow they always had.
+  const arrowBefore = (index, count) => {
+    const wanted = root.dataset.arrows || (boardMode() === 'quad' ? 'last' : 'all');
+    return wanted === 'none' ? false : wanted === 'last' ? index === count - 1 : true;
+  };
   // Whose stroke an item carries. A twin and a bare letter are review: never advice, never counted, never the gate.
   const isOwn = (item) => Boolean(item) && item.mark === mark.id;
   const pointMode = () => (['none', 'tint'].includes(root.dataset.point) ? root.dataset.point : 'halo');
@@ -228,9 +251,27 @@
     const own = marks.poolFor(items, n);
     const plan = reviewPlan(own);
     const options = { templates: templates(), distractors: distractors(), looks: lookAlikes() };
-    const twins = plan.twins ? marks.twinItems(shell, mark, { ...options, keys: own.map((item) => item.key) }) : [];
+    const twins = plan.twins ? twinsFor(own, n, options) : [];
     const bare = marks.reviewItems(shell, mark, { ...options, count: plan.bare, prefer: plan.prefer });
     return [...own, ...twins, ...bare];
+  }
+
+  // Which of the other marks each letter is told apart from. Every own item still has exactly one same-letter twin at least,
+  // which is what the engine's familyFirst needs to make one wrong answer "the same letter, another mark". When alternating, the
+  // mark for a letter is chosen by its place in a teaching order that does not depend on the part (the mark's own six, then the
+  // rest), plus the part: so part 1 is balanced, and every letter drilled against zabar in part 1 meets zair in part 2
+  // (docs/lesson-6/03 §4). With one other mark this is every letter against it, as Lesson 5 always was.
+  function twinsFor(own, n, options) {
+    const keysBy = new Map();
+    const every = shell.lettersOf().map(([glyph]) => shell.keyOf(glyph));
+    const order = [...mark.first, ...every.filter((key) => !mark.first.includes(key))];
+    own.forEach((item) => {
+      const at = Math.max(0, order.indexOf(item.key));
+      for (const m of twinMode() === 'alternate' ? [others[(at + n) % others.length]] : others) {
+        keysBy.set(m, [...(keysBy.get(m) || []), item.key]);
+      }
+    });
+    return [...keysBy].flatMap(([m, keys]) => marks.twinItems(shell, mark, { ...options, keys, marks: [m] }));
   }
 
   // How many questions must pass before the same letter can come back. The engine's own is at most 3, which in a part of six
@@ -338,9 +379,10 @@
 
   // A letter as a tile. Its container carries the name and the letter itself is hidden from a screen reader: a combining
   // mark is not reliably announced (docs/lesson-4/06 §1), so the name is built from the same template the sighted student reads.
-  // `kind` is 'bare', 'marked' (this lesson's stroke, the one that is pointed at) or 'other' (the stroke it is shown against).
-  function markTile(kind, letter, label) {
-    const strokeOf = kind === 'marked' ? mark : kind === 'other' ? other : null;
+  // `kind` is 'bare', 'marked' (this lesson's stroke, the one that is pointed at) or 'other' (a stroke it is shown against:
+  // `stroke` says which, for a board with more than one).
+  function markTile(kind, letter, label, stroke) {
+    const strokeOf = kind === 'marked' ? mark : kind === 'other' ? stroke || other : null;
     const button = el('button', `letter mark-tile ${kind}`);
     button.type = 'button';
     button.dataset.kind = kind;
@@ -496,9 +538,9 @@
     });
   }
 
-  function pairCell(kind, letter, label, caption) {
+  function pairCell(kind, letter, label, caption, stroke) {
     const cell = el('div', `pair-cell ${kind}`);
-    cell.append(markTile(kind, letter, label), el('span', 'pair-caption', caption));
+    cell.append(markTile(kind, letter, label, stroke), el('span', 'pair-caption', caption));
     cell.lastChild.setAttribute('aria-hidden', 'true');
     return cell;
   }
@@ -507,9 +549,12 @@
     const words = templates();
     const bare = fill(words.bare, { name: row.name });
     const withMark = say(words.marked, { name: row.name });
-    // The trio shows where the stroke moved: the letter, then with the mark of the lesson before, then with this one.
-    const trio = boardMode() === 'trio';
-    const pair = el('div', `pair${feature ? ' feature' : ''}${trio ? ' trio' : ''}`);
+    // The trio shows where the stroke moved: the letter, then with the mark of the lesson before, then with this one. The quartet
+    // is the same with every mark taught so far, in the order they were taught; the trio of a lesson with two of them shows the
+    // nearest, which is the first.
+    const board = boardMode();
+    const middle = board === 'quad' ? row.others : board === 'trio' ? row.others.slice(0, 1) : [];
+    const pair = el('div', `pair${feature ? ' feature' : ''}${board === 'trio' || board === 'quad' ? ` ${board}` : ''}`);
     pair.setAttribute('role', 'listitem');
     pair.dataset.key = row.key;
     if (boardMode() === 'marked' && !feature) {
@@ -521,13 +566,16 @@
       return pair;
     }
     pair.append(pairCell('bare', row.glyph, bare, labels ? labels.bare : bare));
-    if (trio) {
-      // The other mark's own word, not this lesson's: "Baa with zabar" beside "Baa with zair".
-      const withOther = say(words.marked, { name: row.name, mark: marks.wordsFor(other, shell).mark });
-      pair.insertAdjacentHTML('beforeend', ARROW);
-      pair.append(pairCell('other', row.glyph, withOther, labels ? labels.other : withOther));
-    }
-    pair.insertAdjacentHTML('beforeend', ARROW);
+    const count = middle.length + 1;
+    middle.forEach((one, i) => {
+      // That mark's own word, not this lesson's: "Baa with zabar" beside "Baa with zair". The caption's {other} is this column's.
+      const stroke = marks.markOf(one.id);
+      const withOther = say(words.marked, { name: row.name, mark: one.name });
+      const caption = labels ? say(labels.other, { other: one.name, Other: marks.cap(one.name) }) : withOther;
+      if (arrowBefore(i, count)) pair.insertAdjacentHTML('beforeend', ARROW);
+      pair.append(pairCell('other', row.glyph, withOther, caption, stroke));
+    });
+    if (arrowBefore(count - 1, count)) pair.insertAdjacentHTML('beforeend', ARROW);
     pair.append(pairCell('marked', row.glyph, withMark, labels ? labels.marked : withMark));
     return pair;
   }
@@ -545,7 +593,8 @@
     featureBox.textContent = '';
     if (rows.length) {
       featureBox.append(pairOf(rows[0], {
-        feature: true, labels: { bare: say(words.pairBare), other: say(words.pairOther), marked: say(words.pairMarked) },
+        // `other` is the template: each middle column fills its own {other}.
+        feature: true, labels: { bare: say(words.pairBare), other: words.pairOther, marked: say(words.pairMarked) },
       }));
     }
     featureBox.append(el('p', 'mark-does', say(words.markDoes)));
@@ -1030,7 +1079,7 @@
   }
 
   const shapeOf = () => [
-    shell.state.script, mark.id, distractors(), reviewCount(), twinsOn(), lookAlikes().map((list) => list.join('')).join(','),
+    shell.state.script, mark.id, distractors(), reviewCount(), twinMode(), lookAlikes().map((list) => list.join('')).join(','),
   ].join('|');
 
   function build() {
@@ -1135,8 +1184,12 @@
     },
     // Whether there is a mark before this one to be told apart from, and whether its letters are riding along.
     hasOther: Boolean(other),
+    otherCount: others.length,
     get twins() {
       return twinsOn();
+    },
+    get twinMode() {
+      return twinMode();
     },
     setPause(ms) {
       pause = ms;

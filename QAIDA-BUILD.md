@@ -30,6 +30,24 @@ thing genuinely new is that **Lesson 4's zabar items ride along as the wrong ans
 answerable by noticing that a mark exists, which the student learnt last lesson. **Step 6 is still not done:** Lesson 6
 (paish) is to come, and the user has to preview lessons 4 and 5.
 
+**Step 6, Lesson 6 (paish), is built, and not yet seen in a browser** (2026-09-21, the user: "next lesson plan is up, build it
+up"). See "Step 6 built (Lesson 6)" below for what it is and where it differs. **Step 6 is still not done until lessons 4, 5 and
+6 have all been previewed.** It was specified the same day ("plan the next lesson"): `docs/lesson-6/`
+is the specification, seven files, and it holds only what is new on top of `docs/lesson-4/` and `docs/lesson-5/`. Paish
+sits **above** the letter like zabar, so it needs **no new CSS** and carries none of Lesson 5's risk. The one genuinely
+new thing: **`after` (one mark) becomes `against` (a list)** — Lesson 6 is told apart from **zabar and zair at once**,
+and `marks.js`'s `after: 'kasra'` points at the wrong contrast (paish's hard one is zabar: same place, different shape).
+`docs/lesson-6/06` §0 asks whether to build it now or after lessons 4 and 5 have been looked at.
+
+**Step 7, Lesson 7 (tanween), is specified, not built** (2026-09-21, the user: "i guess plan next lesson"):
+`docs/lesson-7/` is the specification, seven files, and it holds only what is new on top of `docs/lesson-4/`,
+`docs/lesson-5/` and `docs/lesson-6/`. **It should not be built yet, and this is a plain no rather than a
+preference** (`docs/lesson-7/06` §0): Lesson 6's blocking question — *can you tell بَ from بُ at the tile's size?* —
+is unanswered, and Lesson 7 asks the student to tell **بَ from بً**, the same stroke once against twice. If the tile
+is too small, the fix is in `qaida.css` and `mark-lesson.js`, the two files Lesson 7 leans on hardest. **Four
+lessons now wait on one browser session.** What is genuinely new: **a lesson can hold more than one mark**
+(three doubled marks, one per part, then all the letters), which Lesson 9 needs again.
+
 ## Decisions
 
 | Question | Answer (the user, 2026-09-14) |
@@ -67,8 +85,8 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 3 | **Trace the letters** with a finger, mouse or pen, inside Lesson 1 | `minimalist-ui`, `high-end-visual-design` | **Built, awaiting sign-off.** Was step 9 |
 | 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Built, awaiting sign-off** (2026-09-19). Specified in `docs/lesson-2/`; `README.md` there lists where the code differs. Check: `node tools/qaida-check.js` |
 | 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | **Built, awaiting sign-off** (2026-09-20). Six groups and a table; `docs/lesson-3/README.md` lists where the code differs. Checks: `node tools/qaida-check.js`, `node tools/qaida-lesson3-check.js`. **The joined shapes have not been seen rendering** — that is the first thing to look at |
-| 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 4 built 2026-09-20, awaiting the user's preview** (`docs/lesson-4/` is the spec; `README.md` there lists where the build differs). **Lesson 5 built 2026-09-20, awaiting the user's preview** (`docs/lesson-5/` — the differences only; it assumes `docs/lesson-4/`; `README.md` there lists where the build differs). Lesson 6 not started. One page file, `mark-lesson.js`, serves all three lessons. Mixed review carries through every later lesson (2026-09-19). Checks: `node tools/qaida-check.js`, `qaida-marks-check.js` (Lesson 4's page), `qaida-lesson5-check.js`, `qaida-lesson3-check.js` |
-| 7 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | |
+| 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 4 built 2026-09-20, awaiting the user's preview** (`docs/lesson-4/` is the spec; `README.md` there lists where the build differs). **Lesson 5 built 2026-09-20, awaiting the user's preview** (`docs/lesson-5/` — the differences only; it assumes `docs/lesson-4/`; `README.md` there lists where the build differs). **Lesson 6 built 2026-09-21, awaiting the user's preview** ("next lesson plan is up, build it up" — taken as a yes to `docs/lesson-6/06`'s recommendations, including §0: built before 4 and 5 were previewed; `docs/lesson-6/` is the spec, seven files). One page file, `mark-lesson.js`, serves all three lessons. Mixed review carries through every later lesson (2026-09-19). Checks: `node tools/qaida-check.js`, `qaida-marks-check.js` (Lesson 4's page), `qaida-lesson5-check.js`, `qaida-lesson3-check.js` |
+| 7 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 7 specified 2026-09-21, not built** — `docs/lesson-7/`, seven files, the differences only. **Do not build before lessons 4–6 have been previewed** (`docs/lesson-7/06` §0). The scripts' difference is **font-only**: same three code points, drawn stacked in Indo-Pak and side by side in Madani, so it cannot show until the Indo-Pak font blocker is fixed at step 13 (`docs/lesson-7/02` §5) |
 | 8 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Answered 2026-09-20: **jazam stays last**, after leen |
 | 9 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Each lesson adds its rows to the recording list as it's built |
 | 10 | **Record your own voice** and play it back against the teacher's | `ui-ux-pro-max`, `minimalist-ui` | Only means something once the recordings are in |
@@ -291,6 +309,117 @@ first at whether the mark renders *attached, under the letter* — **ب ي ج** 
 and **ط ظ**, which should be the cleanest — in both faces and both themes; then whether anything is clipped at the bottom of a
 tile, and whether the halo sits on the mark. `design-system/quran-landing/pages/qaida.md` is not updated: it is written once the
 user has seen the page.
+
+### Step 6 built (Lesson 6) — the third mark, and two marks riding along
+
+*2026-09-21. The user: "next lesson plan is up, build it up."*
+
+**Built.** `lesson-6.html` (Lesson 5's page with `data-mark="damma"`, `data-twins="alternate"`, `data-board="quad"`,
+`data-arrows="last"` and its own wording), and edits to `marks.js` (`after` → `against`, a list; `othersOf`; `{others}`;
+`twinItems` takes `marks`; `reviewKeys` reaches back to lessons 4 *and* 5; `boardRows` returns `others`), `mark-lesson.js`
+(`twinMode`, `twinsFor`, `boardMode` learns `quad`, `arrowBefore`, `pairOf` loops the middle cells), `shell.js` (Lesson 6's row),
+`qaida.css` (`.pair.quad` and its narrow-screen rule, nothing else — no `[data-sits='above']`, `.mark-tile` untouched),
+`qaida-options.js` (the three-way twins row, `quartet` on the board row, an arrows row) and `audio/manifest.json`
+(`"damma": {}`). `practice.js` did not change. Lessons 4 and 5 come out identical: their `against` is `[]` and `['fatha']`.
+
+**Where it differs from `docs/lesson-6/`:**
+1. **The alternation is by a teaching order, not by position in the open part.** The spec's `others[(i + group) % n]` with `i`
+   the index inside the part gives a letter a different `i` in part 2 (ب is 0 of 6, then 1 of 29), so it would not flip.
+   `twinsFor` orders the letters as the mark's own six then the rest, and picks `(place + part) % n`: part 1 is balanced
+   (three zabar, three zair), and every letter really does meet the other mark in part 2.
+2. **`trio` on Lesson 6 shows the nearest mark (zabar)**, since the spec's panel keeps `trio` as a choice and does not say which.
+3. **`data-arrows`** is read by the page (`last` for the quartet, `all` otherwise; `none` works anywhere), and the panel row
+   appears only on a lesson with two earlier marks.
+4. **`boardRows` dropped `other`** for `others` as `03` §7 says; the two Lesson 5 assertions in `qaida-check.js` that read it were
+   updated, and are the only existing checks changed.
+5. **The line under the title is mine** ("A third mark, and the shape is what tells it apart.") and so is the end line
+   ("You can tell all three marks apart."), which is the spec's; both have their own text fields.
+
+**Checked, and passing:** `node --check` on every changed script; `node tools/qaida-check.js` (a new Lesson 6 block: `against`,
+the four distinct ids of one letter, 12 twins, counts of 29 not 87, `{others}` in both name sets, review reaching back to lessons 4
+and 5, the board's `others`, the engine finding a twin among the wrong answers); the new `node tools/qaida-lesson6-check.js`
+(the real page in a hand-made DOM, including alternation and its flip, both/off/`on`, a full run to finished at four fifths of the
+29, the name set switching all four columns, and the other script); and lessons 2, 3, 4 and 5's page checks unchanged.
+`qaida-lesson3-check.js` failed once on "the table asks about every group" and passed five reruns; it is random and Lesson 3's
+code was not touched. **Not seen in a browser** — the user previews it, and `docs/lesson-6/05` §4 is the list. Look first at
+whether **بَ and بُ can be told apart at the tile's size** (`05` §4 item 2), then the paish curl on **ث ش ل ج ح خ ع غ و**, then the
+quartet as a whole. `recordings.html` should now list 29 damma rows on its own. `design-system/quran-landing/pages/qaida.md` is
+not updated: it is written once the user has seen the pages.
+
+### Step 7 planned (Lesson 7) — tanween, and a lesson with three marks
+
+*2026-09-21. The user: "i guess plan next lesson."*
+
+**Specified, not built.** `docs/lesson-7/` is **seven files**, thin like `docs/lesson-5/` and `docs/lesson-6/`: it
+assumes all three earlier folders and holds only what is new. Nothing was written to `site/`.
+
+**Lesson 7 is one idea, three shapes.** ً ٌ ٍ (U+064B, U+064C, U+064D) are the marks of lessons 4–6 written twice,
+and each adds an *n*: بَ "ba" → بً "ban". Two sit above and one below, on the same six letters their single
+counterparts used.
+
+**The one thing genuinely new, and the only part with real code in it: a lesson can hold more than one mark.**
+`mark-lesson.js` reads one `mark` for the whole page — `mark.cp`, `mark.sits`, `mark.first`, `mark.audio`,
+`marks.COUNT` at two parts, one `cp` suffix in `shell.masteredCount`. So `marks.js` gains `SETS` (`data-mark="tanween"`
+resolves to a list), `partsOf` (one mark → the two parts lessons 4–6 already have; three marks → one part each, then
+all the letters), and an item carries `parts: [1, 4]` instead of a single `group`. **Lessons 4, 5 and 6 must come out
+identical, and that is the test** — the one-mark assertions are written first, before any new row exists.
+`docs/lesson-7/03`.
+
+**Four smaller findings**, each written where it happens: the twins change meaning **by part** — the single
+counterpart in a warm-up (*one or two?*), the other two tanweens in the last part (*which two?*), and getting that
+wrong quietly turns part 4 into part 1; the last part drills **29 letters, not 87** (one tanween each, by alphabet
+place; the board still shows all three); `:root[data-sits='below']` has to move to the tile, because part 4's board
+row carries marks above *and* below; and `markBox`/the halo must take the stroke they are drawing, or the ring is
+drawn correctly for the wrong mark.
+
+**The scripts' difference that step 7's row warns about is font-only.** Both scripts encode the same three
+characters; Indo-Pak stacks the two strokes and Madani sets them side by side. The Indo-Pak face here is the Noto
+Naskh stand-in (already a launch blocker), so an Indo-Pak student sees Madani tanween and **no code in this lesson
+can change that** — it is the font, at step 13. `docs/lesson-7/02` §5.
+
+**Six questions for the teacher.** §0 is the only blocking one and the answer is a plain **no, not yet**: Lesson 6's
+own blocking question (بَ against بُ at tile size) is unanswered, and this lesson's whole premise is a harder version
+of it. The rest: four parts or two (the arithmetic is the same 47 items either way), the Urdu names (*do zabar*?),
+all 29 letters or only the ones that really carry tanween, 87 recordings and whether to record letter-by-letter, and
+the "open" tanween (U+08F0–2), which is tajweed and out of this pass. `docs/lesson-7/06`.
+
+`design-system/quran-landing/pages/qaida.md` is untouched: it is written after the code exists and the user has seen it.
+
+### Step 6 planned (Lesson 6) — the third mark, and two marks riding along
+
+*2026-09-21. The user: "plan the next lesson."*
+
+**Specified, not built.** `docs/lesson-6/` is **seven files**, and like `docs/lesson-5/` it is deliberately thin: it
+assumes `docs/lesson-4/` (the engine contract, the page, the formats) and `docs/lesson-5/` (twins, `which-mark`, the
+board that shows where the stroke moved), and holds only what is new. `MARKS.damma` was written on 2026-09-20 with the
+rest. Nothing was written to `site/`.
+
+**Lesson 6 is the cheap one, and the plan says so.** Paish sits **above** the letter, so `[data-sits='below']` simply
+does not apply and Lesson 4's tile rules are already the right ones: **no new CSS except one `.pair.quad` rule**, and
+none of Lesson 5's below-the-line risk. `mark-lesson.js` still serves it through `<html data-mark="damma">`; there is no
+`lesson-6.js`; `practice.js` does not change.
+
+**The one thing that is genuinely new, and the only part with real code in it: `after` becomes `against`.** Today
+`marks.js` has `after: 'kasra'` on the damma row and `otherOf()` returns one mark. Both are wrong for this lesson.
+Paish's hard contrast is **zabar** — same place, different shape — not the zair that happens to come just before it; a
+lesson that rides only zair along is answerable by "is it above or below?", which the student learnt last lesson. And
+after Lesson 6 the student has to read بَ بِ بُ cold, which `QAIDA-CONTENT.md` item 6 already asked for ("paish items
+mandatory, zabar + zair review"). So `after` (a string) becomes **`against` (a list in lesson order)**, `otherOf` is its
+first entry, and lessons 4 and 5 come out identical — `[]` and `['fatha']`. `docs/lesson-6/03`.
+
+**Five smaller findings**, each written where it happens: two sets of twins would be **60% of part 1's questions**
+(Lesson 5 measured 45% with one), so the default is **one twin per letter, alternating, flipping between the parts**, with
+"both at once" a row in the panel; `{others}` is a second token ("zabar and zair") so one text field serves lines that
+name both; `boardRows`'s `other` becomes `others` and the board becomes a **quartet** (ب بَ بِ بُ), which makes `trio`
+and `quad` one code path and gives lessons 7, 9 and 14 theirs free; `reviewKeys` reaches back to lessons 4 *and* 5;
+and **paish is drawn as a miniature و**, which earns one line on the board and matters again in Lesson 11.
+
+**Six questions for the teacher**, none blocking. The first is the real one: **should Lesson 6 be built now, or after
+lessons 4 and 5 have been opened in a browser?** Three unpreviewed lessons share one page file, one stylesheet and one
+data file. Claude's recommendation: preview first — but Lesson 6 adds little risk of its own, so if the user wants all
+three in one sitting, build it. `docs/lesson-6/06-open-questions.md`.
+
+`design-system/quran-landing/pages/qaida.md` is untouched: it is written after the code exists and the user has seen it.
 
 ### Step 6 planned (Lesson 5) — the mark below
 

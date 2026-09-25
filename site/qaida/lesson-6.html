@@ -1,0 +1,443 @@
+<!doctype html>
+<!-- The free Qaida, Lesson 6 (QAIDA-BUILD.md, step 6): the third mark, above the letter again. Baa is a letter called Baa,
+     with zabar it is "ba", with zair "bi", and with paish "bu". Paish sits where zabar does and is told apart by its SHAPE,
+     which is the reverse of Lesson 5, so the letters with the earlier marks ride along as the wrong answers: one at a time by
+     default, both at once if the teacher wants the full three-way (docs/lesson-6/03 §4).
+     In two parts, six letters to meet the mark on and then all of them. It teaches no words. The engine is practice.js,
+     unchanged; the data layer is marks.js; the page's code is mark-lesson.js, which also serves lessons 4 and 5 (this file
+     differs from lesson-5.html only in data-mark, a few other attributes and its wording); the specification is
+     docs/lesson-6/, which holds only what is new on top of docs/lesson-4/ and docs/lesson-5/. The data- attributes on <html>
+     are the look; the options panel (qaida-options.js) changes them for tryouts.
+
+     The mark is a combining character and is never pasted into a file: it is composed by marks.js, and written here as a
+     numeric reference where it must be written at all, because a literal one is invisible in every editor and diff.
+     Every element that holds a marked letter is aria-hidden and its container carries the name: a screen reader would
+     otherwise say the letter and drop the mark, or read out the mark's Unicode name. -->
+<html lang="en"
+      data-mark="damma" data-tiles="paper" data-size="comfortable" data-group="1" data-band="1"
+      data-review="0" data-distractors="which-mark" data-twins="alternate" data-board="quad" data-arrows="last" data-point="halo"
+      data-ask="mark" data-choices="4" data-advance="auto" data-miss="trace" data-arrive="stagger" data-peek="under"
+      data-progress="title" data-bar="line" data-track="show" data-finish="settle"
+      data-titlemark="bu" data-titlemark-font="amiri" data-bg="light" data-madani-font="amiri"
+      data-indopak-font="noto">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6: Paish · Free Qaida</title>
+  <meta name="theme-color" content="#1F1A18">
+  <!-- Light or dark before the page draws: the choice made here or on the home page (same site, same storage),
+       otherwise dark, like the home page. -->
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      document.documentElement.dataset.theme = 'dark';
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- TRYOUT: Scheherazade New is only here for the lettering options; keep just the chosen Arabic fonts. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&family=Scheherazade+New&display=swap">
+  <link rel="stylesheet" href="qaida.css">
+  <script src="shell.js" defer></script>
+  <script src="audio.js" defer></script>
+  <script src="trace.js" defer></script>
+  <script src="practice.js" defer></script>
+  <script src="marks.js" defer></script>
+  <script src="mark-lesson.js" defer></script>
+  <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
+       qaida-options.js once the look is chosen. -->
+  <script src="qaida-options.js" defer></script>
+</head>
+<body>
+  <div class="top-sentinel" aria-hidden="true"></div>
+  <a class="skip" href="#lesson" data-words="Skip link (keyboard only)">Skip to the lesson</a>
+
+  <header class="topbar">
+    <div class="where">
+      <a class="brand" href="../">
+        <svg class="mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
+          <rect x="-8" y="-8" width="16" height="16" />
+          <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+          <circle r="2" />
+        </svg>
+        <span class="name" translate="no" data-words="Top bar: site name">Alif to Ayah</span>
+      </a>
+      <a class="crumb" href="./" data-words="Top bar: where you are">Free Qaida</a>
+    </div>
+    <div class="tools">
+      <!-- The writing board: on every lesson, at any time, because nobody knows when someone will want to write
+           something down (the user, 2026-09-19). Opens blank; trace.js does the rest. -->
+      <button class="tool open-board" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
+          <path d="M14.5 6.5l3 3" />
+        </svg>
+        <span class="word" data-words="Top bar: writing board button">Board</span>
+      </button>
+      <!-- Sound on or off, kept on this device. Nothing ever plays by itself; this is for studying in company. -->
+      <button class="tool mute" type="button" aria-pressed="false"
+              data-off="Turn the sound off" data-on="Turn the sound on"
+              data-words-attr="data-off|Sound button, when sound is on;data-on|Sound button, when sound is off">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
+          <path class="waves" d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18 7a7 7 0 0 1 0 10" />
+          <path class="cross" d="M16 9.5l5 5M21 9.5l-5 5" />
+        </svg>
+      </button>
+      <button class="tool open-settings" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 8h8.5M17.5 8H20M4 16h2.5M11.5 16H20" />
+          <circle cx="15" cy="8" r="2.5" />
+          <circle cx="9" cy="16" r="2.5" />
+        </svg>
+        <span class="word" data-words="Top bar: settings button">Settings</span>
+      </button>
+      <button class="tool theme" type="button" aria-label="Switch to light mode">
+        <svg class="half" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="lesson" id="lesson" tabindex="-1">
+    <header class="lesson-head">
+      <div class="head-text">
+        <div class="course">
+          <p class="eyebrow" data-words="Lesson number">Lesson 6 of 14</p>
+          <!-- The whole Qaida at a glance: this lesson in gold, the other 13 to come. -->
+          <ol class="track" aria-hidden="true">
+            <li></li><li></li><li></li><li></li><li></li><li class="now"></li><li></li>
+            <li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+          </ol>
+        </div>
+        <!-- The title follows the student's choice of names, and mark-lesson.js writes it on every change. It is an
+             attribute and not the heading's own text so the teacher's edit is not overwritten at the next switch. -->
+        <h1 data-words-attr="data-title-zabar|Lesson title (zabar);data-title-fatha|Lesson title (fatha)"
+            data-title-zabar="Paish" data-title-fatha="Damma">Paish</h1>
+        <p class="lede" data-words="Line under the title">A third mark, and the shape is what tells it apart.</p>
+        <!-- What the student chose on their first visit, and a way to change it. shell.js fills in the spans. -->
+        <p class="setup"
+           data-madani="Madani script" data-indopak="Indo-Pak script"
+           data-fatha="Fatha, kasra, damma" data-zabar="Zabar, zair, paish"
+           data-families="Shape families" data-grid="Even grid"
+           data-words-attr="data-madani|Settings line: Madani;data-indopak|Settings line: Indo-Pak;data-fatha|Settings line: fatha names;data-zabar|Settings line: zabar names;data-families|Settings line: shape families;data-grid|Settings line: even grid">
+          <span class="setup-script"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="setup-names"></span>
+          <span class="dot" aria-hidden="true"></span>
+          <span class="setup-grouping"></span>
+          <button class="link open-settings" type="button" aria-haspopup="dialog"><span data-words="Settings line: change link">Change</span></button>
+        </p>
+      </div>
+      <!-- The lesson's subject in one glyph: a letter with the mark on it. mark-lesson.js composes it. -->
+      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">&#x628;&#x64F;</span>
+    </header>
+
+    <!-- The two parts. An order, never a chain of locks: every button works at any time, and a part opened out of turn is
+         advised once and then let through (docs/lesson-2/09-going-in-order.md). mark-lesson.js builds the buttons. -->
+    <nav class="bands" aria-label="The two parts of this lesson"
+         data-group1="Meet the mark" data-group2="All the letters"
+         data-group-done="Done" data-group-now="You’re here" data-group-later="Comes later"
+         data-group-label="Part {n}, {name}. {state}"
+         data-group-early="This part comes later. You can carry on if you like — each one builds on the one before."
+         data-group-announce="Part {n}, {name}."
+         data-words-attr="aria-label|Group rail: label;data-group1|Group 1 name;data-group2|Group 2 name;data-group-done|Group rail: a finished group;data-group-now|Group rail: the current group;data-group-later|Group rail: a later group;data-group-label|Group rail: what a screen reader hears ({n}, {name} and {state} are filled in);data-group-early|Advice: a group opened out of turn;data-group-announce|Announced for screen readers: a new group ({n} and {name} are filled in)">
+      <ol></ol>
+    </nav>
+    <div class="struggle band-advice" hidden>
+      <p class="struggle-text"></p>
+    </div>
+    <p class="sr-only band-announce" role="status" aria-live="polite" aria-atomic="true"></p>
+
+    <!-- No counts on the page (the user, 2026-09-20). The bar is the whole lesson and says how it is going in words; the
+         line under it appears only when the open part is done. -->
+    <div class="progress">
+      <div class="progress-row">
+        <p class="progress-text" id="progress-text"
+           data-stage0="Just starting" data-stage1="Getting going" data-stage2="Getting there"
+           data-stage3="Nearly there" data-stage4="All known"
+           data-words-attr="data-stage0|Progress line, nothing known yet;data-stage1|Progress line, a little known;data-stage2|Progress line, about half known;data-stage3|Progress line, most known;data-stage4|Progress line, every letter known"></p>
+        <button class="link reset" type="button" hidden
+                data-label="Start again" data-confirm="Tap again to clear"
+                data-words-attr="data-label|Start again link;data-confirm|Start again, asking to be sure"></button>
+      </div>
+      <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="29" aria-valuenow="0">
+        <span class="fill"></span>
+      </div>
+      <p class="band-line" hidden
+         data-done="All of this group"
+         data-words-attr="data-done|Progress line, every letter in this group known"></p>
+      <!-- The recordings for this lesson are of the SOUND ("ba"), not of the letter's name. mark-lesson.js hides this once
+           they are all in. -->
+      <p class="sound-note" hidden
+         data-none="Hearing practice opens when the recordings arrive."
+         data-some="Hearing practice is open for the letters that are recorded."
+         data-words-attr="data-none|Sound line, nothing recorded;data-some|Sound line, some recorded"></p>
+    </div>
+
+    <!-- The teaching half: the mark, then the letter with and without it. The drill below is the testing half. Every tile is
+         a button: tapping it says the letter (and, once recorded, the sound). -->
+    <section class="marks-board" aria-labelledby="board-title"
+             data-mark-alone="This is {mark}." data-mark-sits="{Mark} sits above the letter, in the same place as {other}."
+             data-pair-bare="The letter on its own" data-pair-other="The same letter with {other}" data-pair-marked="The letter with {mark}"
+             data-mark-does="{Mark} is a different shape from {others}, in the same place as {other}. It is a small curl, not a wow."
+             data-joined="{Mark} goes with the letter wherever it sits." data-joined-note="The same letter twice, not a word."
+             data-words-attr="data-mark-alone|Board: the mark on its own ({mark} is filled in);data-mark-sits|Board: where the mark sits ({Mark} and {other} are filled in);data-pair-bare|Board: the row, the bare side;data-pair-other|Board: the row, the middle columns ({other} is filled in, once for each column);data-pair-marked|Board: the row, this lesson's mark ({mark} is filled in);data-mark-does|Board: what the mark does ({Mark}, {other} and {others} are filled in);data-joined|Board: the joined example ({Mark} is filled in);data-joined-note|Board: what the joined example is not">
+      <div class="section-head">
+        <p class="eyebrow" data-words="Board: step label">Step 1</p>
+        <h2 class="section-title board-title" id="board-title" tabindex="-1" data-words="Board: heading">Look at the mark</h2>
+        <p class="section-guide" data-words="Board: guide line">A small curl above the letter. Tap any of them to hear it.</p>
+      </div>
+
+      <!-- The mark alone, on the dotted circle that a combining mark expects to sit on. -->
+      <div class="mark-alone">
+        <span class="alone-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
+        <p class="alone-label"></p>
+        <p class="alone-sits"></p>
+      </div>
+
+      <!-- One letter four times: bare, with each earlier mark and with this one, with what each is under it. -->
+      <div class="pair-feature" role="list"></div>
+
+      <!-- The group's letters, as a quartet: the letter, then with zabar, with zair and with paish. That is what the board is for:
+           seeing the whole family side by side. A row in the options panel changes it to a trio, pairs, or marked tiles with the
+           bare letter small beneath. -->
+      <div class="pairs" role="list"></div>
+
+      <!-- The mark travels with the letter wherever it sits: the bridge back to Lesson 3, shown and never drilled. -->
+      <div class="joined" hidden>
+        <span class="joined-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
+        <p class="joined-text"></p>
+        <p class="joined-note"></p>
+      </div>
+
+      <!-- The order is a suggestion, not a lock: a student may go on, and is told that the exercise is what makes it stay. -->
+      <p class="shapes-hint"
+         data-words="Board: hint about moving on">You can move on to the other part whenever you like, but do the exercise first: it is what makes it stay.</p>
+      <!-- The way from looking to practising: the exercise is underneath, and this takes the student there. -->
+      <div class="shapes-actions">
+        <button class="button primary practise" type="button">
+          <span data-words="Board: practise button">Practise this group</span>
+          <svg class="arrow down" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 5v14M6 13l6 6 6-6" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <section class="drill" aria-labelledby="drill-title">
+      <!-- Says what this half is for: it is an exercise, and nothing here is marked or timed. -->
+      <div class="section-head">
+        <p class="eyebrow" data-words="Practice: step label">Step 2</p>
+        <h2 class="section-title" id="drill-title" tabindex="-1" data-words="Practice: heading">Now practise</h2>
+        <p class="section-guide" data-words="Practice: guide line">This is an exercise. There is no timer, and nothing here is marked.</p>
+      </div>
+
+      <!-- The question changes with every question, so the group of answers is named by it. -->
+      <p class="ask" id="ask"
+         data-glyph="Which letter is this, and what is on it?" data-name="Which one is this?"
+         data-spot="Which one has {mark} on it?" data-sound="Which one says this?"
+         data-words-attr="data-glyph|Question: showing a letter with its mark;data-name|Question: giving a name;data-spot|Question: which one has the mark on it ({mark} is filled in);data-sound|Question: hearing a sound"></p>
+      <div class="prompt" data-play="Play the sound"
+           data-words-attr="data-play|Question: play button"></div>
+      <div class="choices" role="group" aria-labelledby="ask"></div>
+
+      <!-- Both live regions are here, empty, from the first paint: one inserted at the moment of its first message is
+           not announced. A bare review letter is answered in words of its own: "with no mark". -->
+      <p class="verdict" role="status" aria-live="polite" aria-atomic="true"
+         data-right="Yes — {name} with {mark}." data-right-bare="Yes — {name}, with no mark."
+         data-wrong="That one is {chosen}. This is {name} with {mark}." data-wrong-bare="That one is {chosen}. This is {name}, with no mark."
+         data-pool-error="Something is missing here — reload the page and it should come back."
+         data-words-attr="data-right|Answer: when right ({name} and {mark} are filled in);data-right-bare|Answer: when right, a letter with no mark;data-wrong|Answer: when not ({chosen}, {name} and {mark} are filled in);data-wrong-bare|Answer: when not, a letter with no mark;data-pool-error|Answer line: nothing to ask"></p>
+      <p class="sr-only announce" role="status" aria-live="polite"
+         data-template="Question {n}."
+         data-words-attr="data-template|Announced for screen readers: a new question ({n} is filled in)"></p>
+
+      <!-- Under an answer, not a panel over it: a panel would take the keyboard and hide the choices the student is
+           learning from. It is a strip because a choice is itself a button and cannot hold buttons of its own. -->
+      <div class="after" hidden>
+        <span class="after-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
+        <span class="after-name"></span>
+        <button class="button quiet hear" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
+            <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5" />
+          </svg>
+          <span data-words="Hear it button">Hear it</span>
+        </button>
+        <!-- "Write it" opens the letter WITH its mark: writing the mark is the lesson. -->
+        <button class="button quiet trace" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
+            <path d="M14.5 6.5l3 3" />
+          </svg>
+          <span data-words="Write it button">Write it</span>
+        </button>
+        <button class="button next-question" type="button">
+          <span data-words="Next question button">Next</span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Advice, never a block. Both lines are for the teacher to read first: they are what a beginner who is
+           finding this hard will see. -->
+      <div class="advice" role="status" aria-live="polite"
+           data-struggling="{name} keeps slipping. Look at it again at the top of the page."
+           data-ready-group="You seem to know this part. The next one is ready when you are."
+           data-ready-lesson="You seem to know {mark} on every letter."
+           data-words-attr="data-struggling|Advice: one letter is hard ({name} is filled in);data-ready-group|Advice: a group is known;data-ready-lesson|Advice: the whole lesson is known ({mark} is filled in)">
+        <div class="struggle" hidden>
+          <p class="struggle-text"></p>
+          <div class="struggle-buttons">
+            <button class="button quiet show-me" type="button" data-words="Advice: show me button">Show me</button>
+            <button class="button quiet trace" type="button" aria-haspopup="dialog" data-words="Advice: write it button">Write it</button>
+          </div>
+        </div>
+        <p class="ready-note" hidden></p>
+      </div>
+
+      <!-- The words that build every letter's name, so a name is edited once and every name follows. {name} is the
+           letter's, {mark} the student's own word for the stroke. -->
+      <span hidden
+            data-name-marked="{name} with {mark}" data-name-bare="{name}"
+            data-words-attr="data-name-marked|Item name, a letter with the mark ({name} and {mark} are filled in);data-name-bare|Item name, a letter with no mark ({name} is filled in)"></span>
+      <!-- Lesson 2's table of look-alikes, groups between commas: which letters are offered as wrong answers for each other. -->
+      <span hidden data-groups="ب ت ث ن ي, ج ح خ ع غ, د ذ ر ز و, س ش ص ض, ط ظ, ف ق ك, ل ا, م ه, ء و"
+            data-words-attr="data-groups|Look-alike letters (groups between commas)"></span>
+    </section>
+
+    <footer class="lesson-end">
+      <!-- The star and its rules draw into place once the lesson says you seem ready. -->
+      <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
+        <line class="rule left" x1="-100" y1="0" x2="-24" y2="0" />
+        <line class="rule right" x1="24" y1="0" x2="100" y2="0" />
+        <g class="star">
+          <rect x="-8" y="-8" width="16" height="16" />
+          <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+          <circle r="2" />
+        </g>
+      </svg>
+      <p class="end-line"
+         data-before="Work through both parts to finish the lesson."
+         data-finished="You can tell all three marks apart. This lesson is marked as done. You can keep practising as long as you like."
+         data-words-attr="data-before|Last line, before the lesson says you seem ready;data-finished|Last line, once it does ({mark}, {other} and {others} can be filled in)"></p>
+      <div class="onward">
+        <a class="button back" href="./">
+          <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+          <span data-words="Back to the lessons button">Back to the Qaida</span>
+        </a>
+        <!-- Lesson 7 isn't built yet, so a click shows the note at the bottom of the screen; the moment it is, it is a link.
+             Tanween is called Tanween in both sets of names. Not locked: the lesson only recommends. -->
+        <button class="button primary next" type="button"
+                data-next-zabar="Next: Tanween" data-next-fatha="Next: Tanween" data-soon="The next lesson isn’t built yet."
+                data-words-attr="data-next-zabar|Next lesson button (zabar names);data-next-fatha|Next lesson button (fatha names);data-soon|Note: the next lesson is not built yet">
+          <span></span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <p class="note" role="status"></p>
+
+  <!-- The writing board. Opened from the top bar it is blank, for whatever someone needs to write down; opened from
+       "Write it" it has the letter drawn faintly underneath, with its mark. No marking either way: a machine can't judge
+       Arabic handwriting well enough to be trusted, and a wrong "incorrect" teaches a student to doubt themselves. -->
+  <dialog class="tracer" aria-labelledby="tracer-title">
+    <div class="tracer-head">
+      <h2 class="tracer-title" id="tracer-title" data-template="Trace {name}" data-free="Writing board"
+          data-words-attr="data-template|Tracing board: title ({name} is filled in);data-free|Writing board: title"></h2>
+      <button class="tool close-trace" type="button" aria-label="Close the board">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+    <div class="board">
+      <!-- The letter underneath is drawn rather than set as text, so trace.js can centre it on its ink. Half the
+           Arabic alphabet hangs below the line it sits on, and centring the text box leaves those letters low. -->
+      <canvas class="board-guide" aria-hidden="true"></canvas>
+      <canvas class="board-ink"></canvas>
+    </div>
+    <div class="board-tools">
+      <button class="link undo" type="button" data-words="Tracing board: undo">Undo</button>
+      <button class="link clear" type="button" data-words="Tracing board: clear">Clear</button>
+      <button class="link toggle-guide" type="button" aria-pressed="false"
+              data-hide="Hide the letter" data-show="Show the letter"
+              data-words-attr="data-hide|Tracing board: hide the letter;data-show|Tracing board: show the letter">Hide the letter</button>
+    </div>
+    <p class="board-hint"
+       data-trace="Write over the letter with your finger, a mouse or a pen. Hide it and try again from memory. This needs something to draw with — a keyboard won’t do it."
+       data-free="Write whatever you need — a letter, a word, a mark. Nothing is saved or marked. This needs something to draw with — a keyboard won’t do it."
+       data-words-attr="data-trace|Tracing board: line at the bottom;data-free|Writing board: line at the bottom"></p>
+  </dialog>
+
+  <!-- First visit: script, names and grouping. Opens by itself the first time, and from Settings or Change after. -->
+  <dialog class="chooser" aria-labelledby="chooser-title">
+    <form method="dialog">
+      <p class="eyebrow" data-words="Choice: small heading">Before you start</p>
+      <h2 id="chooser-title" data-words="Choice: title">Choose how your letters look</h2>
+      <p class="intro" data-words="Choice: line under the title">Pick what matches the Qur’an you read from. You can change this any time.</p>
+      <fieldset>
+        <legend data-words="Choice: script heading">Script</legend>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="script" value="madani">
+            <span class="sample madani" lang="ar" dir="rtl" aria-hidden="true">ك ه ي</span>
+            <span class="option-name" data-words="Choice: Madani">Madani</span>
+            <span class="option-note" data-words="Choice: Madani note">Finer, flowing letters</span>
+          </label>
+          <label class="option">
+            <input type="radio" name="script" value="indopak">
+            <span class="sample indopak" lang="ar" dir="rtl" aria-hidden="true">ک ہ ی</span>
+            <span class="option-name" data-words="Choice: Indo-Pak">Indo-Pak</span>
+            <span class="option-note" data-words="Choice: Indo-Pak note">Bolder letters, and the Qaida order</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend data-words="Choice: names heading">Names for the marks</legend>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="names" value="fatha">
+            <span class="option-name" data-words="Choice: fatha names">Fatha, kasra, damma</span>
+            <span class="option-note" data-words="Choice: fatha names note">Arabic names for the marks and the letters</span>
+          </label>
+          <label class="option">
+            <input type="radio" name="names" value="zabar">
+            <span class="option-name" data-words="Choice: zabar names">Zabar, zair, paish</span>
+            <span class="option-note" data-words="Choice: zabar names note">South Asian names for the marks and the letters</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend data-words="Choice: grouping heading">Letter grouping</legend>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="grouping" value="families">
+            <span class="option-name" data-words="Choice: grouping families">Shape families</span>
+            <span class="option-note" data-words="Choice: grouping families note">Look-alike letters sit together (ب ت ث)</span>
+          </label>
+          <label class="option">
+            <input type="radio" name="grouping" value="grid">
+            <span class="option-name" data-words="Choice: grouping grid">Even grid</span>
+            <span class="option-note" data-words="Choice: grouping grid note">Uniform spacing across every letter</span>
+          </label>
+        </div>
+      </fieldset>
+      <button class="button primary done" value="done"
+              data-first="Start the lesson" data-later="Done"
+              data-words-attr="data-first|Choice: button, first visit;data-later|Choice: button, later visits"></button>
+    </form>
+  </dialog>
+</body>
+</html>

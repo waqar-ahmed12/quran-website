@@ -403,18 +403,34 @@
         group.lastElementChild.title = 'What each one makes the question. A look-alike: "which letter is this?". With and without the mark: '
           + '"is there a mark at all?", which the student already learnt. With the other mark: "which mark is this, and where does it sit?", '
           + 'which is what this lesson is for.';
-        option('The other mark riding along', { On: 'on', Off: 'off' }, 'twins', () => lesson.setTwins());
-        group.lastElementChild.title = 'On: the same letters with the earlier mark (zabar) are among the wrong answers and are asked in their own right, '
-          + 'about a third of the questions. Off turns this lesson back into the one before it with a different stroke: a student could pass '
-          + 'it by noticing that a mark is there.';
+        if (lesson.otherCount > 1) {
+          // Two earlier marks (Lesson 6). Both at once is more than half the questions about marks this lesson is not teaching, so
+          // one at a time is the default and this is the row most likely to be turned down (docs/lesson-6/03 §4).
+          if (!['alternate', 'both', 'off'].includes(root.dataset.twins)) root.dataset.twins = lesson.twinMode;
+          option('The other marks riding along', { 'One at a time': 'alternate', 'Both at once': 'both', Off: 'off' }, 'twins', () => lesson.setTwins());
+          group.lastElementChild.title = 'One at a time: each letter is told apart from one earlier mark (zabar or zair by turns, and the other way round in '
+            + 'the second part), about 45% of the questions in part 1 and 35% in part 2. Both at once: every letter against both, about 60% and 50%: '
+            + 'the full three-way, and noticeably longer. Off turns this lesson back into Lesson 4 with a different stroke.';
+        } else {
+          option('The other mark riding along', { On: 'on', Off: 'off' }, 'twins', () => lesson.setTwins());
+          group.lastElementChild.title = 'On: the same letters with the earlier mark (zabar) are among the wrong answers and are asked in their own right, '
+            + 'about a third of the questions. Off turns this lesson back into the one before it with a different stroke: a student could pass '
+            + 'it by noticing that a mark is there.';
+        }
       }
       option('The board shows',
         {
+          ...(lesson.otherCount > 1 ? { 'The quartet: letter, each earlier mark, this mark': 'quad' } : {}),
           ...(twinned ? { 'The trio: letter, other mark, this mark': 'trio' } : {}),
           'The pairs': 'pairs',
           'Just the marked letters': 'marked',
         },
         'board', () => lesson.render());
+      if (lesson.otherCount > 1) {
+        option('Arrows on the board', { 'Just the last': 'last', All: 'all', None: 'none' }, 'arrows', () => lesson.render());
+        group.lastElementChild.title = 'The quartet reads left to right on its own, so by default one arrow marks the mark the lesson is about. '
+          + 'Applies to the quartet only.';
+      }
       option('Point at the mark', { 'A halo': 'halo', Nothing: 'none', 'Tint it': 'tint' }, 'point', () => lesson.render());
     }
 

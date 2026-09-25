@@ -718,8 +718,9 @@ console.log('\nLesson 5: the mark below');
 
   // The board and the rail.
   const rows = marks.boardRows(shell, mark, 1);
-  check(rows.length === 6 && rows.every((row) => row.marked === row.glyph + KASRA && row.other === row.glyph + FATHA), 'the board has six rows; each carries the letter with zair and with zabar');
-  check(marks.boardRows(shell, marks.MARKS.fatha, 2).every((row) => row.other === ''), "and the first mark's board has no other column");
+  check(rows.length === 6 && rows.every((row) => row.marked === row.glyph + KASRA && row.others.length === 1 && row.others[0].glyph === row.glyph + FATHA && row.others[0].id === 'fatha'),
+    'the board has six rows; each carries the letter with zair and, in `others`, with zabar');
+  check(marks.boardRows(shell, marks.MARKS.fatha, 2).every((row) => row.others.length === 0), "and the first mark's board has no other column");
   check(marks.boardRows(shell, mark, 2).length === 29 && rows.map((row) => row.key).sort().join('') === mark.first.slice().sort().join(''), 'part 2 is all 29, part 1 is the mark\'s own six');
   check(marks.sampleOf(shell, mark, 1) === 'د' + KASRA && marks.sampleOf(shell, mark, 2) === 'ع' + KASRA, "the rail shows the mark's own sample (not baa), and a hanging letter for part 2");
   check(marks.sampleOf(shell, fatha, 1) === 'ب' + FATHA, "and baa for fatha, as before");
@@ -729,6 +730,129 @@ console.log('\nLesson 5: the mark below');
   check(row.built === true && row.href === 'lesson-5.html' && row.progress === 'drill' && row.cp === 0x0650, 'the home has Lesson 5 as a real link that counts the drill by its mark');
 }
 function kasra(w) { return w.marks.MARKS.kasra; }
+
+// ---- 9c. Lesson 6: the third mark, and two marks riding along ----------------------------------------------------
+// docs/lesson-6/05 §3. The data layer only: marks.js in node, no page. The page is tools/qaida-lesson6-check.js.
+
+console.log('\nLesson 6: the third mark');
+{
+  const FATHA = String.fromCharCode(0x064E);
+  const KASRA = String.fromCharCode(0x0650);
+  const DAMMA = String.fromCharCode(0x064F);
+  const looks = GROUPS.split(',').map((g) => g.trim().split(/\s+/).filter(Boolean));
+  const world = (script) => {
+    const w = boot();
+    if (script) w.shell.state.script = script;
+    w.mark = w.marks.MARKS.damma;
+    w.items = w.marks.allItems(w.shell, w.mark, { looks, distractors: 'which-mark' });
+    return w;
+  };
+  const madani = world();
+  const indopak = world('indopak');
+  const { shell, marks, mark, items } = madani;
+  const { fatha, kasra: zair } = marks.MARKS;
+
+  // `against`: a list, in lesson order, and otherOf is its first entry.
+  check([fatha, zair, mark].every((m) => Array.isArray(m.against)), '`against` is a list on every mark');
+  check(fatha.against.length === 0 && zair.against.join() === 'fatha' && mark.against.join() === 'fatha,kasra', 'fatha has none, kasra has fatha, damma has fatha and kasra, in lesson order');
+  check(marks.otherOf(fatha) === null && marks.otherOf(zair).id === 'fatha' && marks.otherOf(mark).id === 'fatha',
+    "otherOf is the first of the list: paish's nearest contrast is zabar, not the zair before it");
+  check(marks.othersOf(mark).map((m) => m.id).join() === 'fatha,kasra', 'othersOf(paish) is zabar then zair');
+
+  // Ids and glyphs.
+  check(mark.sits === 'above' && mark.cp === 0x064F && mark.lesson === 6, 'paish sits above, is U+064F, and is lesson 6');
+  check(items.length === 29 && indopak.items.length === 29, 'allItems() is 29 in both scripts');
+  check(items.every((item) => item.id.length === 2 && item.id.endsWith(DAMMA) && item.glyph === item.base + DAMMA && item.mark === 'damma' && item.marked), 'every id is a letter and U+064F, and says it is damma\'s');
+  check(JSON.stringify(items.map((item) => item.id).sort()) === JSON.stringify(indopak.items.map((item) => item.id).sort()), 'Madani and Indo-Pak produce the same id set');
+  check(items.every((item) => item.audio.kind === 'damma' && item.audio.glyph === item.base), "every item's recording is the damma group, keyed by the base letter");
+  check(!/[ً-ْ]/.test(fs.readFileSync(path.join(dir, 'marks.js'), 'utf8')), 'marks.js holds no literal combining mark: not one of the three');
+  check(!/[ً-ْ]/.test(fs.readFileSync(path.join(dir, 'lesson-6.html'), 'utf8')), 'and lesson-6.html holds none either: the title glyph is a numeric reference');
+  check(JSON.stringify(marks.sizes(items)) === '[6,29]', 'the two parts hold 6 and 29');
+  check(mark.first.join() === fatha.first.join(), "paish's part 1 is zabar's six: the pair بَ / بُ is on the board from the first minute");
+
+  // The four ids of one letter are distinct, so credit for one mark can never be credited for another.
+  const ba = [ 'ب', 'ب' + FATHA, 'ب' + KASRA, 'ب' + DAMMA ];
+  check(new Set(ba).size === 4, 'the four ids of one letter are four distinct strings');
+
+  // Two sets of twins.
+  const keys = marks.poolFor(items, 1).map((item) => item.key);
+  const both = marks.twinItems(shell, mark, { keys, looks, distractors: 'which-mark' });
+  check(both.length === 12, 'twinItems with the default gives both marks: 2 x 6 twins', String(both.length));
+  check(both.every((twin) => twin.group === 0 && twin.required === false && twin.marked), 'every twin is review: group 0, never required');
+  check(both.filter((twin) => twin.mark === 'fatha').length === 6 && both.filter((twin) => twin.mark === 'kasra').length === 6, 'six of each mark');
+  check(both.every((twin) => twin.id === twin.key + String.fromCharCode(marks.MARKS[twin.mark].cp) && twin.audio.kind === marks.MARKS[twin.mark].audio), 'each carries its own mark id and its own recording');
+  check(both.every((twin) => twin.name === `${twin.letterName} with ${twin.mark}`), 'and its own mark\'s word', both[0].name);
+  check(marks.twinItems(shell, mark, { keys, marks: [zair] }).length === 6 && marks.twinItems(shell, mark, { keys, marks: [] }).length === 0, 'the page can say which marks: one gives six, none gives none');
+  const bare = marks.reviewItems(shell, mark, { count: 8 });
+  const ids = [...items, ...both, ...bare].map((item) => item.id);
+  check(new Set(ids).size === ids.length, 'the lesson\'s own ids, both sets of twins and the bare letters never collide');
+
+  // Counting is unchanged by them.
+  const pooled = [...items, ...both, ...bare];
+  check(JSON.stringify(marks.sizes(pooled)) === '[6,29]' && marks.stats(shell, 6, pooled, 2).total === 29 && marks.poolFor(pooled, 2).length === 29, 'sizes, stats and poolFor still count 29, not 87');
+  const counted = world();
+  const bothAll = counted.marks.twinItems(counted.shell, counted.mark, { keys: counted.items.map((item) => item.key) });
+  for (const item of [...bothAll, ...bare]) for (let k = 0; k < 3; k += 1) counted.shell.recordAnswer(6, item.id, true);
+  check(counted.marks.stats(counted.shell, 6, [...counted.items, ...bothAll, ...bare], 2).known === 0, 'knowing 58 twins and the bare letters moves the lesson by nothing');
+  check(counted.shell.masteredCount(6, 3) === 0, "and neither does the home's card", String(counted.shell.masteredCount(6, 3)));
+  for (const item of counted.items.slice(0, 4)) for (let k = 0; k < 3; k += 1) counted.shell.recordAnswer(6, item.id, true);
+  check(counted.shell.masteredCount(6, 3) === 4, 'four of its own known reads four', String(counted.shell.masteredCount(6, 3)));
+
+  // {others}.
+  const words = marks.wordsFor(mark, shell);
+  check(words.other === 'fatha' && words.others === 'fatha and kasra' && words.Others === 'Fatha and kasra', '{others} is "fatha and kasra" in the fatha names');
+  const zabarNames = world();
+  zabarNames.shell.state.names = 'zabar';
+  const zw = zabarNames.marks.wordsFor(zabarNames.mark, zabarNames.shell);
+  check(zw.mark === 'paish' && zw.other === 'zabar' && zw.others === 'zabar and zair', '{others} is "zabar and zair" in the zabar names', zw.others);
+  check(marks.wordsFor(zair, shell).others === 'fatha' && marks.wordsFor(fatha, shell).others === '' && marks.wordsFor(fatha, shell).other === '', '{others} is one name on Lesson 5 and empty on Lesson 4');
+
+  // Review reaches back to lessons 4 and 5.
+  const missed = boot();
+  missed.shell.recordAnswer(4, 'ج' + FATHA, false);
+  missed.shell.recordAnswer(5, 'ض' + KASRA, false);
+  missed.shell.recordAnswer(2, 'غ', false);
+  const back = missed.marks.reviewItems(missed.shell, missed.marks.MARKS.damma, { count: 3 }).map((item) => item.id);
+  check(['غ', 'ج', 'ض'].every((key) => back.includes(key)), 'the bare sample follows lessons 2, 4 and 5: a letter missed in any is in it', back.join(''));
+  const forZair = missed.marks.reviewItems(missed.shell, missed.marks.MARKS.kasra, { count: 3 }).map((item) => item.id);
+  check(!forZair.includes('ض'), "and Lesson 5 does not look at its own lesson for itself", forZair.join(''));
+
+  // The board: the letter, then one entry per earlier mark.
+  const rows = marks.boardRows(shell, mark, 1);
+  check(rows.length === 6 && rows.every((row) => row.marked === row.glyph + DAMMA && row.others.map((o) => o.glyph).join() === [row.glyph + FATHA, row.glyph + KASRA].join()),
+    'the board has six rows, each with zabar then zair in `others`');
+  check(rows.every((row) => row.others.map((o) => o.name).join() === 'fatha,kasra'), 'each entry carries its own name, for its own caption', rows[0].others.map((o) => o.name).join());
+  check(marks.boardRows(shell, mark, 2).length === 29, 'part 2 is all 29');
+  check(marks.sampleOf(shell, mark, 1) === 'ب' + DAMMA && marks.sampleOf(shell, mark, 2) === 'ع' + DAMMA, 'the rail shows baa with paish, and ain with paish');
+
+  // The engine, told the alternate, still finds the same letter with the other mark among the wrong answers.
+  const w = world();
+  const engineItems = () => [
+    ...marks.poolFor(w.items, 1),
+    ...marks.twinItems(w.shell, w.mark, { keys: keys.filter((_, i) => i % 2 === 0), marks: [fatha], looks, distractors: 'which-mark' }),
+    ...marks.twinItems(w.shell, w.mark, { keys: keys.filter((_, i) => i % 2 === 1), marks: [zair], looks, distractors: 'which-mark' }),
+  ];
+  const drill = w.practice.create({ lesson: 6, items: engineItems(), formats: FORMATS, random: seeded(13), noRepeatWithin: 4 });
+  drill.start();
+  check(drill.progress().total === 6, 'the engine counts 6 required, twins not included', String(drill.progress().total));
+  let ownAsked = 0;
+  let withTwin = 0;
+  for (let i = 0; i < 200; i += 1) {
+    const q = drill.question;
+    if (!q) break;
+    if (q.item.mark === 'damma') {
+      ownAsked += 1;
+      if (q.choices.some((c) => c.id !== q.item.id && c.key === q.item.key)) withTwin += 1;
+    }
+    drill.answer(q.item.id);
+    drill.next();
+  }
+  check(ownAsked > 0 && withTwin === ownAsked, 'every question about paish has the same letter with another mark among the wrong answers', `${withTwin} of ${ownAsked}`);
+
+  // The lesson's row on the home.
+  const row = shell.LESSONS.find((entry) => entry.n === 6);
+  check(row.built === true && row.href === 'lesson-6.html' && row.progress === 'drill' && row.cp === 0x064F, 'the home has Lesson 6 as a real link that counts the drill by its mark');
+}
 
 // ---- 10. The engine keeps to its boundaries ---------------------------------------------------------------------
 
