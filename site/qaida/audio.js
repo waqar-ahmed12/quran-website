@@ -119,6 +119,12 @@
     slugFor,
     wanted,
     has: (kind, glyph) => Boolean(fileFor(kind, glyph)),
+    // The teacher's file for this item, for voice.js to play beside the student's own recording. Null exactly when
+    // has() is false — never the stand-in: matching your pronunciation against a wordless hum isn't a thing.
+    urlFor: (kind, glyph) => {
+      const file = fileFor(kind, glyph);
+      return file ? BASE + file : null;
+    },
     get manifest() {
       return manifest;
     },

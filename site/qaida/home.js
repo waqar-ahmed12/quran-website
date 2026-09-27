@@ -133,6 +133,9 @@
     }
     disarm();
     for (const { n } of shell.LESSONS) shell.clearLesson(n);
+    // "Start again" already claims to clear everything; this makes that true for a voice recorded here too
+    // (docs/your-voice/02 §5). A no-op today: the home doesn't load voice-store.js, only a lesson page does.
+    if (window.qaidaVoiceStore) window.qaidaVoiceStore.clear();
     render();
   });
 
@@ -168,6 +171,7 @@
     },
     clearAll() {
       for (const { n } of shell.LESSONS) shell.clearLesson(n);
+      if (window.qaidaVoiceStore) window.qaidaVoiceStore.clear();
       render();
     },
   };

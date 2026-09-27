@@ -538,7 +538,9 @@ a.crumb:hover {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  min-height: 1.5rem;
+  /* .reset is a .link, 44px for its tap target — reserved here always, hidden or not, so the row doesn't grow (and
+     shove the bar and the whole drill down with it) the moment "Start again" has something to clear (2026-09-24). */
+  min-height: 44px;
 }
 
 .progress-text {
@@ -878,14 +880,31 @@ a.crumb:hover {
   box-shadow: inset 0 0 0 1.5px var(--tile-mark), 0 0 8px rgb(var(--rgb-accent) / 0.3);
 }
 
-/* The end of the lesson: the star between two rules, a line, and the way on to Lesson 2. */
+/* The end of the lesson: the star between two rules, a line, and the way on to Lesson 2. Its own two internal gaps
+   (2026-09-25, sliders in the options panel) replace what was one flex `gap` for both, so "below the star" and
+   "below the text" can move on their own — a direct-child selector so the home page's own .home-end (a different
+   class, the same .end-line and .onward inside it) isn't nudged along for free. */
 .lesson-end {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.35rem, 0.7vh, 0.5rem);
   margin-top: var(--end-gap);
   text-align: center;
+}
+
+.lesson-end > .end-line {
+  margin-top: var(--gap-below-star, clamp(0.35rem, 0.7vh, 0.5rem));
+}
+
+.lesson-end > .onward {
+  margin-top: var(--gap-below-text, clamp(0.6rem, 1vh, 0.75rem));
+}
+
+/* A drill page's own tally sits right above this (2026-09-25): --end-gap is shared with Lesson 1's "letter last
+   tapped" strip, which still wants the fuller gap, so this is its own variable and its own slider in the options
+   panel ("Gap: tally to the star"), tighter by default rather than a second change to the shared one. */
+.drill + .lesson-end {
+  margin-top: var(--drill-end-gap, clamp(0.125rem, 0.4vh, 0.375rem));
 }
 
 .ornament {
@@ -1970,13 +1989,18 @@ a.crumb:hover {
   transition-duration: 150ms;
 }
 
-/* The same height for every letter, so the answers below it don't jump about between questions. */
+/* The same height for every letter, so the answers below it don't jump about between questions. 1.9x, not 1.35x
+   (2026-09-23): several letters (ش ص ض ع غ ق ن و ي…) draw real ink well below the line they sit on — more than a
+   line box sized for an average letter leaves room for — which used to spill into .choices below. lesson-2.js now
+   also centres the glyph on that ink (shell.centerInk), not on its line box; overflow stays hidden as a backstop
+   for whatever the taller box and the recentring between them don't cover. */
 .prompt {
   --prompt-size: clamp(5.5rem, 4rem + 6vw, 8.5rem);
   display: grid;
   place-items: center;
   width: 100%;
-  min-height: calc(var(--prompt-size) * 1.35);
+  min-height: calc(var(--prompt-size) * 1.9);
+  overflow: hidden;
 }
 
 .prompt-glyph {
@@ -1984,6 +2008,7 @@ a.crumb:hover {
   font-size: var(--prompt-size);
   line-height: 1.35;
   color: var(--color-accent);
+  display: inline-block; /* translateY (shell.centerInk) has no effect on an inline box */
 }
 
 .prompt-name {
@@ -3164,6 +3189,295 @@ a.crumb:hover {
   .tracer.closing::backdrop {
     animation: fade-out 260ms ease forwards;
   }
+}
+
+/* Say it and listen back --------------------------------------------------------------------
+   Same dialog conventions as the tracing board: a backdrop, a rise on open, a fall on close, nothing animated under
+   reduced motion. docs/your-voice/03. */
+.echo {
+  width: min(30rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100svh - 2rem);
+  padding: clamp(1.25rem, 4vw, 1.75rem);
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-foreground);
+}
+
+.echo::backdrop {
+  background: rgb(var(--rgb-background) / 0.8);
+}
+
+.echo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.875rem;
+}
+
+.echo-title {
+  margin: 0;
+  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+  font-weight: 300;
+}
+
+.close-echo {
+  margin-right: -0.625rem;
+}
+
+.echo-item {
+  display: grid;
+  justify-items: center;
+  gap: 0.125rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.echo-glyph {
+  font-family: var(--font-letter);
+  font-size: clamp(2.75rem, 2.25rem + 2.4vw, 4rem);
+  line-height: 1.3;
+  color: var(--color-accent);
+}
+
+.echo-name {
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--color-foreground);
+}
+
+.echo-asks {
+  margin-top: 0.125rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground);
+}
+
+/* The two lanes: drawn and coloured the same on purpose. This is a comparison, not a verdict. */
+.echo-lanes {
+  display: grid;
+  gap: 0.625rem;
+  margin-bottom: 1.125rem;
+}
+
+.lane {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lane .button.quiet {
+  flex: none;
+}
+
+.wave {
+  flex: 1 1 auto;
+  height: 2.25rem;
+  min-width: 0;
+  color: rgb(var(--rgb-accent) / 0.55);
+}
+
+.delete-mine {
+  flex: none;
+  font-size: 0.8125rem;
+}
+
+.echo-do {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+}
+
+/* The big one: tap to start, tap to stop. The ring around it moves with the voice while recording — the only honest
+   answer to "is this thing even hearing me?" (docs/your-voice/03 §4). --level is set by voice.js, 0…1. */
+.record {
+  position: relative;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 50%;
+  background: none;
+  color: var(--color-accent);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 200ms ease, border-color 200ms ease;
+}
+
+.record:hover {
+  background: rgb(var(--rgb-accent) / 0.08);
+}
+
+.record::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1.5px solid rgb(var(--rgb-accent) / 0.55);
+  opacity: 0;
+  scale: 0.9;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .record::before {
+    transition: opacity 150ms ease;
+  }
+}
+
+[data-state='recording'] .record::before {
+  opacity: var(--level, 0);
+  scale: calc(1 + var(--level, 0) * 0.35);
+}
+
+.record .dot {
+  display: block;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin: 0 auto 0.25rem;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+[data-state='recording'] .record .dot {
+  border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-state='recording'] .record .dot {
+    animation: echo-pulse 1.4s ease-in-out infinite;
+  }
+}
+
+@keyframes echo-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.record-word {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+}
+
+.echo-do .both {
+  font-size: 0.875rem;
+}
+
+.echo-state {
+  min-height: 1.4em;
+  margin: 0.875rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.unmute-echo {
+  display: inline;
+  margin-inline-start: 0.375rem;
+  font-size: inherit;
+}
+
+.echo-note {
+  margin: 0.625rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+/* denied / nomic: no scolding, and the record button stays where it is in denied so a change of mind has somewhere
+   to tap. In nomic there is nothing to retry, so the button is hidden and only the teacher's lane is left. */
+[data-state='nomic'] .record,
+[data-state='nomic'] .record-word {
+  display: none;
+}
+
+[data-state='asking'] .record,
+[data-state='saving'] .record {
+  cursor: wait;
+}
+
+@media (max-width: 419px) {
+  .lane {
+    flex-wrap: wrap;
+  }
+
+  .wave {
+    order: 1;
+    flex-basis: 100%;
+    height: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .echo[open] {
+    animation: rise 400ms var(--ease-out);
+  }
+
+  .echo[open]::backdrop {
+    animation: fade 300ms ease;
+  }
+
+  .echo.closing {
+    animation: fall 260ms cubic-bezier(0.32, 0, 0.67, 0) forwards;
+  }
+
+  .echo.closing::backdrop {
+    animation: fade-out 260ms ease forwards;
+  }
+}
+
+/* The dot that says "you have already said this one" — the counterpart of .mark-sound on the letter tiles, on the
+   Say it buttons instead (docs/your-voice/04 §5). */
+.open-echo,
+.current-say,
+.say {
+  position: relative;
+}
+
+.open-echo[data-recorded]::after,
+.current-say[data-recorded]::after,
+.say[data-recorded]::after {
+  content: '';
+  position: absolute;
+  top: 0.375rem;
+  inset-inline-end: 0.375rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/* Say it button location (options panel, docs/your-voice/07 §2): the top bar's copy, the letter's copy, or both. */
+[data-say='letter'] .open-echo,
+[data-say='topbar'] .current-say,
+[data-say='topbar'] .say {
+  display: none;
+}
+
+/* The real Settings dialog's own delete row (docs/your-voice/07 §4). Hidden until voice.js has counted something,
+   and until the browser can even offer recording at all. */
+.voice-settings {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.voice-count {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground);
+}
+
+.delete-voice {
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground);
 }
 
 /* The recording list (recordings.html) — a working page for the teacher, not part of the site. ---------------- */

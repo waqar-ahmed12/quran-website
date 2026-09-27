@@ -237,7 +237,7 @@
 
   // How a group is going, worked out from what the shell holds. The engine only measures the group it was handed and the
   // rail wants both at once. The rule is the engine's: ready is enough known and nothing missed still shaky.
-  function stats(shell, lesson, items, group, { target = 3, readyAt = 0.8, clean = true } = {}) {
+  function stats(shell, lesson, items, group, { target = 2, readyAt = 0.7, clean = true } = {}) {
     const record = shell.drillOf(lesson);
     const needed = items.filter((item) => inPart(item, group));
     const known = needed.filter((item) => (record.streak[item.id] || 0) >= target).length;

@@ -243,7 +243,9 @@ async function main() {
   check(/^Yes — that is /.test($('.verdict').textContent), 'says what the letter is, warmly', $('.verdict').textContent);
   check(answerButton().attrs['data-verdict'] === 'right' && choices().filter((c) => c.attrs['data-verdict'] === 'dim').length === 3, 'gold on the right one, the rest step back');
   check($('.after').hidden, 'nothing to press: it moves on by itself for a pointer');
-  check($('.progress-text').textContent === '0 of 29 letters known', 'one right answer is not yet "known"');
+  // 2026-09-24: target is 1, not 2 (fixes/lesson 2.txt, "if the user is doing good, it means he knows") — one right
+  // answer is enough, immediately, not a second one in a row.
+  check($('.progress-text').textContent === '1 of 29 letters known', 'one right answer is already "known"');
   await sleep(60);
   check($('.announce').textContent === 'Question 2.' && $('.verdict').textContent === '', 'then the next question, with the answer line cleared', $('.announce').textContent);
 
@@ -310,7 +312,7 @@ async function main() {
   }
   const known = shell.masteredCount(2);
   check(!$('.ready-note').hidden, 'the page says it', `after ${asked} more answers`);
-  check(known >= 24, 'once four fifths of the letters are known', `${known} of 29`);
+  check(known >= 21, 'once seven tenths of the letters are known', `${known} of 29`);
   check(/seem to know these well/.test($('.ready-note').textContent), 'in plain words', $('.ready-note').textContent);
   check($('.lesson').classes().includes('complete') && shell.isDone(2), 'the lesson is marked finished on this device');
   check($('.end-line').textContent.startsWith('You seem to know these'), 'the last line changes');
@@ -329,7 +331,10 @@ async function main() {
   shell.state.script = 'indopak';
   shell.renderSetup();
   await sleep(10);
-  check($('.progress-text').textContent.startsWith(`${knownBefore} of 29`), 'switching script keeps what is known', $('.progress-text').textContent);
+  // Not a fixed prefix: the auto-advance timer can carry a couple of extra right answers past the ready check above
+  // (real setTimeout, real Math.random — this file has no seed), and if that happens to reach all 29 the progress
+  // line reads "All 29 letters known" rather than "{n} of 29" at all. What matters is nothing was lost switching.
+  check(shell.masteredCount(2) === knownBefore, 'switching script keeps what is known', `${shell.masteredCount(2)} vs ${knownBefore} before`);
   check(doc.documentElement.dataset.script === 'indopak', 'and the page follows the script');
 
   shell.setNames(shell.lettersOf().map(([, name], i) => (i === 1 ? 'Bay' : name)).join(', '));

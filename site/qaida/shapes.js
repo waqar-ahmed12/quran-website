@@ -124,7 +124,7 @@
 
   // How a band is going, worked out from what the shell holds. The engine only measures the band it was handed, and
   // the rail wants every band at once. The rule is the engine's: ready is enough known and nothing missed still shaky.
-  function stats(shell, lesson, items, band, { target = 3, readyAt = 0.8, clean = true } = {}) {
+  function stats(shell, lesson, items, band, { target = 2, readyAt = 0.7, clean = true } = {}) {
     const record = shell.drillOf(lesson);
     const needed = band === TABLE ? items : items.filter((item) => item.band === band);
     const known = needed.filter((item) => (record.streak[item.id] || 0) >= target).length;

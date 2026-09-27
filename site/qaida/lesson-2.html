@@ -7,7 +7,7 @@
 <html lang="en"
       data-tiles="paper" data-size="comfortable" data-ask="glyph" data-choices="4"
       data-distractors="family" data-advance="auto" data-miss="trace" data-arrive="stagger"
-      data-progress="title" data-bar="line" data-track="show" data-finish="settle"
+      data-progress="title" data-bar="line" data-track="show" data-finish="glow"
       data-titlemark="ba" data-titlemark-font="amiri" data-bg="light" data-madani-font="amiri"
       data-indopak-font="noto">
 <head>
@@ -31,6 +31,8 @@
   <link rel="stylesheet" href="qaida.css">
   <script src="shell.js" defer></script>
   <script src="audio.js" defer></script>
+  <script src="voice-store.js" defer></script>
+  <script src="voice.js" defer></script>
   <script src="trace.js" defer></script>
   <script src="practice.js" defer></script>
   <script src="lesson-2.js" defer></script>
@@ -63,6 +65,15 @@
           <path d="M14.5 6.5l3 3" />
         </svg>
         <span class="word" data-words="Top bar: writing board button">Board</span>
+      </button>
+      <!-- Say it and listen back: on every lesson, at any time. Opens on the letter last looked at, or blank.
+           voice.js does the rest. -->
+      <button class="tool open-echo" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <rect x="9" y="3" width="6" height="11" rx="3" />
+          <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
+        </svg>
+        <span class="word" data-words="Top bar: say it button">Say it</span>
       </button>
       <!-- Sound on or off, kept on this device. Nothing ever plays by itself; this is for studying in company. -->
       <button class="tool mute" type="button" aria-pressed="false"
@@ -174,6 +185,13 @@
           </svg>
           <span data-words="Hear it button">Hear it</span>
         </button>
+        <button class="button quiet say" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <rect x="9" y="3" width="6" height="11" rx="3" />
+            <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
+          </svg>
+          <span data-words="Say it button">Say it</span>
+        </button>
         <button class="button quiet trace" type="button" aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
@@ -189,8 +207,9 @@
         </button>
       </div>
 
-      <!-- Advice, never a block. Both lines are for the teacher to read first: they are what a beginner who is
-           finding this hard will see. -->
+      <!-- Advice, never a block. The struggling-letter line is for the teacher to read first: it's what a beginner who is
+           finding this hard will see. The ready line is announced here (screen readers only, 2026-09-24): saying it again
+           on screen only duplicated the star and the gold Next button below, and shoved them down each time it appeared. -->
       <div class="advice" role="status" aria-live="polite">
         <div class="struggle" hidden>
           <p class="struggle-text"
@@ -201,9 +220,9 @@
             <button class="button quiet trace" type="button" aria-haspopup="dialog" data-words="Advice: trace it button">Trace it</button>
           </div>
         </div>
-        <p class="ready-note" hidden
+        <p class="ready-note sr-only" hidden
            data-template="You seem to know these well. Lesson 3 is ready when you are — or stay and keep practising."
-           data-words-attr="data-template|Advice: ready to move on"></p>
+           data-words-attr="data-template|Advice: ready to move on (announced to screen readers only)"></p>
       </div>
 
       <p class="tally" hidden
@@ -228,7 +247,7 @@
         </g>
       </svg>
       <p class="end-line"
-         data-before="Take your time. Every letter gets easier with practice." data-after="You seem to know these. Lesson 3 is ready when you are."
+         data-before="Every letter gets easier with practice." data-after="You seem to know these. Lesson 3 is ready when you are."
          data-words-attr="data-before|Last line, before the lesson says you seem ready;data-after|Last line, once it does"></p>
       <div class="onward">
         <a class="button back" href="./">
@@ -281,6 +300,82 @@
        data-trace="Write over the letter with your finger, a mouse or a pen. Hide it and try again from memory. This needs something to draw with — a keyboard won’t do it."
        data-free="Write whatever you need — a letter, a word, a mark. Nothing is saved or marked. This needs something to draw with — a keyboard won’t do it."
        data-words-attr="data-trace|Tracing board: line at the bottom;data-free|Writing board: line at the bottom"></p>
+  </dialog>
+
+  <!-- Say it and listen back. The two clips are played, never compared: a machine grading a beginner's pronunciation
+       would be wrong often and wrong in the worst direction (docs/your-voice/01 §3). voice.js does the rest. -->
+  <dialog class="echo" aria-labelledby="echo-title">
+    <div class="echo-head">
+      <h2 class="echo-title" id="echo-title" data-template="Say {name}" data-free="Your voice"
+          data-words-attr="data-template|Say it panel: title ({name} is filled in);data-free|Say it panel: title with no letter"></h2>
+      <button class="tool close-echo" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </div>
+
+    <!-- What is being said. The glyph is aria-hidden and the name beside it carries the meaning, exactly as the
+         drill tiles do. -->
+    <div class="echo-item">
+      <span class="echo-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
+      <span class="echo-name"></span>
+      <span class="echo-asks" data-name="Say its name." data-sound="Say the sound — not the letter’s name."
+            data-words-attr="data-name|Say it panel: when the name is wanted;data-sound|Say it panel: when the sound is wanted"></span>
+    </div>
+
+    <!-- Two lanes, drawn the same and coloured the same: this is a comparison, not a verdict. -->
+    <div class="echo-lanes">
+      <div class="lane teacher" hidden>
+        <button class="button quiet play-teacher" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l11 7-11 7z" /></svg>
+          <span data-words="Say it panel: play the teacher">The teacher</span>
+        </button>
+        <canvas class="wave teacher-wave" aria-hidden="true"></canvas>
+      </div>
+      <div class="lane mine" hidden>
+        <button class="button quiet play-mine" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 5l11 7-11 7z" /></svg>
+          <span data-words="Say it panel: play your own">You</span>
+        </button>
+        <canvas class="wave mine-wave" aria-hidden="true"></canvas>
+        <button class="link delete-mine" type="button" data-words="Say it panel: delete this recording">Delete</button>
+      </div>
+    </div>
+
+    <!-- The big one. Tap to start, tap to stop. -->
+    <div class="echo-do">
+      <button class="record" type="button" aria-describedby="echo-state"
+              data-start="Record" data-stop="Stop"
+              data-words-attr="data-start|Record button;data-stop|Record button, while recording">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="record-word"></span>
+      </button>
+      <button class="button quiet both" type="button" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 8h9M4 16h9" /><path d="M16 5l4 3-4 3M16 13l4 3-4 3" />
+        </svg>
+        <span data-words="Say it panel: play both">One after the other</span>
+      </button>
+    </div>
+
+    <p class="echo-state" id="echo-state" role="status" aria-live="polite"
+       data-asking="Waiting for you to allow the microphone."
+       data-recording="Recording. {n} seconds."
+       data-cap="That is as long as one recording goes. Tap Record to start again."
+       data-saving="Just a moment."
+       data-before="Tap Record, then say it."
+       data-after="Play them one after the other and listen for the difference."
+       data-deleted="Deleted."
+       data-muted="The sound is off. Turn it on to hear either voice."
+       data-denied="Your browser is keeping the microphone private. If you want to record, allow it for this page and tap Record again."
+       data-nomic="No microphone found on this device. You can still listen."
+       data-words-attr="data-asking|Say it panel: waiting for the microphone;data-recording|Say it panel: while recording ({n} is filled in);data-cap|Say it panel: the recording stopped itself;data-saving|Say it panel: saving;data-before|Say it panel: before recording;data-after|Say it panel: after recording;data-deleted|Say it panel: deleted;data-muted|Say it panel: the sound is off;data-denied|Say it panel: microphone not allowed;data-nomic|Say it panel: no microphone"></p>
+    <button class="link unmute-echo" type="button" hidden
+            data-words="Say it panel: turn the sound on">Turn the sound on</button>
+    <p class="echo-note"
+       data-privacy="Your recordings stay in this browser, on this device. Nothing is sent anywhere."
+       data-no-teacher="No recording from the teacher for this one yet. You can still say it and hear yourself back."
+       data-nostore="This browser will not keep recordings, so this one lasts until you close the page."
+       data-words-attr="data-privacy|Say it panel: where recordings are kept;data-no-teacher|Say it panel: nothing to match against yet;data-nostore|Say it panel: recordings cannot be kept"></p>
   </dialog>
 
   <!-- First visit: script, names and grouping. Opens by itself the first time, and from Settings or Change after. -->
@@ -336,6 +431,16 @@
           </label>
         </div>
       </fieldset>
+      <!-- Say it and listen back keeps its own recordings here, not in the tryout panel: deleting a child's voice
+           cannot live in a file that is scheduled for deletion (docs/your-voice/07 §4). voice.js fills this in. -->
+      <div class="voice-settings" hidden>
+        <p class="voice-count" role="status"
+           data-template="{n} recordings, about {size}." data-none="No recordings yet."
+           data-words-attr="data-template|Say it panel: recordings kept ({n} and {size} are filled in);data-none|Say it panel: no recordings kept"></p>
+        <button class="link delete-voice" type="button"
+                data-label="Delete every recording of my voice" data-confirm="Tap again to delete them"
+                data-words-attr="data-label|Say it panel: delete everything;data-confirm|Say it panel: delete everything, asking to be sure">Delete every recording of my voice</button>
+      </div>
       <button class="button primary done" value="done"
               data-first="Start the lesson" data-later="Done"
               data-words-attr="data-first|Choice: button, first visit;data-later|Choice: button, later visits"></button>

@@ -17,7 +17,7 @@ every lesson of marks, and a fourth copy would be a fourth place to fix every bu
 | `site/qaida/audio/manifest.json` | edit | add `"fathatain": {}`, `"kasratain": {}`, `"dammatain": {}` |
 | `tools/qaida-check.js` | edit | a Lesson 7 block beside the Lesson 4, 5 and 6 ones (§3) |
 | `tools/qaida-lesson7-check.js` | **new** | the harness of `qaida-lesson6-check.js`, pointed at `lesson-7.html` |
-| `QAIDA-BUILD.md` | edit | the status table and a "Step 7 built — Lesson 7" log entry |
+| `QAIDA-BUILD.md` | edit | the status table and a "Step 8 built — Lesson 7" log entry |
 | `design-system/quran-landing/pages/qaida.md` | **after the user has seen it** | not before |
 
 **Nothing else.** `practice.js` does not change. `audio.js`, `recordings.js` and `recordings.html` need no edit:
@@ -138,11 +138,11 @@ lesson works at all.
 
 ## 5. When it is done
 
-Update `QAIDA-BUILD.md` — the status table and a "Step 7 built — Lesson 7" entry listing **where the build differs
+Update `QAIDA-BUILD.md` — the status table and a "Step 8 built — Lesson 7" entry listing **where the build differs
 from this folder**, the way the Lesson 3, 4, 5 and 6 entries do. Leave
 `design-system/quran-landing/pages/qaida.md` until the user has seen the page.
 
-**Step 7 is lessons 7–9: tanween, zabar + alif, standing harakaat.** Lesson 8 (madd) is the first lesson where the
+**Step 8 is lessons 7–9: tanween, zabar + alif, standing harakaat.** Lesson 8 (madd) is the first lesson where the
 mark is joined by a **letter** — the alif — so its items are two letters and a mark, and `twinItems` will want a
 pair rather than a letter. **Lesson 9 is the one to read this folder for:** standing harakaat are three marks in
 one lesson, exactly as here, and `SETS` / `partsOf` / `twinMarksFor` were built for it. It is also the first

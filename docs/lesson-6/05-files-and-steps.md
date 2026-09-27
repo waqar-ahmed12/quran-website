@@ -120,7 +120,7 @@ from this folder**, the way the Lesson 3, 4 and 5 entries do. Leave
 **Step 6 is done when lessons 4, 5 and 6 have all been previewed and signed off** — not when Lesson 6 is written.
 Three lessons are waiting on one browser session.
 
-**Step 7 is lessons 7–9: tanween, zabar + alif, standing harakaat.** Tanween is this mark doubled and reuses
+**Step 8 is lessons 7–9: tanween, zabar + alif, standing harakaat.** Tanween is this mark doubled and reuses
 everything built here, including `against` (its contrast is the single marks, all three of them). Lesson 9 is the
 first lesson in the Qaida with **no letter on the page at all**, and that will need its own plan rather than a
 copy.

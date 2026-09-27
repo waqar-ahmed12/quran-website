@@ -7,7 +7,7 @@ wording rules and the accessibility limits are written in `docs/lesson-4/`; the 
 the alternating twins are in `docs/lesson-6/`. **This folder is only what is new.** Where it is silent, those three
 folders are the specification and the built code is the answer.
 
-Written 2026-09-21, for whoever starts `QAIDA-BUILD.md` **step 7**: *"Lessons 7–9: tanween, zabar + alif, standing
+Written 2026-09-21, for whoever starts `QAIDA-BUILD.md` **step 8** (written as step 7; renumbered 2026-09-27 when "say it and listen back" became step 7 — `lesson-7.html` is copied from `lesson-6.html`, so it is born with the Say it block): *"Lessons 7–9: tanween, zabar + alif, standing
 harakaat (the two scripts write some of these marks differently)."* Lesson 7 is the first of the three.
 
 It is **not** a design record. The design record is `design-system/quran-landing/pages/qaida.md`, written *after*

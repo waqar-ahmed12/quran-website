@@ -280,7 +280,7 @@ async function main() {
   check(htmlEl.attrs['data-mark'] === 'damma' && htmlEl.attrs['data-sits'] === 'above', 'the page teaches damma, and tells the stylesheet the mark sits above: Lesson 4\'s tile rules apply, and none of Lesson 5\'s');
   check(htmlEl.attrs['data-distractors'] === 'which-mark' && htmlEl.attrs['data-board'] === 'quad' && htmlEl.attrs['data-twins'] === 'alternate' && htmlEl.attrs['data-arrows'] === 'last',
     'and asks which mark, shows the quartet, alternates the other marks, and draws one arrow');
-  check(JSON.stringify(qaida.groupCosts().map((p) => [p.items, p.answers])) === '[[6,15],[29,72]]', 'groupCosts() is unchanged: 15 and 72 right answers', JSON.stringify(qaida.groupCosts()));
+  check(JSON.stringify(qaida.groupCosts().map((p) => [p.items, p.answers])) === '[[6,10],[29,42]]', 'groupCosts() is unchanged: 10 and 42 right answers', JSON.stringify(qaida.groupCosts()));
   check(qaida.review === 0 && qaida.group === 1 && qaida.twins === true && qaida.twinMode === 'alternate', 'it starts on part 1, with no plain letters and the twins alternating');
   check(rail().length === 2 && rail().every((b) => b.attrs.disabled === undefined), 'two parts, both enabled: nothing is locked');
   check(railButton(1).querySelector('.band-glyph').textContent === 'ب' + DAMMA && railButton(2).querySelector('.band-glyph').textContent === 'ع' + DAMMA, 'the rail shows baa with paish, and ain with paish');
@@ -451,14 +451,15 @@ async function main() {
   await sleep(10);
   check(!shell.isDone(6) && !$('.ready-note').hidden && /seem to know this part/.test($('.ready-note').textContent), 'part 1 says you seem to know it, and the lesson is not done', $('.ready-note').textContent);
   check(shell.masteredCount(6) === 5 && $('.bar').attrs['aria-valuenow'] === '5', 'and the home\'s card equals the page\'s bar: 5 of 29, though 58 twins are known too', `${shell.masteredCount(6)} / ${$('.bar').attrs['aria-valuenow']}`);
-  for (const item of everyItem().slice(0, 23)) for (let k = 0; k < 3; k += 1) shell.recordAnswer(6, item.id, true);
+  // 15 (plus whatever of part 1's 5 fall outside this slice) stays under seven tenths of 29 (21) either way.
+  for (const item of everyItem().slice(0, 15)) for (let k = 0; k < 3; k += 1) shell.recordAnswer(6, item.id, true);
   qaida.setGroup(2);
   await sleep(10);
-  check(!shell.isDone(6), '23 of 29 is under four fifths of the lesson\'s own: not finished', `${shell.masteredCount(6)} known`);
+  check(!shell.isDone(6), 'under seven tenths of the lesson\'s own known: not finished', `${shell.masteredCount(6)} known`);
   for (const item of everyItem()) for (let k = 0; k < 3; k += 1) shell.recordAnswer(6, item.id, true);
   qaida.setGroup(2);
   await sleep(10);
-  check(shell.isDone(6), 'all 29 of its own known marks the lesson finished, at four fifths of the 29 and not of the pool');
+  check(shell.isDone(6), 'all 29 of its own known marks the lesson finished, at seven tenths of the 29 and not of the pool');
   check(/^You can tell all three marks apart\. This lesson is marked as done/.test($('.end-line').textContent), 'and the last line names what was earned', $('.end-line').textContent);
   check(/You seem to know damma on every letter/.test($('.ready-note').textContent), 'and the advice names the mark', $('.ready-note').textContent);
   check($('.bar').attrs['aria-valuenow'] === '29' && shell.masteredCount(6) === 29 && $('.progress-text').textContent === 'All known', 'the bar is full, the home agrees, and it says so in words');

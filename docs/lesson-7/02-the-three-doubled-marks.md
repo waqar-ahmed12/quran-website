@@ -76,7 +76,7 @@ Neither is a reason to change the lesson. Both are reasons to look at it in a br
 
 ## 5. What the two scripts really do differently
 
-`QAIDA-BUILD.md` step 7 carries a warning: *"the two scripts write some of these marks differently"*. Here is what
+`QAIDA-BUILD.md` step 8 carries a warning: *"the two scripts write some of these marks differently"*. Here is what
 that amounts to, and it is **less work than it sounds**:
 
 - **It is the same three characters in both scripts.** U+064B, U+064C and U+064D are what an Indo-Pak mushaf and a

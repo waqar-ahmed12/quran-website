@@ -29,6 +29,38 @@ code differs from this folder, **the code wins**, and the differences are these:
 - **A global `[hidden] { display: none !important }`** was added. Without it, any class that sets `display` (`.link`,
   `.current`) ignored the attribute; this also fixes Lesson 1's "Start again" and its empty strip.
 - **`09-going-in-order.md` is not built.** Lesson 2 opens from the home once Lesson 1 is finished, as before.
+- **Two fixes from the user's first preview (2026-09-23, `fixes/lesson 2.txt`).** The right answer's button was a
+  fresh shuffle every time, which is fair only over the long run — over a handful of questions it clusters, and the
+  user noticed the second and the last slot coming up most. `practice.js`'s `makeQuestion` now draws the slot from a
+  shuffle bag (`drawPosition`), so any run of `choices` questions in a row covers every slot exactly once —
+  `tools/qaida-check.js` asserts this over 400 questions. And **`data-finish` defaults to `"glow"`, not `"settle"`**:
+  the lesson recommends moving on once the student is ready but never stops them practising, so the Next button now
+  keeps a gentle pulse instead of settling into a static gold once shown — the whole point being that a student who
+  keeps drilling out of boredom, not need, still has a reason to look down and move on.
+- **Two more the same day.** A screenshot showed Sheen's isolated form (its bowl dips well below the line it sits
+  on) overlapping `.choices`; `.prompt` reserved room off `line-height` alone, and several letters draw ink outside
+  what a font's own metrics admit to. `.prompt` now reserves 1.9x the glyph size (was 1.35x, matching what Lesson
+  3's joined-shape prompt already needed), and a new `shell.centerInk(box, el)` nudges the glyph onto its *drawn*
+  bounds (`Range.getBoundingClientRect()`) rather than its line box — the DOM equivalent of `trace.js`'s
+  `measureText`-based centring, wired into `lesson-2.js`, `lesson-3.js` and `mark-lesson.js` alike. And
+  **`target: 3` / `readyAt: 0.8` (72 correct answers, at the least) are now `target: 2` / `readyAt: 0.7` (42, at the
+  least)**, after the user hit 39 questions at 13 of 29 known and said so — "if the user is doing good in a row, it
+  means he knows". `clean` did not change. The two numbers are now held in exactly one place each kind of check
+  reads (`practice.js`, `shell.js`'s `DRILL_TARGET`, and `shapes.js`/`marks.js`'s `stats()`, which had quietly
+  duplicated the old numbers of their own); every test that hard-coded the old arithmetic was updated to match.
+- **A third round (2026-09-24).** Still too slow — 33 questions, 8 of 29 known — because a weighted lottery never
+  *guarantees* an item is drawn; it can duck a letter for a long time by chance. `practice.js` gained an opt-in
+  **deck** (`deck: true`, off everywhere but here): every not-yet-known letter, twice, shuffled; a miss splices one
+  more turn back in 2-4 questions ahead, never at the end. `lesson-2.js` asks for it, along with **`target: 1`**
+  ("known" = the last time you saw it, you got it — not two in a row any more). Spent, the deck hands back to the
+  same weighted draw as before, for practising past done. `tools/qaida-check.js` proves a clean run is exactly 58
+  questions and one mistake costs exactly one more.
+- **A fourth round (2026-09-24), from three screenshots.** "You seem to know these well…" was said twice on screen —
+  gold under the question, and again by the star at the bottom — so `.ready-note` is now `sr-only` (still announced,
+  never shown twice; the star and the glowing Next button are the one visible "you're ready" moment). And
+  `.progress-row`'s `min-height` (sized for its text) was shorter than `.reset`'s own tap-target height, so the row
+  itself grew by 20px the moment "Start again" had something to clear, pushing the whole drill down with it —
+  `.progress-row` now reserves that height always.
 
 ## What Lesson 2 is, in a paragraph
 

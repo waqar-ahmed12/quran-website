@@ -533,6 +533,7 @@
       // A joined form reads out as a letter in invisible joiners; the choices carry the names.
       shown.setAttribute('aria-hidden', 'true');
       prompt.append(shown);
+      shell.centerInk(prompt, shown);
     } else if (q.prompt.mode === 'name') {
       prompt.append(el('span', 'prompt-name', q.prompt.name));
     } else {
@@ -706,6 +707,16 @@
     const v = view.verdict;
     if (v && audio() && v.item.audio) audio().play(v.item.audio.kind, v.item.audio.glyph);
   });
+
+  // Missing when the browser can't record at all (voice.js removes it): docs/your-voice/02 §1. The glyph is
+  // item.audio.glyph, already the isolated letter rather than the joined shape — the same choice "Write it" makes.
+  const sayButton = after.querySelector('.say');
+  if (sayButton) {
+    sayButton.addEventListener('click', () => {
+      const v = view.verdict;
+      if (v && v.item.audio && window.qaidaEcho) window.qaidaEcho.open(v.item.audio.kind, v.item.audio.glyph, v.item.name);
+    });
+  }
 
   // The writing board opens on the ISOLATED letter, not the joined shape: a joiner draws a stray connecting stroke that a
   // student would faithfully copy, and a beginner writes the body of a letter first (docs/lesson-3/06 §4).
@@ -973,6 +984,11 @@
     render,
     replay,
     clear,
+    // The shape last answered or asked, for the top-bar Say it button to open on (docs/your-voice/04 §1).
+    get lastItem() {
+      const item = (view.verdict && view.verdict.item) || (view.question && view.question.item);
+      return item && item.audio ? [item.audio.kind, item.audio.glyph, item.name] : null;
+    },
     get pause() {
       return pause;
     },

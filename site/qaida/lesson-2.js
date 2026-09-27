@@ -114,6 +114,7 @@
       letter.dir = 'rtl';
       letter.textContent = q.prompt.glyph;
       prompt.append(letter);
+      shell.centerInk(prompt, letter);
     } else if (q.prompt.mode === 'name') {
       const name = document.createElement('span');
       name.className = 'prompt-name';
@@ -280,6 +281,15 @@
     if (v && audio() && v.item.audio) audio().play(v.item.audio.kind, v.item.audio.glyph);
   });
 
+  // Missing when the browser can't record at all (voice.js removes it): docs/your-voice/02 §1.
+  const sayButton = after.querySelector('.say');
+  if (sayButton) {
+    sayButton.addEventListener('click', () => {
+      const v = view.verdict;
+      if (v && v.item.audio && window.qaidaEcho) window.qaidaEcho.open(v.item.audio.kind, v.item.audio.glyph, v.item.name);
+    });
+  }
+
   const trace = (item) => {
     if (item && window.qaidaTrace) window.qaidaTrace.open(item.glyph, item.name);
   };
@@ -423,6 +433,11 @@
         formats: formatsFor(mode),
         choices: Number(root.dataset.choices) || 4,
         familyFirst: root.dataset.distractors !== 'any',
+        // 2026-09-24 (fixes/lesson 2.txt): every letter, required and flat with nothing riding along, so it can use
+        // the deck — twice each, close-by retry on a miss — instead of leaving coverage to a weighted lottery.
+        // `target: 1` to match: "known" is simply "the last time you saw it, you got it".
+        deck: true,
+        target: 1,
         on: {
           question: showQuestion,
           verdict: showVerdict,
@@ -470,6 +485,11 @@
     render,
     replay,
     clear,
+    // The letter last answered or asked, for the top-bar Say it button to open on (docs/your-voice/04 §1).
+    get lastItem() {
+      const item = (view.verdict && view.verdict.item) || (view.question && view.question.item);
+      return item && item.audio ? [item.audio.kind, item.audio.glyph, item.name] : null;
+    },
     get pause() {
       return pause;
     },

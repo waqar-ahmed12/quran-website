@@ -1,0 +1,25 @@
+in lesson three part 1:\
+ when we are practicisng it gives pretty obvious options 
+for example waaw is shown and there are 4 options to select from
+but only 1 of the options show waaw so its pretty obvious
+also in the example it shows it does not show a different photo for 
+waaw in the start/alone and waaw joined. it simple shows waaw in both joined and alone
+it should show a stroked version of waaw when it wants to asses waaw joined. a stroke version
+or with another letter بو like this
+
+the same is the problem before practising it shows the same example 
+in the table above which is for learning, it shows the same example of alif alone and joined with some other letter
+it should show باfor alif بد for daal, بذ for dhaal etc.
+
+this is problem for all parts of lession 3 for example
+it should be different for start and middle for the letter ت
+in part 3 of lesson three but it isnt.
+
+
+problem 2:
+
+there is no way to go back to the previous lkesson when a lesson is opened. it only gives the option to go backl to qaidah
+
+problem 3:
+
+Main qaidah page should not have locks on the lessons. cuz whgat difference does it even make???
