@@ -30,14 +30,21 @@ thing genuinely new is that **Lesson 4's zabar items ride along as the wrong ans
 answerable by noticing that a mark exists, which the student learnt last lesson. **Step 6 is still not done:** Lesson 6
 (paish) is to come, and the user has to preview lessons 4 and 5.
 
-**Step 7, saying it out loud, is specified and not built** (2026-09-22, the user: *"i wanted to have a way to record
-audio, so that the student could play back and match his pronounciation with the audio. i want it in every lesson,
-because thats important"*): `docs/your-voice/` is the specification. It **was step 10** and moved to step 7 for one
-reason — lessons 6–14 are not written yet, and a thing that has to be in every lesson is cheaper to be born with than
-retrofitted fourteen times. **The recommended order is this step, then Lesson 6**, so Lesson 6 is copied from a page
-that already has it. **The catch is in `docs/your-voice/09` §1:** `audio/manifest.json` is empty, so there is nothing
-for a student to match *against* until the teacher records the 29 letter names — one sitting, and it covers lessons
-1, 2 and 3 at once.
+**Step 7, saying it out loud, is built, and not yet seen in a browser** (2026-09-24): `docs/your-voice/` is the
+specification and the "Step 7 built" entry in the step log below lists where the build differs. It **was step 10**
+and moved to step 7 for one reason — lessons 6–14 are not written yet, and a thing that has to be in every lesson is
+cheaper to be born with than retrofitted fourteen times. **The catch is still in `docs/your-voice/09` §1:**
+`audio/manifest.json` is empty, so there is nothing for a student to match *against* until the teacher records the 29
+letter names — one sitting, and it covers lessons 1, 2 and 3 at once. Until then the panel is honestly "record
+yourself, hear yourself, keep it." **Step 7 is not done:** the five open questions were all built from their
+recommendation, none of it is seen in a browser yet, and the recommended next step, Lesson 6, is still to come.
+
+**Step 6, Lesson 6 (paish), is planned, not built** (2026-09-24, the user: "please plan hte next lesson"):
+`docs/lesson-6/` holds the differences from lessons 4 and 5. **The one finding that matters:** `marks.js` has
+`MARKS.damma.after: 'kasra'`, so as it stands Lesson 6 would ask paish against zair, which is answered by
+position alone. Paish sits **above, like zabar**, and the shape tells them apart, so the contrast has to be zabar
+(`after: 'fatha'`). Zair rides along as a passenger through a new `also` field. Recommended before building: the
+user previews lessons 4 and 5.
 
 ## Decisions
 
@@ -54,12 +61,12 @@ for a student to match *against* until the teacher records the 29 letter names �
 | Finishing a drill lesson | **A recommendation, not a gate** *(2026-09-19)*: "a recommendation that you seem okay, let's move on". A missed letter **comes back more often but never straight away**; one missed repeatedly earns "go back and look at it again" — advice, never a block |
 | Mixed review | **Every later lesson mixes in** earlier material *(2026-09-19)*. The lesson's own items are the gate; review items ride along and never are. Answers the "ask first" on steps 6 and 8 |
 | Skipping ahead | **Allowed** *(2026-09-19)*: "if the user wanted to skip they can, but they should also be advised that if they are new, it is recommended to go with the flow". **Nothing is locked.** A lesson out of turn advises once, then lets them through. Overrules step 1's locks — see `docs/lesson-2/09-going-in-order.md` |
-| A letter is "known" | **Three right answers in a row** *(2026-09-19: "i guess three")* |
-| "You seem ready" | **Four fifths of the letters known, and no missed letter still shaky** *(2026-09-19: "4 fifth without mistakes, if mistake, repeat the mistake and practice all letters" — Claude's reading)*. A mistake repeats the letter (more often, never straight away) and every letter stays in the mix |
+| A letter is "known" | ~~Three right answers in a row *(2026-09-19: "i guess three")*~~ **Revised to two** *(2026-09-23, after using Lesson 2: "why 39 questions!!! if the user is doing good in a row, it means he knows")* |
+| "You seem ready" | ~~Four fifths of the letters known~~ **Revised to seven tenths** *(2026-09-23, same note)*, **and no missed letter still shaky** *(2026-09-19: "4 fifth without mistakes, if mistake, repeat the mistake and practice all letters" — Claude's reading; the fraction itself changed 2026-09-23, `clean` did not)*. A mistake repeats the letter (more often, never straight away) and every letter stays in the mix |
 | A writing board | **In every lesson, always available** *(2026-09-19: "we don't know when someone would need to write")*. A **Board** button in every lesson's top bar opens a blank board; "Trace it" stays as the shortcut to a letter just missed. Every later lesson copies the button and the tracer dialog |
 | Wording | **Never harsh** *(2026-09-19)*. Plain, short, and a wrong answer says what the letter is and nothing more |
 | Saying it out loud | **In every lesson** *(2026-09-22: "i want it in every lesson, because thats important")*. The student records their own voice and plays it against the teacher's. **Never scored** — the same rule as the tracing board, for a stronger reason — and **it never leaves the device**. `docs/your-voice/` |
-| Lesson 3's length | **Split the big group in two, `target` stays 3** *(2026-09-20, from three options shown with their numbers)*. Six groups: 6 + 2 + 21 + 15 + 24 = 68 shapes, then the table. Position names: start / middle / end **of a word** |
+| Lesson 3's length | **Split the big group in two, `target` stays whatever the engine's default is** *(2026-09-20, from three options shown with their numbers; that default was 3, revised to 2 on 2026-09-23 — see "A letter is 'known'" above)*. Six groups: 6 + 2 + 21 + 15 + 24 = 68 shapes, then the table. Position names: start / middle / end **of a word** |
 
 ## Steps
 
@@ -77,8 +84,8 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 3 | **Trace the letters** with a finger, mouse or pen, inside Lesson 1 | `minimalist-ui`, `high-end-visual-design` | **Built, awaiting sign-off.** Was step 9 |
 | 4 | **Lesson 2, the recognition drill.** Letters out of order; the practice engine the later exercises reuse | `ui-ux-pro-max`, `minimalist-ui` | **Built, awaiting sign-off** (2026-09-19). Specified in `docs/lesson-2/`; `README.md` there lists where the code differs. Check: `node tools/qaida-check.js` |
 | 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | **Built, awaiting sign-off** (2026-09-20). Six groups and a table; `docs/lesson-3/README.md` lists where the code differs. Checks: `node tools/qaida-check.js`, `node tools/qaida-lesson3-check.js`. **The joined shapes have not been seen rendering** — that is the first thing to look at |
-| 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 4 built 2026-09-20, awaiting the user's preview** (`docs/lesson-4/` is the spec; `README.md` there lists where the build differs). **Lesson 5 built 2026-09-20, awaiting the user's preview** (`docs/lesson-5/` — the differences only; it assumes `docs/lesson-4/`; `README.md` there lists where the build differs). Lesson 6 not started. One page file, `mark-lesson.js`, serves all three lessons. Mixed review carries through every later lesson (2026-09-19). Checks: `node tools/qaida-check.js`, `qaida-marks-check.js` (Lesson 4's page), `qaida-lesson5-check.js`, `qaida-lesson3-check.js` |
-| 7 | **Say it and listen back:** the student records their own voice and plays it against the teacher's, **in every lesson** | `ui-ux-pro-max`, `minimalist-ui` | **Specified 2026-09-22 in `docs/your-voice/`, not built.** *Was step 10;* moved here at the user's request — *"i want it in every lesson, because thats important"* — so lessons 6–14 are born with it instead of being retrofitted |
+| 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 4 built 2026-09-20, awaiting the user's preview** (`docs/lesson-4/` is the spec; `README.md` there lists where the build differs). **Lesson 5 built 2026-09-20, awaiting the user's preview** (`docs/lesson-5/` — the differences only; it assumes `docs/lesson-4/`; `README.md` there lists where the build differs). **Lesson 6 planned 2026-09-24, not built** (`docs/lesson-6/`, differences from lessons 4 and 5). One page file, `mark-lesson.js`, serves all three lessons. Mixed review carries through every later lesson (2026-09-19). Checks: `node tools/qaida-check.js`, `qaida-marks-check.js` (Lesson 4's page), `qaida-lesson5-check.js`, `qaida-lesson3-check.js` |
+| 7 | **Say it and listen back:** the student records their own voice and plays it against the teacher's, **in every lesson** | `ui-ux-pro-max`, `minimalist-ui` | **Built 2026-09-24, awaiting the user's preview.** Specified in `docs/your-voice/`; the step log below lists where the build differs. *Was step 10;* moved here at the user's request — *"i want it in every lesson, because thats important"* — so lessons 6–14 are born with it instead of being retrofitted. Check: `node tools/qaida-voice-check.js` |
 | 8 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | Was step 7 |
 | 9 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Was step 8. Answered 2026-09-20: **jazam stays last**, after leen |
 | 10 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Was step 9. Each lesson adds its rows to the recording list as it's built |
@@ -204,6 +211,78 @@ The options panel has a "The drill" section, and every choice in it exports to `
 `node --check`. **Not seen in a browser** — the user previews it. **Not built:** `docs/lesson-2/09-going-in-order.md`
 (nothing locked, advice at the door), which the spec says to ask about. Lesson 2 opens from the home once Lesson 1 is finished.
 `design-system/quran-landing/pages/qaida.md` is **not yet updated**: it is written after the user has seen the page.
+
+**Two fixes after the user's first preview (2026-09-23, `fixes/lesson 2.txt`).** "The second option and the last
+option were most likely to be correct, there should be spread": `practice.js`'s `makeQuestion` drew each question's
+right-answer button from a fresh shuffle, fair only over the long run. It now draws the slot from a **shuffle bag**
+(`drawPosition` — the trick behind Tetris's piece bag): every slot is used once before any repeat, so any run of
+`choices` questions in a row covers every position exactly once. `tools/qaida-check.js` gained a check proving it
+over 400 questions. "Lesson 2 takes too long… after a certain point, just glow up the button below": the "After the
+last letter" behaviour already had a `"glow"` mode (built at step 1) that keeps the Next button pulsing once the
+lesson recommends moving on — it just wasn't the default. Lesson 2's `data-finish` is now `"glow"` rather than
+`"settle"`; practising stays unlimited, but the Next button no longer goes quiet once it is shown. Checked with
+`node tools/qaida-check.js` (all pass) and `node --check`. **Not seen in a browser** — the user previews it.
+
+**Two more, the same day, after the user kept using it.** A screenshot: Sheen's isolated form (a wide bowl that
+dips well below the line it sits on) was overlapping `.choices` — `.prompt`, the box the question's big letter sits
+in, was sized off `line-height`, and several letters (ش ص ض ع غ ق ن و ي…) draw real ink outside what a font's own
+metrics claim. Two things, matching what Lesson 3's `data-band` prompt had already worked out for joined shapes
+(`qaida.css`, "a joined shape hangs lower… so the question gets more room"): `.prompt`'s room is now 1.9x the glyph
+size, not 1.35x, and a new **`shell.centerInk(box, el)`** (`shell.js`) nudges the glyph to put its *drawn* bounds —
+read with `Range.getBoundingClientRect()`, the same idea as `trace.js`'s `measureText`-based centring, just for a
+DOM span instead of a canvas — in the middle of the box, not its line box. Wired into `lesson-2.js`; also into
+`lesson-3.js` and `mark-lesson.js`, which share `.prompt-glyph` and hadn't been previewed yet either.
+
+And then: *"it still takes too long, like why 39 questions!!! like if the user is doing good in a row, it means he
+knows!!!"* — a screenshot showed 13 of 29 known after 39 questions. `target: 3` and `readyAt: 0.8` came to a floor of
+24 x 3 = 72 correct answers before the lesson would ever recommend moving on, which the user's own use of it says is
+too many. **Revised: `target: 2`, `readyAt: 0.7`** (practice.js's `DEFAULTS`, `shell.js`'s `DRILL_TARGET`, and the
+same two numbers duplicated in `shapes.js` and `marks.js`'s `stats()` — all four now agree), a floor of 21 x 2 = 42.
+`clean` is untouched: a shaky letter is still advice, never a block. Every place a test hard-coded the old 24 x 3 /
+"four fifths" arithmetic (`tools/qaida-check.js`, `qaida-page-check.js`, `qaida-lesson3-check.js`,
+`qaida-lesson5-check.js`, `qaida-marks-check.js`) was worked through by hand and updated to 21 x 2 / "seven tenths";
+one assertion in `qaida-page-check.js` ("switching script keeps what is known") was also leaning on the old numbers
+to avoid a real, pre-existing race in that test (a live `setTimeout` auto-advance racing the test's own polling,
+with no seeded random) landing exactly on "all 29 known" — it now checks the count itself rather than a template
+string, which is what it meant to test regardless of the numbers. All five check scripts pass, `qaida-page-check.js`
+run four times in a row to be sure of that race. Decisions table above updated; the 2026-09-19 numbers are struck
+through, not deleted. **Not seen in a browser** — the user previews it.
+
+**A third round, the next day (2026-09-24):** a screenshot — 33 questions, still 8 of 29 known — and *"like if the
+user is doing good in a row, it means he knows!!! ask every letter twice randomly, if mistake made, ask one more
+time… place these randoms close by so that the progress above moves quickly."* The weighted lottery (still the
+engine's only way of choosing what to ask, even after the target/readyAt drop above) never *guarantees* an item gets
+drawn — over a short session it can leave several letters untouched by chance, which is what the screenshot shows.
+**`practice.js` gained a second way of choosing, opt-in (`deck: true`) and off everywhere except Lesson 2**, which
+asked for it explicitly along with **`target: 1`** (`lesson-2.js`): a shuffled deck of every not-yet-known required
+item, twice each; `buildDeck()`/`pickFromDeck()` drain it, and a miss splices one more turn back in 2-4 questions
+ahead (`answer()`) — close by, never at the very end, never straight back. Once the deck is spent the drill falls
+back to the same weighted draw as before, for practising past done. Lessons 3-5 (`shapes.js`/`marks.js`'s pools mix
+required and review items, which the deck doesn't understand yet) are **untouched** — `deck` defaults `false`, so
+nothing about them changed. `tools/qaida-check.js` gained a section proving a clean run is exactly 58 questions
+(29 letters, twice each, none skipped, none repeated) and that one mistake costs exactly one more turn, arriving
+5-8 questions later in the seeded runs tried. `qaida-page-check.js`'s "one right answer is not yet known" assertion
+was written for the old target: 2 and became "already known" for target: 1. All three suites that touch Lesson 2
+(`qaida-check.js`, `qaida-page-check.js`, `qaida-lesson3-check.js`, which shares `practice.js`) pass; `qaida-lesson5-check.js`
+and `qaida-marks-check.js` each have one *unrelated* failure ("try again" now appears in the new voice-recorder
+wording, tripping the old "no scolding" check) from the Step 7 work landing in the same tree — not touched here, and
+not this step's to fix. **Not seen in a browser** — the user previews it.
+
+**A fourth round, from three screenshots (2026-09-24): "remove the words, it looks cluttered… when 'Start again'
+comes the entire thing moves down… when the golden words come, the button moves down."** Two faults, both visual,
+not the drill:
+1. **The "you seem ready" line said the same thing twice** — once gold, under the question (`.advice .ready-note`),
+   and again at the very bottom by the star (`.end-line`), both on screen at once. `.ready-note` is now `sr-only` in
+   `lesson-2.html`: still announced (the `.advice` region is still `aria-live="polite"`, and `.hidden` still toggles
+   the same way it always did), never shown twice. The star and the glowing Next button are now the one and only
+   visible "you're ready" moment.
+2. **`.progress-row` jumped 44 - 24 = 20px the moment "Start again" appeared**, because the row's `min-height`
+   (1.5rem, sized for the text alone) was smaller than `.reset`'s own `.link` min-height (44px, the tap target) — so
+   the *row* grew the moment the button had something to clear, shoving the bar and the whole drill down with it.
+   `qaida.css`'s `.progress-row` now reserves 44px always, hidden or not — the same trick `.prompt` already uses so
+   the answers don't jump between letters. Fixing (1) also fixed the rest of the "button moves down" complaint,
+   since the gold line no longer occupies any visible space to begin with. `qaida-page-check.js` still passes (three
+   runs, given its real timers). **Not seen in a browser** — the user previews it.
 
 ### Step 5 built — Lesson 3, letter shapes
 
@@ -345,6 +424,91 @@ with no release, exactly as `audio.js` already works.
 where the button lives, whether a student can send a recording to the teacher (**recommended: no** — and if ever,
 "save it to my device", not an upload), whether the advice strip gets one, whether the letter tiles get a second mark,
 and whether the recordings are easier taken letter by letter than lesson by lesson.
+
+### Step 7 built — say it and listen back
+
+*2026-09-24, built from the recommendations in `docs/your-voice/09-open-questions.md`, none of which were asked.*
+
+**Built.** `voice-store.js` (IndexedDB, no DOM — the counterpart of `shapes.js`/`marks.js`) and `voice.js` (the panel,
+the recorder, the level ring, the waveform) are new. `qaida.css` gained one `ECHO` block. All five lesson pages
+(`lesson-1.html` … `lesson-5.html`) gained the two `<script>` lines, the top-bar **Say it** button, the
+`<dialog class="echo">` block, and a **Say it** button in the after-strip (Lesson 1's `.current` strip; the `.after`
+strip on lessons 2–5) — the same block `04-where-it-appears.md` §6 says lessons 6–14 copy in as they are written.
+`qaida.js`, `lesson-2.js`, `lesson-3.js` and `mark-lesson.js` each gained one `.say`/`.current-say` handler beside
+their existing `.hear` one, and a `lastItem` getter on `window.qaida` so the top-bar button knows what to open on.
+`audio.js` gained `urlFor(kind, glyph)`, nothing else. `home.js`'s Start again and the options panel's Clear
+everything both now also call `voice-store.clear()` — a no-op today, since `index.html` was left untouched and
+doesn't load `voice-store.js` (per the file list in `08-files-and-steps.md` §1), but wired correctly for whenever it
+does. `qaida-options.js` gained a "Your voice" section, in the same place on every page `07-options-panel.md` §1
+asks for. `tools/qaida-voice-check.js` is the check, 35 checks with no browser: `voice-store.js` against a fake
+IndexedDB (the caps, the eviction, re-recording replacing, a damaged record ignored, resolving harmlessly when the
+database refuses to open), `voice.js` against the real `lesson-1.html` with a fake microphone and `MediaRecorder`
+(the states, both teardown paths, denial, muting, `shell.onChange` closing the panel, no buttons at all with no
+`MediaRecorder`), a source-text check that neither file contains a network call of any kind, and that `home.js`'s
+Start again reaches `voice-store.clear()`.
+
+**Where it differs from `docs/your-voice/`** — four points, each a deliberate simplification, not an oversight:
+
+1. **The teacher's own clip never gets a waveform.** `03-the-panel.md` §5 says it is "built with `decodeAudioData` …
+   on the fetched file," but `08-files-and-steps.md` §3's own check (item 18) demands no network call of any kind in
+   either file — the two cannot both be true. Since the same section allows a lane to draw nothing when a decode
+   isn't attempted ("a missing picture is not an error message"), that is what happens here: only the student's own
+   clip, decoded straight from the recorded `Blob`, ever gets a peak envelope. The play button for the teacher's clip
+   is unaffected, and the waveform is scaled against the recording-length cap instead of the teacher's own length, so
+   a short clip still visibly fills less of the box.
+2. **"The shape of the sound" is On/Off, not "Both voices / Only yours / Off."** Once only the student's clip is ever
+   drawn, the first two choices are the same picture — offering them separately would be a control with no observable
+   difference, which is worse than not offering it.
+3. **The dot on Say it is refreshed by a light poll** (`document.hidden ? skip : check every 600ms`, one indexed
+   lookup only when the item actually changed), not by an event fired when "the item in view" changes — no such event
+   exists on the four lesson pages today, and adding one to each would be a bigger change than the dot itself.
+   `09-open-questions.md` §5 already says nothing is lost if this stays imperfect.
+4. **"Delete every recording of my voice" was built in the real Settings dialog (`.chooser`, on all five lesson
+   pages) from the start**, exactly as `07-options-panel.md` §4 asks, with the temporary options panel's own copy
+   calling the same `qaidaEcho.deleteAll()`. The count line ("{n} recordings, about {size}.") appears in both places.
+
+**Not built, on purpose:** sending a recording to the teacher (§3's own recommendation is no), a Say it in the
+advice strip (§4, "leave it"), a second dot on Lesson 1's grid tiles (§5, "not this step"), and the options panel's
+own "why there is no Say it button here" line for a browser that cannot record (`06-accessibility-and-privacy.md`
+§5 — explicitly step 13, with the rest of the panel).
+
+**Not seen in a browser.** The user previews it (`node serve.js`, then `http://localhost:8777/site/qaida/lesson-1.html`
+— needs `https` or `localhost`, never `file://`). `08-files-and-steps.md` §4 is the checklist, in order: the
+microphone light going dark after closing the panel matters most; then that the permission is asked for only on the
+first tap of Record, not on load; the ring moving with your voice; the top bar still fitting on a phone at four
+tools; playback sounding like you, not distorted; whether 0.4s is the right gap for "One after the other"; whether
+the waveform reads as a picture or a score; a clip surviving a close-and-reopen; both deletes actually deleting,
+after a reload; and the same in dark and light. `design-system/quran-landing/pages/qaida.md` is not updated: it is
+written once the user has seen the page.
+
+### Step 6 planned (Lesson 6) — the other mark above
+
+*2026-09-24. The user: "please plan hte next lesson."*
+
+**Specified, not built.** `docs/lesson-6/` is seven files in the shape of `docs/lesson-5/`, and like that folder it
+holds only the differences. Read `docs/lesson-4/`, then `docs/lesson-5/`, then this. `06-open-questions.md` is the one
+to read first. Nothing was written to `site/`.
+
+**The finding.** `MARKS.damma` was written on 2026-09-20 with `after: 'kasra'`, following `docs/lesson-5/05` §5.
+That is the wrong contrast. Lesson 5 was "above or below"; paish sits **above**, like zabar, so a paish-against-zair
+lesson is answered by position, which the student already has. The confusion a beginner really has is **paish
+against zabar**, told apart by **shape** (a curl against a line). So `after` becomes `'fatha'`, and zair comes along
+through a new `also: ['kasra']`. Its letters are **untagged**, because `practice.js` guarantees exactly one tag-sharing
+wrong answer and it must be the zabar twin. Zair is also left out of part 1 and kept to a third of part 2, so review
+doesn't become most of the lesson.
+
+**Smaller points**, each where it happens: part 1 keeps Lesson 4's six (the same letters the student met zabar on,
+and the mark sits in the same clear space); paish is taller than zabar, so **ا ل ط ظ ك** may clip at the top of a tile
+(put on the checklist, not pre-built); the board gains a **`set`** mode, the printed Qaida's "ba bi bu" row (the
+letter, zabar, zair, paish, no arrows); `{also}` joins `{other}` in the wording; Lesson 6 gets the glowing Next
+button the user asked for on Lesson 2, and lessons 4 and 5 could match.
+
+**Before building:** the user previews lessons 4 and 5, because Lesson 6's rendering risk is Lesson 4's strip with a
+taller mark in it. Every check script passed when this was written.
+
+**Six questions for the teacher**, none blocking. The one worth answering first is **§1, how long a mark lesson
+should take**: Lesson 2 now asks every letter twice and is done, and lessons 3–6 still keep asking until enough are
+known, which is what made Lesson 2 feel long.
 
 ### Step 6 planned (Lesson 5) — the mark below
 

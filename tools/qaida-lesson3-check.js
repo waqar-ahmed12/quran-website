@@ -518,7 +518,7 @@ async function main() {
   check(['Group', 'What each group asks for', 'Shapes drilled', 'Wrong answers offered', 'The board shows'].every((r) => shapeRows.includes(r)), 'the four rows of its own, and the numbers', shapeRows.join(' | '));
   check(rowsOf('The drill').filter((r) => r === 'Wrong answers offered').length === 0, 'and the drill does not repeat the wrong-answers row');
   const costsRow = panel.querySelectorAll('output').map((o) => o.textContent).find((s) => /shapes in all/.test(s));
-  check(/^1: 6 shapes, 15 right · 2: 2 shapes, 6 right · 3: 21 shapes, 51 right · 4: 15 shapes, 36 right · 5: 24 shapes, 60 right — 68 shapes in all$/.test(costsRow || ''), 'the panel shows what each group asks for', costsRow);
+  check(/^1: 6 shapes, 10 right · 2: 2 shapes, 4 right · 3: 21 shapes, 30 right · 4: 15 shapes, 22 right · 5: 24 shapes, 34 right — 68 shapes in all$/.test(costsRow || ''), 'the panel shows what each group asks for', costsRow);
   const press = (row, label) => {
     const d = panel.querySelectorAll('details').find((x) => x.querySelector('summary').textContent === 'Letter shapes');
     const r = d.children.filter((c) => c.tag === 'div').find((c) => c.children[0].textContent === row);

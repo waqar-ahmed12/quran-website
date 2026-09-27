@@ -253,7 +253,7 @@ async function main() {
   console.log('\nThe page');
   check(qaida.kind === 'drill' && typeof qaida.setGroup === 'function' && typeof qaida.groupCosts === 'function' && typeof qaida.setReview === 'function'
     && typeof qaida.setDistractors === 'function', 'publishes window.qaida with kind "drill" and the rows of its own');
-  check(JSON.stringify(qaida.groupCosts().map((p) => [p.items, p.answers])) === '[[6,15],[29,72]]', 'groupCosts() says what each part asks for: 15 and 72 right answers', JSON.stringify(qaida.groupCosts()));
+  check(JSON.stringify(qaida.groupCosts().map((p) => [p.items, p.answers])) === '[[6,10],[29,42]]', 'groupCosts() says what each part asks for: 10 and 42 right answers', JSON.stringify(qaida.groupCosts()));
   check(qaida.review === 0 && qaida.group === 1, 'it starts on part 1, with no plain letters riding along (the user, 2026-09-20)');
   check(rail().length === 2, 'the rail has two parts', String(rail().length));
   check(rail().every((b) => b.attrs.disabled === undefined && b.attrs['aria-disabled'] === undefined), 'both are enabled: nothing is locked');

@@ -261,7 +261,7 @@ async function main() {
     'publishes window.qaida with kind "drill", the rows of its own, and the rows for the other mark');
   check(htmlEl.attrs['data-mark'] === 'kasra' && htmlEl.attrs['data-sits'] === 'below', 'the page teaches kasra, and tells the stylesheet the mark sits below');
   check(htmlEl.attrs['data-distractors'] === 'which-mark' && htmlEl.attrs['data-board'] === 'trio' && htmlEl.attrs['data-twins'] === 'on', 'and asks which mark, shows the trio, and has the other mark riding along');
-  check(JSON.stringify(qaida.groupCosts().map((p) => [p.items, p.answers])) === '[[6,15],[29,72]]', 'groupCosts() is unchanged: 15 and 72 right answers', JSON.stringify(qaida.groupCosts()));
+  check(JSON.stringify(qaida.groupCosts().map((p) => [p.items, p.answers])) === '[[6,10],[29,42]]', 'groupCosts() is unchanged: 10 and 42 right answers', JSON.stringify(qaida.groupCosts()));
   check(qaida.review === 0 && qaida.group === 1 && qaida.twins === true, 'it starts on part 1, with no plain letters (the user, 2026-09-20) and the twins on');
   check(rail().length === 2 && rail().every((b) => b.attrs.disabled === undefined), 'two parts, both enabled: nothing is locked');
   check(railButton(1).querySelector('.band-glyph').textContent === 'د' + KASRA, 'the rail shows daal with the mark under it, not baa (baa has a dot where the mark goes)', railButton(1).querySelector('.band-glyph').textContent);
@@ -410,10 +410,11 @@ async function main() {
   check(!shell.isDone(5), 'part 1 known is not the lesson');
   check(!$('.ready-note').hidden && /seem to know this part/.test($('.ready-note').textContent), 'part 1 says you seem to know it', $('.ready-note').textContent);
   check(shell.masteredCount(5) === 5 && $('.bar').attrs['aria-valuenow'] === '5', 'and the home\'s card equals the page\'s bar: 5 of 29, though 29 twins are known too', `${shell.masteredCount(5)} / ${$('.bar').attrs['aria-valuenow']}`);
-  for (const item of everyItem().slice(0, 23)) for (let k = 0; k < 3; k += 1) shell.recordAnswer(5, item.id, true);
+  // 15 (plus whatever of part 1's 5 fall outside this slice) stays under seven tenths of 29 (21) either way.
+  for (const item of everyItem().slice(0, 15)) for (let k = 0; k < 3; k += 1) shell.recordAnswer(5, item.id, true);
   qaida.setGroup(2);
   await sleep(10);
-  check(!shell.isDone(5), '23 of 29 is under four fifths of the lesson\'s own: not finished, however many twins are known', `${shell.masteredCount(5)} known`);
+  check(!shell.isDone(5), 'under seven tenths of the lesson\'s own known: not finished, however many twins are known', `${shell.masteredCount(5)} known`);
   for (const item of everyItem()) for (let k = 0; k < 3; k += 1) shell.recordAnswer(5, item.id, true);
   qaida.setGroup(2);
   await sleep(10);

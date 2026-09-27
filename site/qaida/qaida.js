@@ -123,6 +123,15 @@
       if (chosen < 0 || !window.qaidaTrace) return;
       window.qaidaTrace.open(letters[chosen][0], letters[chosen][1]);
     });
+
+    const sayButton = current.querySelector('.current-say');
+    // Missing when the browser can't record at all (voice.js removes it): docs/your-voice/02 §1.
+    if (sayButton) {
+      sayButton.addEventListener('click', () => {
+        if (chosen < 0 || !window.qaidaEcho) return;
+        window.qaidaEcho.open('letters', letters[chosen][0], letters[chosen][1]);
+      });
+    }
   }
 
   // Progress ---------------------------------------------------------------------------------
@@ -236,6 +245,10 @@
     kind: 'letters', // the options panel builds its rows from this: a drill lesson has different ones
     render,
     replay,
+    // The letter last tapped, for the top-bar Say it button to open on (docs/your-voice/04 §1).
+    get lastItem() {
+      return chosen >= 0 ? ['letters', letters[chosen][0], letters[chosen][1]] : null;
+    },
     get peekMs() {
       return peekMs;
     },

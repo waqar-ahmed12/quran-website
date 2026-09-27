@@ -291,10 +291,94 @@
     slider('Room below the buttons', 0, 10, 0.25, now, show, (v) => root.style.setProperty('--page-foot', `${v}rem`));
   };
 
-  const gapSlider = () => {
+  // Two more, inside the star-and-buttons block itself (2026-09-25): the star to the line under it, and that line
+  // to the buttons. Shared by every lesson page — the block is the same shape everywhere, unlike gapSlider above.
+  const starGapSlider = () => {
+    const line = document.querySelector('.lesson-end > .end-line');
+    const now = line ? inRem(getComputedStyle(line).marginTop) : 0.4;
+    slider('Gap: below the star', 0, 3, 0.25, now, show, (v) => root.style.setProperty('--gap-below-star', `${v}rem`));
+  };
+
+  const textGapSlider = () => {
+    const onward = document.querySelector('.lesson-end > .onward');
+    const now = onward ? inRem(getComputedStyle(onward).marginTop) : 0.7;
+    slider('Gap: below the text', 0, 3, 0.25, now, show, (v) => root.style.setProperty('--gap-below-text', `${v}rem`));
+  };
+
+  // Say it and listen back (docs/your-voice/07). Missing entirely when the browser can't record at all — nothing to
+  // look at, and step 13 is where this section learns to say so (06 §5).
+  const voiceSection = () => {
+    if (!window.qaidaEcho) return;
+    section('Your voice');
+    option('Say it button',
+      { 'In the top bar and on the letter': 'both', 'Only on the letter': 'letter', 'Only in the top bar': 'topbar' },
+      'say');
+    slider('Longest recording', 2, 15, 1, 6, (v) => `${v} s`, (v) => { root.dataset.echoCap = String(v); });
+    option('The moving ring while recording', { On: 'on', Off: 'off' }, 'echoRing');
+    // Only your own clip ever gets a waveform here — drawing the teacher's would mean reading it over the network,
+    // which voice.js never does (docs/your-voice/03 §5 allows a missing picture) — so this is on/off, not a choice.
+    option('The shape of the sound', { On: 'on', Off: 'off' }, 'echoWave');
+    slider('Gap between the two', 0, 1.5, 0.1, 0.4, (v) => `${v.toFixed(1)} s`,
+      (v) => { root.dataset.echoGap = String(Math.round(v * 1000)); });
+    option('Play the teacher first when the panel opens', { Yes: 'yes', No: 'no' }, 'echoAuto');
+    option('A mark on Say it when you have recorded it', { On: 'on', Off: 'off' }, 'echoDot');
+    option('Keep recordings', { 'Until deleted': 'kept', 'Until the page is closed': 'session' }, 'echoKeep');
+
+    // Not a look, so not registered: a plain count and a two-tap delete, the same function the real Settings
+    // dialog's own copy calls (docs/your-voice/07 §3-4).
+    const countRow = el('div');
+    const countOut = el('output', '…');
+    countRow.append(el('span', 'Recordings kept'), countOut);
+    group.append(countRow);
+    const store = window.qaidaVoiceStore;
+    const refreshCount = async () => {
+      if (!store) return;
+      const ids = await store.ids();
+      if (ids.length === 0) {
+        countOut.textContent = 'None yet.';
+        return;
+      }
+      let bytes = 0;
+      for (const id of ids) {
+        // eslint-disable-next-line no-await-in-loop -- a handful of tiny clips, a dev-only panel
+        const record = await store.get(id);
+        if (record) bytes += record.blob.size;
+      }
+      const size = bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+      countOut.textContent = `${ids.length} recordings, about ${size}.`;
+    };
+    refreshCount();
+
+    let armed = 0;
+    const deleteRow = el('div');
+    const deleteButton = el('button', 'Delete every recording of my voice');
+    deleteButton.type = 'button';
+    deleteButton.addEventListener('click', async () => {
+      if (!armed) {
+        deleteButton.textContent = 'Tap again to delete them';
+        armed = setTimeout(() => {
+          armed = 0;
+          deleteButton.textContent = 'Delete every recording of my voice';
+        }, 3000);
+        return;
+      }
+      clearTimeout(armed);
+      armed = 0;
+      deleteButton.textContent = 'Delete every recording of my voice';
+      await window.qaidaEcho.deleteAll();
+      refreshCount();
+    });
+    deleteRow.append(deleteButton);
+    group.append(deleteRow);
+  };
+
+  // 2026-09-25: a drill page (Lesson 2 on) no longer shares --end-gap with Lesson 1's "letter last tapped" strip —
+  // a fix for one kept nudging the other. Same slider, its own CSS variable and a label that names what it moves,
+  // so it turns up under the section a teacher would actually look in for it.
+  const gapSlider = (cssVar = '--end-gap', label = 'Gap above the star') => {
     const end = document.querySelector('.lesson-end');
     const now = end ? inRem(getComputedStyle(end).marginTop) : 0.75;
-    slider('Space above the buttons', 0, 6, 0.25, now, show, (v) => root.style.setProperty('--end-gap', `${v}rem`));
+    slider(label, 0, 6, 0.25, now, show, (v) => root.style.setProperty(cssVar, `${v}rem`));
   };
 
   // Lesson 1 shows a page of letter tiles; Lesson 2 is a drill and has different rows. `kind` tells them apart, so a
@@ -327,7 +411,9 @@
       'Open the blank board': () => window.qaidaTrace && window.qaidaTrace.open(),
     });
 
-    section('Progress and page');
+    voiceSection();
+
+    section('Page look, spacing & progress bar', true);
     option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
     option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
     option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
@@ -336,6 +422,8 @@
     option('Big alif font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
     option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
     gapSlider();
+    starGapSlider();
+    textGapSlider();
     footSlider();
     actions('Try it', {
       'See every letter': () => lesson.seeAll(),
@@ -497,7 +585,9 @@
       'Open the blank board': () => window.qaidaTrace && window.qaidaTrace.open(),
     });
 
-    section('Progress and page');
+    voiceSection();
+
+    section('Page look, spacing & progress bar', true);
     option('Letter tiles', { Paper: 'paper', Outline: 'line', 'Gold ink': 'gold' }, 'tiles');
     option('Letter size', { Comfortable: 'comfortable', Large: 'large' }, 'size');
     edgeSlider();
@@ -509,7 +599,9 @@
     option(`Big ${mark} by the title`, { Center: 'ba', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
     option(`Big ${mark} font`, { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
     option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
-    gapSlider();
+    gapSlider('--drill-end-gap', 'Gap: tally to the star');
+    starGapSlider();
+    textGapSlider();
     footSlider();
   }
 

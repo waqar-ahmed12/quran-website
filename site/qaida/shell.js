@@ -143,7 +143,7 @@
     v: 1, script: 'madani', names: 'fatha', grouping: 'families', chosen: false, muted: false, lessons: {},
   });
 
-  const DRILL_TARGET = 3; // right answers in a row that make an item known, until the lesson says otherwise
+  const DRILL_TARGET = 2; // right answers in a row that make an item known, until the lesson says otherwise (2026-09-23: was 3)
 
   // Maps are built without a prototype: JSON.parse makes a real own "__proto__" key, and putting one on an ordinary
   // object hits the prototype setter instead of making a key.
@@ -523,6 +523,34 @@
 
   applyMute();
 
+  // A big glyph shown on its own — Lesson 2's question, Lesson 3's board, a mark lesson's prompt — is centred by
+  // its line box, not by what it actually draws. Several letters (ش ص ض ع غ ق ن و ي…) carry real ink well below
+  // the line they sit on, which a fixed-height box built for an average letter doesn't leave room for; the ink
+  // then spills into whatever sits under it. `Range.getBoundingClientRect()` gives the true drawn bounds of `el`
+  // (unlike a font's own metrics, which several Arabic faces draw well outside of), so it can be nudged to put
+  // that, not its line box, in the middle of `box`. Call once the element's text is set and it is in the page.
+  function centerInk(box, el, awaitFonts = true) {
+    // No-op outside a real browser (the checks in tools/ hand-make a DOM with no Range or layout to measure).
+    if (typeof document.createRange !== 'function' || typeof box.getBoundingClientRect !== 'function') return;
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const ink = range.getBoundingClientRect();
+    if (ink.width && ink.height) {
+      const frame = box.getBoundingClientRect();
+      const shift = frame.top + frame.height / 2 - (ink.top + ink.height / 2);
+      el.style.transform = shift ? `translateY(${shift}px)` : '';
+    } // else nothing drawn yet (hidden, or empty) — the fonts.ready look below still runs
+    // The web font can still be loading (a system fallback measures differently), so it's worth one more look once
+    // it has: mark-lesson.js's halo already waits on the same event for the same reason. `awaitFonts` guards against
+    // that second look scheduling a third — `document.fonts.ready` is a settled promise once fonts are in, and
+    // chaining .then() off it forever would spin the microtask queue.
+    if (awaitFonts && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        if (box.contains(el)) centerInk(box, el, false);
+      });
+    }
+  }
+
   // The top bar gains its hairline once the page has scrolled.
   const topbar = $('.topbar');
   const sentinel = $('.top-sentinel');
@@ -556,6 +584,7 @@
     doneCount,
     renderSetup,
     applyMute,
+    centerInk,
     onChange,
     showChooser,
     closeChooser,

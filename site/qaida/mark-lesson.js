@@ -647,6 +647,7 @@
     if (q.prompt.mode === 'glyph') {
       const shown = arabic(el('span', 'prompt-glyph', q.prompt.glyph));
       prompt.append(shown);
+      shell.centerInk(prompt, shown);
     } else if (q.prompt.mode === 'name') {
       prompt.append(el('span', 'prompt-name', q.prompt.name));
     } else {
@@ -822,6 +823,16 @@
     const v = view.verdict;
     if (v && audio() && v.item.audio) audio().play(v.item.audio.kind, v.item.audio.glyph);
   });
+
+  // Missing when the browser can't record at all (voice.js removes it): docs/your-voice/02 §1. item.audio.kind is
+  // already the mark's audio key (fatha, kasra), so lessons 4, 5 and 6 are correct with no case analysis.
+  const sayButton = after.querySelector('.say');
+  if (sayButton) {
+    sayButton.addEventListener('click', () => {
+      const v = view.verdict;
+      if (v && v.item.audio && window.qaidaEcho) window.qaidaEcho.open(v.item.audio.kind, v.item.audio.glyph, v.item.name);
+    });
+  }
 
   // The writing board opens on the letter WITH its mark, not the bare letter as Lesson 3 does: writing the mark is the
   // lesson, and it is the part with a real chance of being drawn in the wrong place (docs/lesson-4/06 §4). A bare review
@@ -1118,6 +1129,11 @@
     render,
     replay,
     clear,
+    // The item last answered or asked, for the top-bar Say it button to open on (docs/your-voice/04 §1).
+    get lastItem() {
+      const item = (view.verdict && view.verdict.item) || (view.question && view.question.item);
+      return item && item.audio ? [item.audio.kind, item.audio.glyph, item.name] : null;
+    },
     get pause() {
       return pause;
     },

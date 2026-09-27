@@ -10,17 +10,28 @@
   const shell = window.qaidaShell;
   if (!shell) return;
 
-  // The user's answers, 2026-09-19: three right answers in a row make an item known; "four fifths without mistakes"
-  // makes a lesson ready — four fifths known, and nothing missed that is still shaky (`clean`).
+  // Revised 2026-09-23 (fixes/lesson 2.txt: "why 39 questions!!! if the user is doing good in a row, it means he
+  // knows"). Three in a row to master a letter, and four fifths of the lesson known before it recommends moving on,
+  // came to 24 x 3 = 72 correct answers at the least — too long for a recognition drill, by the user's own account
+  // after using it. Two in a row now makes an item known, and seven tenths of the lesson makes it ready: a floor of
+  // 21 x 2 = 42, and each mistake now costs less to put right too. `clean` stays: a letter still shaky is still
+  // advice, never a block, and the numbers are one row each in the options panel if they still feel off.
   const DEFAULTS = {
     choices: 4, // buttons per question, kept between 2 and 6
-    target: 3, // consecutive right answers that master an item
-    readyAt: 0.8, // fraction of the required items that must be known
+    target: 2, // consecutive right answers that master an item
+    readyAt: 0.7, // fraction of the required items that must be known
     clean: true, // …and none of the ones that were missed may still be unmastered
     strugglingAt: 3, // lifetime misses on one item before it is reported as struggling
     familyFirst: true, // one look-alike among the wrong answers, when there is one
     cooldown: 2, // questions a just-missed item sits out before it can come back
     noRepeatWithin: null, // null: min(3, a third of the pool)
+    // 2026-09-24 (fixes/lesson 2.txt: "33 questions in a row and still 8 letters… ask every letter twice randomly,
+    // if mistake made, ask one more time… place these randoms close by so the progress moves quickly"). A weighted
+    // lottery can leave any one item undrawn for a long time by chance — nobody asked for chance, they asked for
+    // every item to get its fair, bounded turn. `deck` is opt-in (only Lesson 2 uses it today: a flat, all-required
+    // pool with no review items riding along; the weighted draw below still runs everything else, unchanged) —
+    // see buildDeck() and pickFromDeck().
+    deck: false,
   };
 
   const clamp = (n, low, high) => Math.min(high, Math.max(low, n));
@@ -51,6 +62,8 @@
       missedAt: new Map(), // id -> the question number it was missed on
       readyFired: false,
       struggled: new Set(),
+      posBag: { size: 0, queue: [] }, // which button slot the right answer lands in — see drawPosition
+      deck: [], // ids still owed a turn, `settings.deck` only — see buildDeck()
     });
 
     let session = fresh();
@@ -69,6 +82,19 @@
       }
       return out;
     }
+
+    // Every required item not already known, twice each, shuffled together. Emptied by pickFromDeck as the visit
+    // goes on; a miss puts one more copy back in close by (see answer()), never at the very end. Once it runs dry,
+    // pickItem falls back to the weighted draw below — free practice, not owed to anyone any more.
+    function buildDeck() {
+      if (!settings.deck) return [];
+      const owed = items.filter((item) => isRequired(item) && streakOf(item.id) < settings.target);
+      const queue = [];
+      for (const item of owed) queue.push(item.id, item.id);
+      return shuffle(queue);
+    }
+
+    session.deck = buildDeck(); // build once now that streakOf and shuffle above both exist
 
     // Progress ---------------------------------------------------------------------------------
 
@@ -132,7 +158,32 @@
         emit('error', 'formats');
         return null;
       }
+      // The deck (Lesson 2 only, `settings.deck`) drives things until every item has had its bounded, close-together
+      // turns; empty (or switched off), it's the weighted draw everything else has always used.
+      if (session.deck.length) {
+        const picked = pickFromDeck(playable);
+        if (picked) return picked;
+      }
+      const picked = pickWeighted(playable);
+      if (!picked) emit('error', 'formats');
+      return picked;
+    }
 
+    // Pops the next id the deck owes a turn — skipping over one that would repeat the very last question, since a
+    // deck (unlike the lottery below) has no other reason not to hand back the same id twice running.
+    function pickFromDeck(playable) {
+      const last = session.recent[session.recent.length - 1];
+      let at = session.deck.findIndex((id) => id !== last);
+      if (at === -1) at = 0; // every copy left is the one just asked — ask it anyway rather than stall
+      const id = session.deck[at];
+      const item = playable.find((it) => it.id === id);
+      const format = item && chooseFormat(item);
+      if (!item || !format) return null; // not askable right now; leave it queued and fall back to the lottery once
+      session.deck.splice(at, 1);
+      return { item, format, fromDeck: true };
+    }
+
+    function pickWeighted(playable) {
       const next = session.n + 1;
       const last = session.recent[session.recent.length - 1];
       const span = settings.noRepeatWithin != null
@@ -161,7 +212,6 @@
         if (format) return { item, format };
         pool = pool.filter((other) => other !== item);
       }
-      emit('error', 'formats');
       return null;
     }
 
@@ -195,7 +245,19 @@
       return chosen;
     }
 
-    function makeQuestion(item, format, n) {
+    // Where the right answer lands. A fresh shuffle is fair only in the long run — over a handful of questions it
+    // clusters, which is what the user noticed ("the second option and the last were most likely to be correct").
+    // A shuffle bag (the trick behind Tetris's piece bag) fixes that: every slot is drawn once before any slot
+    // repeats, so any run of `count` questions in a row covers every position exactly once.
+    function drawPosition(count) {
+      const bag = session.posBag;
+      if (bag.size !== count || !bag.queue.length) {
+        session.posBag = { size: count, queue: shuffle([...Array(count).keys()]) };
+      }
+      return session.posBag.queue.pop();
+    }
+
+    function makeQuestion(item, format, n, fromDeck) {
       const wanted = clamp(Math.round(Number(settings.choices)) || DEFAULTS.choices, 2, 6) - 1;
       const spread = distractorsFor(item, format, wanted);
       if (!spread.length) return null; // below two choices there is no question to ask
@@ -203,7 +265,16 @@
       if (format.ask === 'glyph') prompt.glyph = item.glyph;
       else if (format.ask === 'name') prompt.name = item.name;
       else if (format.ask === 'sound') prompt.audio = item.audio;
-      return { n, format, item, prompt, choices: shuffle([item, ...spread]), answered: false, verdict: null };
+
+      const total = spread.length + 1;
+      const others = shuffle(spread);
+      const choices = new Array(total);
+      const at = drawPosition(total);
+      choices[at] = item;
+      for (let i = 0, next = 0; i < total; i += 1) {
+        if (i !== at) choices[i] = others[next++];
+      }
+      return { n, format, item, prompt, choices, answered: false, verdict: null, fromDeck: Boolean(fromDeck) };
     }
 
     function advance() {
@@ -212,7 +283,7 @@
         current = null;
         return null;
       }
-      const question = makeQuestion(picked.item, picked.format, session.n + 1);
+      const question = makeQuestion(picked.item, picked.format, session.n + 1, picked.fromDeck);
       if (!question) {
         current = null;
         emit('error', 'pool');
@@ -249,6 +320,13 @@
       } else {
         session.wrong += 1;
         session.missedAt.set(item.id, question.n);
+        // "If a mistake is made, ask one more time" — put one more turn back in close by (2 to 4 questions ahead,
+        // never straight back). Only while this question actually came from the deck: a slip during free practice
+        // after the deck is spent shouldn't reopen it.
+        if (question.fromDeck) {
+          const at = Math.min(session.deck.length, 2 + Math.floor(settings.random() * 3));
+          session.deck.splice(at, 0, item.id);
+        }
       }
 
       const mastered = right && before < settings.target && streak >= settings.target;
@@ -286,7 +364,7 @@
         format = chooseFormat(current.item);
         if (!format) return advance();
       }
-      const question = makeQuestion(current.item, format, current.n);
+      const question = makeQuestion(current.item, format, current.n, current.fromDeck);
       if (!question) {
         emit('error', 'pool');
         return null;
@@ -387,6 +465,7 @@
       reset() {
         shell.clearDrill(lesson);
         session = fresh();
+        session.deck = buildDeck();
         current = null;
         writeTotal();
         emit('progress', progress());

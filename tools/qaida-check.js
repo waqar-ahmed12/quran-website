@@ -136,6 +136,80 @@ console.log('\nQuestions');
   check(six.drill.question.choices.length === 6, 'six choices when asked for six');
 }
 
+// ---- 2c. The deck (`deck: true`, Lesson 2's own opt-in): every item twice, a miss adds one more nearby
+//          (fixes/lesson 2.txt, 2026-09-24: "33 questions in a row and still 8 letters… ask every letter twice
+//          randomly, if mistake made, ask one more time… place these randoms close by") --------------------------
+
+console.log('\nThe deck (deck: true, Lesson 2 only)');
+{
+  const { drill } = make({ seed: 9, options: { deck: true, target: 1 } });
+  const counts = new Map();
+  // target: 1 credits a letter "known" the moment it is first answered right, well before the deck (29 letters,
+  // twice each) is spent — so counting to a fixed 58 is the way to see the deck itself run out, not `progress()`.
+  for (let n = 0; n < 58; n += 1) {
+    const q = drill.question;
+    counts.set(q.item.id, (counts.get(q.item.id) || 0) + 1);
+    drill.answer(q.item.id); // nothing missed: nothing should come back
+    drill.next();
+  }
+  const uneven = [...counts.entries()].filter(([, c]) => c !== 2);
+  check(uneven.length === 0, 'a clean run: every letter asked exactly twice in 58 questions, none skipped, none repeated', JSON.stringify(uneven));
+  check(drill.progress().known === 29, 'and every one of them known', `${drill.progress().known} of 29`);
+  check(drill.question.fromDeck === false, 'the 59th question is free practice, not owed to anyone any more');
+}
+
+{
+  const { drill } = make({ seed: 4, options: { deck: true, target: 1 } });
+  const counts = new Map();
+  let missedId = '';
+  let missedAt = 0;
+  let backAt = 0;
+  // 59 = the 58-question deck plus the one extra turn a single mistake owes: exactly the count the rule promises,
+  // never open-ended, whichever of the missed letter's two remaining copies (its own second turn, or the one just
+  // added) happens to come up first.
+  for (let n = 1; n <= 59; n += 1) {
+    const q = drill.question;
+    counts.set(q.item.id, (counts.get(q.item.id) || 0) + 1);
+    if (n === 1) {
+      missedId = q.item.id; // miss the very first letter drawn, once, and only once
+      missedAt = n;
+      drill.answer(wrongChoice(q).id);
+    } else {
+      if (q.item.id === missedId && !backAt) backAt = n;
+      drill.answer(q.item.id);
+    }
+    drill.next();
+  }
+  check(backAt > missedAt, 'the missed letter is asked again');
+  check(backAt - missedAt <= 8, 'and soon — close by, not spread out across the session', `${backAt - missedAt} questions later`);
+  check((counts.get(missedId) || 0) === 3, 'that one letter got three turns in all: missed once, asked twice more', String(counts.get(missedId)));
+  check([...counts.entries()].filter(([id]) => id !== missedId).every(([, c]) => c === 2), 'every other letter still just twice');
+  check(drill.progress().known === 29, 'it still ends with every letter known', `${drill.progress().known} of 29`);
+}
+
+{
+  // `deck` is opt-in and off by default: a drill that never asks for it (every other lesson, and this file's other
+  // checks) draws exactly the way it always has.
+  const { drill } = make({ seed: 9 });
+  check(drill.question.fromDeck === false, 'deck off by default: an ordinary drill\'s questions are never "from the deck"', String(drill.question.fromDeck));
+}
+
+// ---- 2b. The right answer's position is spread, not clustered (fixes/lesson 2.txt: "the second option and the
+//          last option were most likely to be correct") ------------------------------------------------------------
+
+console.log('\nWhere the right answer lands');
+{
+  const { drill } = make({ options: { choices: 4 }, seed: 11 });
+  const counts = [0, 0, 0, 0];
+  for (let i = 0; i < 400; i += 1) {
+    const q = drill.question;
+    counts[q.choices.findIndex((c) => c.id === q.item.id)] += 1;
+    drill.answer(wrongChoice(q).id);
+    drill.next();
+  }
+  check(counts.every((n) => n === 100), 'four choices, 400 questions: every position holds the right answer exactly 100 times', counts.join(','));
+}
+
 // ---- 3. A missed letter: not straight away, then more often ------------------------------------------------------
 
 console.log('\nA missed letter');
@@ -193,7 +267,8 @@ console.log('\nA missed letter');
     `missed ${mean(gapsMissed).toFixed(1)} vs others ${mean(gapsOthers).toFixed(1)} questions`);
 }
 
-// ---- 4. Ready: four fifths known, nothing missed and still shaky ---------------------------------------------
+// ---- 4. Ready: seven tenths known, nothing missed and still shaky (2026-09-23: was four fifths, three in a row —
+//        fixes/lesson 2.txt, "why 39 questions!!!") -----------------------------------------------------------
 
 console.log('\nReady');
 {
@@ -210,28 +285,28 @@ console.log('\nReady');
   }
   const p = drill.progress();
   check(readyAt > 0, 'a perfect student is told they seem ready', `at question ${readyAt}`);
-  check(readyAt >= 24 * 3, 'not before four fifths of the letters have three right answers in a row', `24 x 3 = 72`);
+  check(readyAt >= 21 * 2, 'not before seven tenths of the letters have two right answers in a row', `21 x 2 = 42`);
   check(events.ready === 1, 'ready fires once, however long they carry on', `${events.ready} times`);
-  check(p.known >= 24, 'the bar counts letters known', `${p.known} of ${p.total}`);
+  check(p.known >= 21, 'the bar counts letters known', `${p.known} of ${p.total}`);
 }
 
 {
   const { drill, shell } = make({ seed: 5 });
   const ids = shell.lettersOf().map(([g]) => shell.keyOf(g));
-  for (const id of ids.slice(0, 24)) for (let k = 0; k < 3; k += 1) shell.recordAnswer(2, id, true);
-  check(drill.progress().ready === true, 'twenty-four letters known and nothing missed: ready');
+  for (const id of ids.slice(0, 21)) for (let k = 0; k < 2; k += 1) shell.recordAnswer(2, id, true);
+  check(drill.progress().ready === true, 'twenty-one letters known and nothing missed: ready');
 
   shell.recordAnswer(2, ids[25], false); // a letter missed and still shaky
-  check(drill.progress().ready === false, 'twenty-four known but one missed letter still shaky: not ready', `toFix ${drill.progress().toFix}`);
+  check(drill.progress().ready === false, 'twenty-one known but one missed letter still shaky: not ready', `toFix ${drill.progress().toFix}`);
 
-  for (let k = 0; k < 3; k += 1) shell.recordAnswer(2, ids[25], true);
+  for (let k = 0; k < 2; k += 1) shell.recordAnswer(2, ids[25], true);
   check(drill.progress().ready === true, 'once that letter is put right: ready again');
 }
 
 {
   const { drill, shell } = make({ seed: 5, options: { readyAt: 1 } });
   const ids = shell.lettersOf().map(([g]) => shell.keyOf(g));
-  for (const id of ids.slice(0, 28)) for (let k = 0; k < 3; k += 1) shell.recordAnswer(2, id, true);
+  for (const id of ids.slice(0, 28)) for (let k = 0; k < 2; k += 1) shell.recordAnswer(2, id, true);
   check(drill.progress().ready === false, 'readyAt 1: twenty-eight of twenty-nine is not ready');
   drill.masterAll();
   check(drill.progress().ready === true && drill.progress().known === 29, 'masterAll: every letter known, ready');
@@ -316,7 +391,7 @@ console.log('\nStorage');
   const { shell } = boot(hostile);
   const drill = shell.drillOf(2);
   check(shell.lessonState(2).done === true && shell.lessonState(2).seen.length === 1, 'the rest of the lesson survives a damaged drill');
-  check(drill.total === 0 && drill.target === 3, 'a bad total and target become 0 and 3', `${drill.total}, ${drill.target}`);
+  check(drill.total === 0 && drill.target === 2, 'a bad total and target become 0 and 2', `${drill.total}, ${drill.target}`);
   check(Object.getPrototypeOf(drill.right) === null, 'maps have no prototype, so "__proto__" cannot poison them');
   check(JSON.stringify(Object.keys(drill.right)) === JSON.stringify(['ت', 'ث', 'ج']), 'only sound keys are kept', Object.keys(drill.right).join(' '));
   check(drill.right['ت'] === 2 && drill.right['ث'] === 3 && drill.right['ج'] === 9999, 'counts are whole numbers, capped at 9999');
