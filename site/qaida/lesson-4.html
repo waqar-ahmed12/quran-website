@@ -16,7 +16,7 @@
       data-review="0" data-distractors="look-alike" data-board="pairs" data-point="halo"
       data-ask="mark" data-choices="4" data-advance="auto" data-miss="trace" data-arrive="stagger" data-peek="under"
       data-progress="title" data-bar="line" data-track="show" data-finish="settle"
-      data-titlemark="ba" data-titlemark-font="amiri" data-bg="light" data-madani-font="amiri"
+      data-titlemark="ba" data-titlemark-font="amiri" data-bg="light" data-madani-font="scheherazade"
       data-indopak-font="noto">
 <head>
   <meta charset="utf-8">
@@ -45,6 +45,7 @@
   <script src="practice.js" defer></script>
   <script src="marks.js" defer></script>
   <script src="mark-lesson.js" defer></script>
+  <script src="spell.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
   <script src="qaida-options.js" defer></script>
@@ -325,6 +326,50 @@
             data-words-attr="data-groups|Look-alike letters (groups between commas)"></span>
     </section>
 
+    <!-- Real words, made only from letters and marks this lesson has taught: the traditional spelling method (the
+         user's own example, 2026-09-27) — name each letter with its mark, then put it together with what came
+         before, one letter at a time, to the whole word. Shown, never scored, like "Write it" and "Say it"; no
+         audio here yet (the user, 2026-09-27: "no speech for now"). The words themselves are candidates (spell.js),
+         to be checked before they ship. Which word is on screen is its own small tracker, kept apart from the
+         Part 1 / Part 2 rail above: that one is about meeting the mark, this one is about which word. -->
+    <section class="spell" aria-labelledby="spell-title"
+             data-word-label="Word {n} of {total}" data-word-button="Word {n}"
+             data-letter-line="{name} with {mark}: {sound}." data-blend-line="Put together: {sound}."
+             data-whole-line="The whole word: {sound}." data-meaning-line="It means “{meaning}.”"
+             data-words-attr="data-word-label|Spell it: which word, of how many ({n} and {total} are filled in);data-word-button|Spell it: a word's own button, for a screen reader ({n} is filled in);data-letter-line|Spell it: naming a letter ({name}, {mark} and {sound} are filled in);data-blend-line|Spell it: a blend so far ({sound} is filled in);data-whole-line|Spell it: the finished word ({sound} is filled in);data-meaning-line|Spell it: what the word means ({meaning} is filled in)">
+      <div class="section-head">
+        <p class="eyebrow" data-words="Spell it: step label">Step 3</p>
+        <h2 class="section-title" id="spell-title" tabindex="-1" data-words="Spell it: heading">Spell a word</h2>
+        <p class="section-guide" data-words="Spell it: guide line">Put letters together, one at a time, to read a real word.</p>
+      </div>
+
+      <div class="spell-words" role="group" aria-label="Which word">
+        <p class="spell-words-label"></p>
+        <div class="spell-words-nav"></div>
+      </div>
+
+      <div class="spell-stage" role="group" aria-labelledby="spell-title">
+        <p class="spell-glyph" lang="ar" dir="rtl" aria-hidden="true"></p>
+        <p class="spell-caption" role="status" aria-live="polite"></p>
+        <p class="spell-meaning" hidden></p>
+      </div>
+      <div class="spell-controls">
+        <button class="button quiet spell-back" type="button" data-words="Spell it: back button">Back</button>
+        <button class="button primary spell-next" type="button" data-words="Spell it: next button">Next</button>
+        <button class="button primary spell-restart" type="button" hidden data-words="Spell it: start over button">Start over</button>
+        <button class="button primary spell-nextword" type="button" hidden data-words="Spell it: next word button">Next word</button>
+      </div>
+
+      <!-- The extra list moved out to its own page (the user, 2026-09-27: "don't you think there should be a
+           separate page for the more words"): a printed Qaida's own "mashq" (exercise) page, twelve words, no
+           meanings, no walkthrough — exercise-4.html. -->
+      <div class="spell-more">
+        <h3 class="spell-more-title" data-words="Spell it: more words heading">More words to read</h3>
+        <p class="spell-more-guide" data-words="Spell it: more words guide line">Twelve more, using the same mark — no translations, just reading.</p>
+        <a class="button quiet" href="exercise-4.html" data-words="Spell it: more words link">Practice reading →</a>
+      </div>
+    </section>
+
     <footer class="lesson-end">
       <!-- The star and its rules draw into place once the lesson says you seem ready. -->
       <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
@@ -346,6 +391,14 @@
             <path d="M19 12H5M11 6l-6 6 6 6" />
           </svg>
           <span data-words="Back to the lessons button">Back to the Qaida</span>
+        </a>
+        <!-- Lesson 3 is built, and its title has no zabar/fatha variant, so this is a plain link, unlike Next
+             (the user, 2026-09-27: "there is a next lesson, but no way to go back"). -->
+        <a class="button quiet prev" href="lesson-3.html">
+          <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+          <span data-words="Previous lesson button">Previous: Letter shapes</span>
         </a>
         <!-- Lesson 5 is built, so this is a link to it (mark-lesson.js reads the lesson's row in shell.js); before a lesson exists
              a click shows the note at the bottom of the screen instead.

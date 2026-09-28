@@ -1,29 +1,31 @@
 <!doctype html>
-<!-- The free Qaida, Lesson 5 (QAIDA-BUILD.md, step 6): the mark below. The same small stroke as Lesson 4's, written under
-     the letter instead of over it: baa is a letter called Baa, with the stroke above it it is "ba", and with the stroke
-     under it it is "bi". What this lesson teaches that Lesson 4 did not is WHICH mark and WHERE it sits: the letters with
-     zabar ride along as the wrong answers, because a student who has done Lesson 4 can already see that a stroke is there.
-     In two parts, six letters to meet the mark on and then all of them. It teaches no words. The engine is practice.js,
-     unchanged; the data layer is marks.js; the page's code is mark-lesson.js, which also serves lessons 4 and 6 (this file
-     differs from lesson-4.html only in data-mark, a few other attributes and its wording); the specification is
-     docs/lesson-5/, which holds only the differences from docs/lesson-4/. The data- attributes on <html> are the look; the
-     options panel (qaida-options.js) changes them for tryouts.
+<!-- The free Qaida, Lesson 7 (QAIDA-BUILD.md step 8): the doubled marks. Baa with one fatha is "ba"; baa with the
+     same stroke written TWICE is "ban". Two of the three sit above the letter (fathatain, dammatain) and one below
+     (kasratain), exactly where their single counterparts sit. It teaches no words (docs/lesson-7/01 §3) — no
+     Spell-a-word section here. The engine is practice.js, unchanged; the data layer is marks.js; the page's code is
+     mark-lesson.js, which now serves four lessons (this file differs from lesson-6.html in data-mark — which now
+     names a SET, "tanween", not a single mark — a few other attributes and its wording); the specification is
+     docs/lesson-7/, which holds only what is new on top of docs/lesson-4/, docs/lesson-5/ and docs/lesson-6/.
 
-     The mark is a combining character and is never pasted into a file: it is composed by marks.js, and written here as a
-     numeric reference where it must be written at all, because a literal one is invisible in every editor and diff.
-     Every element that holds a marked letter is aria-hidden and its container carries the name: a screen reader would
-     otherwise say the letter and drop the mark, or read out the mark's Unicode name. -->
+     The one genuinely new idea (docs/lesson-7/03): a lesson can hold more than one mark. Four parts — meet each
+     doubled mark on its own six letters, then all 29 with all three in the mix — where lessons 4-6 only ever had
+     two. The data- attributes on <html> are the look; the options panel (qaida-options.js) changes them for tryouts.
+
+     The mark is a combining character and is never pasted into a file: it is composed by marks.js, and written here
+     as a numeric reference where it must be written at all, because a literal one is invisible in every editor and
+     diff. Every element that holds a marked letter is aria-hidden and its container carries the name: a screen
+     reader would otherwise say the letter and drop the mark, or read out the mark's Unicode name. -->
 <html lang="en"
-      data-mark="kasra" data-tiles="paper" data-size="comfortable" data-group="1" data-band="1"
-      data-review="0" data-distractors="which-mark" data-twins="on" data-board="trio" data-point="halo"
+      data-mark="tanween" data-tiles="paper" data-size="comfortable" data-group="1" data-band="1"
+      data-review="0" data-distractors="which-mark" data-twins="alternate" data-board="auto" data-arrows="last" data-point="halo"
       data-ask="mark" data-choices="4" data-advance="auto" data-miss="trace" data-arrive="stagger" data-peek="under"
       data-progress="title" data-bar="line" data-track="show" data-finish="settle"
-      data-titlemark="bi" data-titlemark-font="amiri" data-bg="light" data-madani-font="scheherazade"
+      data-titlemark="ban" data-titlemark-font="amiri" data-bg="light" data-madani-font="scheherazade"
       data-indopak-font="noto">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lesson 5: Zair · Free Qaida</title>
+  <title>Lesson 7: Tanween · Free Qaida</title>
   <meta name="theme-color" content="#1F1A18">
   <!-- Light or dark before the page draws: the choice made here or on the home page (same site, same storage),
        otherwise dark, like the home page. -->
@@ -47,7 +49,6 @@
   <script src="practice.js" defer></script>
   <script src="marks.js" defer></script>
   <script src="mark-lesson.js" defer></script>
-  <script src="spell.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
   <script src="qaida-options.js" defer></script>
@@ -118,18 +119,18 @@
     <header class="lesson-head">
       <div class="head-text">
         <div class="course">
-          <p class="eyebrow" data-words="Lesson number">Lesson 5 of 14</p>
+          <p class="eyebrow" data-words="Lesson number">Lesson 7 of 14</p>
           <!-- The whole Qaida at a glance: this lesson in gold, the other 13 to come. -->
           <ol class="track" aria-hidden="true">
-            <li></li><li></li><li></li><li></li><li class="now"></li><li></li><li></li>
+            <li></li><li></li><li></li><li></li><li></li><li></li><li class="now"></li>
             <li></li><li></li><li></li><li></li><li></li><li></li><li></li>
           </ol>
         </div>
-        <!-- The title follows the student's choice of names, and mark-lesson.js writes it on every change. It is an
-             attribute and not the heading's own text so the teacher's edit is not overwritten at the next switch. -->
+        <!-- Tanween is the same word in both name sets (docs/lesson-7/02 §1) — still two fields, since the teacher
+             may want the Urdu names spelled differently even though the lesson's own name does not change. -->
         <h1 data-words-attr="data-title-zabar|Lesson title (zabar);data-title-fatha|Lesson title (fatha)"
-            data-title-zabar="Zair" data-title-fatha="Kasra">Zair</h1>
-        <p class="lede" data-words="Line under the title">The same mark, written under the letter.</p>
+            data-title-zabar="Tanween" data-title-fatha="Tanween">Tanween</h1>
+        <p class="lede" data-words="Line under the title">The same three marks, written twice — and the sound ends in n.</p>
         <!-- What the student chose on their first visit, and a way to change it. shell.js fills in the spans. -->
         <p class="setup"
            data-madani="Madani script" data-indopak="Indo-Pak script"
@@ -144,19 +145,21 @@
           <button class="link open-settings" type="button" aria-haspopup="dialog"><span data-words="Settings line: change link">Change</span></button>
         </p>
       </div>
-      <!-- The lesson's subject in one glyph: a letter with the mark under it. mark-lesson.js composes it. -->
-      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">&#x62F;&#x650;</span>
+      <!-- The lesson's subject in one glyph: baa with fathatain. mark-lesson.js composes it. -->
+      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">&#x628;&#x64B;</span>
     </header>
 
-    <!-- The two parts. An order, never a chain of locks: every button works at any time, and a part opened out of turn is
-         advised once and then let through (docs/lesson-2/09-going-in-order.md). mark-lesson.js builds the buttons. -->
-    <nav class="bands" aria-label="The two parts of this lesson"
-         data-group1="Meet the mark" data-group2="All the letters"
+    <!-- The four parts. An order, never a chain of locks: every button works at any time, and a part opened out of turn is
+         advised once and then let through (docs/lesson-2/09-going-in-order.md). mark-lesson.js builds the buttons from
+         marks.partsOf(), so only the names are supplied here — one per doubled mark, then the last, plain one
+         (docs/lesson-7/04 §3). The first three contain a mark name, so they are {mark} templates, filled per part. -->
+    <nav class="bands" aria-label="The four parts of this lesson"
+         data-group1="Meet {mark}" data-group2="Meet {mark}" data-group3="Meet {mark}" data-group4="All the letters"
          data-group-done="Done" data-group-now="You’re here" data-group-later="Comes later"
          data-group-label="Part {n}, {name}. {state}"
          data-group-early="This part comes later. You can carry on if you like — each one builds on the one before."
          data-group-announce="Part {n}, {name}."
-         data-words-attr="aria-label|Group rail: label;data-group1|Group 1 name;data-group2|Group 2 name;data-group-done|Group rail: a finished group;data-group-now|Group rail: the current group;data-group-later|Group rail: a later group;data-group-label|Group rail: what a screen reader hears ({n}, {name} and {state} are filled in);data-group-early|Advice: a group opened out of turn;data-group-announce|Announced for screen readers: a new group ({n} and {name} are filled in)">
+         data-words-attr="aria-label|Group rail: label;data-group1|Group 1 name (a doubled mark, {mark} filled in);data-group2|Group 2 name ({mark} filled in);data-group3|Group 3 name ({mark} filled in);data-group4|Group 4 name;data-group-done|Group rail: a finished group;data-group-now|Group rail: the current group;data-group-later|Group rail: a later group;data-group-label|Group rail: what a screen reader hears ({n}, {name} and {state} are filled in);data-group-early|Advice: a group opened out of turn;data-group-announce|Announced for screen readers: a new group ({n} and {name} are filled in)">
       <ol></ol>
     </nav>
     <div class="struggle band-advice" hidden>
@@ -182,7 +185,7 @@
       <p class="band-line" hidden
          data-done="All of this group"
          data-words-attr="data-done|Progress line, every letter in this group known"></p>
-      <!-- The recordings for this lesson are of the SOUND ("ba"), not of the letter's name. mark-lesson.js hides this once
+      <!-- The recordings for this lesson are of the SOUND ("ban"), not of the letter's name. mark-lesson.js hides this once
            they are all in. -->
       <p class="sound-note" hidden
          data-none="Hearing practice opens when the recordings arrive."
@@ -191,17 +194,20 @@
     </div>
 
     <!-- The teaching half: the mark, then the letter with and without it. The drill below is the testing half. Every tile is
-         a button: tapping it says the letter (and, once recorded, the sound). -->
+         a button: tapping it says the letter (and, once recorded, the sound).
+         {where} says which end of the letter the OPEN PART's mark sits at (docs/lesson-7/04 §4): unlike lessons 4-6,
+         this changes from one part to the next on the SAME page (fathatain and dammatain above, kasratain below). -->
     <section class="marks-board" aria-labelledby="board-title"
-             data-mark-alone="This is {mark}." data-mark-sits="{Mark} sits under the letter."
+             data-mark-alone="This is {mark}." data-mark-sits="{Mark} sits {where}, in the same place as {other}."
+             data-where-above="above the letter" data-where-below="under the letter"
              data-pair-bare="The letter on its own" data-pair-other="The same letter with {other}" data-pair-marked="The letter with {mark}"
-             data-mark-does="{Mark} is the same stroke as {other}, written under the letter instead of over it."
+             data-mark-does="{Mark} is {other} written twice. Two of them, and the sound ends in n."
              data-joined="{Mark} goes with the letter wherever it sits." data-joined-note="The same letter twice, not a word."
-             data-words-attr="data-mark-alone|Board: the mark on its own ({mark} is filled in);data-mark-sits|Board: where the mark sits ({Mark} is filled in);data-pair-bare|Board: the row, the bare side;data-pair-other|Board: the row, the middle ({other} is filled in);data-pair-marked|Board: the row, this lesson's mark ({mark} is filled in);data-mark-does|Board: what the mark does ({Mark} and {other} are filled in);data-joined|Board: the joined example ({Mark} is filled in);data-joined-note|Board: what the joined example is not">
+             data-words-attr="data-mark-alone|Board: the mark on its own ({mark} is filled in);data-mark-sits|Board: where the mark sits ({Mark}, {where} and {other} are filled in);data-where-above|Board: where a mark sits, above;data-where-below|Board: where a mark sits, below;data-pair-bare|Board: the row, the bare side;data-pair-other|Board: the row, the middle columns ({other} is filled in, once for each column);data-pair-marked|Board: the row, this part's mark ({mark} is filled in);data-mark-does|Board: what the mark does ({Mark} and {other} are filled in);data-joined|Board: the joined example ({Mark} is filled in);data-joined-note|Board: what the joined example is not">
       <div class="section-head">
         <p class="eyebrow" data-words="Board: step label">Step 1</p>
         <h2 class="section-title board-title" id="board-title" tabindex="-1" data-words="Board: heading">Look at the mark</h2>
-        <p class="section-guide" data-words="Board: guide line">The same small stroke, written under the letter. Tap any of them to hear it.</p>
+        <p class="section-guide" data-words="Board: guide line">Two small strokes, above or below the letter. Tap any of them to hear it.</p>
       </div>
 
       <!-- The mark alone, on the dotted circle that a combining mark expects to sit on. -->
@@ -211,11 +217,11 @@
         <p class="alone-sits"></p>
       </div>
 
-      <!-- One letter three times: bare, with the other mark and with this one, with what each is under it. -->
+      <!-- One letter twice (a warm-up part) or four times (the last part), with what each is under it. -->
       <div class="pair-feature" role="list"></div>
 
-      <!-- The group's letters, as a trio: the letter, then with the mark above, then with the mark under. That is what the board is
-           for: seeing the stroke MOVE. A row in the options panel changes it to pairs, or to marked tiles with the bare letter small beneath. -->
+      <!-- The group's letters: a trio in a warm-up part (bare, single, doubled) or a quartet in the last (bare, then all
+           three doubled marks) — data-board="auto" on <html> picks which, per part (docs/lesson-7/04 §4). -->
       <div class="pairs" role="list"></div>
 
       <!-- The mark travels with the letter wherever it sits: the bridge back to Lesson 3, shown and never drilled. -->
@@ -227,7 +233,7 @@
 
       <!-- The order is a suggestion, not a lock: a student may go on, and is told that the exercise is what makes it stay. -->
       <p class="shapes-hint"
-         data-words="Board: hint about moving on">You can move on to the other part whenever you like, but do the exercise first: it is what makes it stay.</p>
+         data-words="Board: hint about moving on">You can move on to the other parts whenever you like, but do the exercise first: it is what makes it stay.</p>
       <!-- The way from looking to practising: the exercise is underneath, and this takes the student there. -->
       <div class="shapes-actions">
         <button class="button primary practise" type="button">
@@ -249,9 +255,9 @@
 
       <!-- The question changes with every question, so the group of answers is named by it. -->
       <p class="ask" id="ask"
-         data-glyph="Which letter is this, and what is under it?" data-name="Which one is this?"
-         data-spot="Which one has {mark} under it?" data-sound="Which one says this?"
-         data-words-attr="data-glyph|Question: showing a letter with its mark;data-name|Question: giving a name;data-spot|Question: which one has the mark under it ({mark} is filled in);data-sound|Question: hearing a sound"></p>
+         data-glyph="Which letter is this, and what is on it?" data-name="Which one is this?"
+         data-spot="Which one has {mark} on it?" data-sound="Which one says this?"
+         data-words-attr="data-glyph|Question: showing a letter with its mark;data-name|Question: giving a name;data-spot|Question: which one has the mark on it ({mark} is filled in);data-sound|Question: hearing a sound"></p>
       <div class="prompt" data-play="Play the sound"
            data-words-attr="data-play|Question: play button"></div>
       <div class="choices" role="group" aria-labelledby="ask"></div>
@@ -286,7 +292,7 @@
           </svg>
           <span data-words="Say it button">Say it</span>
         </button>
-        <!-- "Write it" opens the letter WITH its mark: writing the mark is the lesson. -->
+        <!-- "Write it" opens the letter WITH its doubled mark: writing it is the lesson. -->
         <button class="button quiet trace" type="button" aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
@@ -329,49 +335,8 @@
             data-words-attr="data-groups|Look-alike letters (groups between commas)"></span>
     </section>
 
-    <!-- Real words, made only from letters and marks this lesson has taught: the traditional spelling method (the
-         user's own example, 2026-09-27) — name each letter with its mark, then put it together with what came
-         before, one letter at a time, to the whole word. Shown, never scored, like "Write it" and "Say it"; no
-         audio here yet (the user, 2026-09-27: "no speech for now"). The words themselves are candidates (spell.js),
-         to be checked before they ship. Which word is on screen is its own small tracker, kept apart from the
-         Part 1 / Part 2 rail above: that one is about meeting the mark, this one is about which word. -->
-    <section class="spell" aria-labelledby="spell-title"
-             data-word-label="Word {n} of {total}" data-word-button="Word {n}"
-             data-letter-line="{name} with {mark}: {sound}." data-blend-line="Put together: {sound}."
-             data-whole-line="The whole word: {sound}." data-meaning-line="It means “{meaning}.”"
-             data-words-attr="data-word-label|Spell it: which word, of how many ({n} and {total} are filled in);data-word-button|Spell it: a word's own button, for a screen reader ({n} is filled in);data-letter-line|Spell it: naming a letter ({name}, {mark} and {sound} are filled in);data-blend-line|Spell it: a blend so far ({sound} is filled in);data-whole-line|Spell it: the finished word ({sound} is filled in);data-meaning-line|Spell it: what the word means ({meaning} is filled in)">
-      <div class="section-head">
-        <p class="eyebrow" data-words="Spell it: step label">Step 3</p>
-        <h2 class="section-title" id="spell-title" tabindex="-1" data-words="Spell it: heading">Spell a word</h2>
-        <p class="section-guide" data-words="Spell it: guide line">Put letters together, one at a time, to read a real word.</p>
-      </div>
-
-      <div class="spell-words" role="group" aria-label="Which word">
-        <p class="spell-words-label"></p>
-        <div class="spell-words-nav"></div>
-      </div>
-
-      <div class="spell-stage" role="group" aria-labelledby="spell-title">
-        <p class="spell-glyph" lang="ar" dir="rtl" aria-hidden="true"></p>
-        <p class="spell-caption" role="status" aria-live="polite"></p>
-        <p class="spell-meaning" hidden></p>
-      </div>
-      <div class="spell-controls">
-        <button class="button quiet spell-back" type="button" data-words="Spell it: back button">Back</button>
-        <button class="button primary spell-next" type="button" data-words="Spell it: next button">Next</button>
-        <button class="button primary spell-restart" type="button" hidden data-words="Spell it: start over button">Start over</button>
-        <button class="button primary spell-nextword" type="button" hidden data-words="Spell it: next word button">Next word</button>
-      </div>
-
-      <!-- The extra list moved out to its own page (the user, 2026-09-27: "don't you think there should be a
-           separate page for the more words"): a printed Qaida's own "mashq" (exercise) page, twelve words, no
-           meanings, no walkthrough — exercise-5.html. -->
-      <div class="spell-more">
-        <h3 class="spell-more-title" data-words="Spell it: more words heading">More words to read</h3>
-        <p class="spell-more-guide" data-words="Spell it: more words guide line">Twelve more, using the same mark — no translations, just reading.</p>
-        <a class="button quiet" href="exercise-5.html" data-words="Spell it: more words link">Practice reading →</a>
-      </div>
-    </section>
+    <!-- No "Spell a word" section: tanween only ever happens at the end of a word in real text, and this lesson
+         teaches the letter and the mark, not words (docs/lesson-7/01 §3). -->
 
     <footer class="lesson-end">
       <!-- The star and its rules draw into place once the lesson says you seem ready. -->
@@ -385,9 +350,9 @@
         </g>
       </svg>
       <p class="end-line"
-         data-before="Work through both parts to finish the lesson."
-         data-finished="You can tell {other} from {mark}. This lesson is marked as done. You can keep practising as long as you like."
-         data-words-attr="data-before|Last line, before the lesson says you seem ready;data-finished|Last line, once it does ({mark} and {other} are filled in)"></p>
+         data-before="Work through the parts to finish the lesson."
+         data-finished="You can read all three doubled marks. This lesson is marked as done. You can keep practising as long as you like."
+         data-words-attr="data-before|Last line, before the lesson says you seem ready;data-finished|Last line, once it does"></p>
       <div class="onward">
         <a class="button back" href="./">
           <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -395,21 +360,20 @@
           </svg>
           <span data-words="Back to the lessons button">Back to the Qaida</span>
         </a>
-        <!-- Lesson 4 is always built by the time this page can be reached, so this is a plain link; the label follows
-             the student's choice of names, and mark-lesson.js writes it in (the user, 2026-09-27: "there is a next
-             lesson, but no way to go back"). -->
-        <a class="button quiet prev" href="lesson-4.html"
-           data-prev-zabar="Previous: Zabar" data-prev-fatha="Previous: Fatha"
+        <!-- Lesson 6 is always built by the time this page can be reached, so this is a plain link; the label follows
+             the student's choice of names, and mark-lesson.js writes it in. -->
+        <a class="button quiet prev" href="lesson-6.html"
+           data-prev-zabar="Previous: Paish" data-prev-fatha="Previous: Damma"
            data-words-attr="data-prev-zabar|Previous lesson button (zabar names);data-prev-fatha|Previous lesson button (fatha names)">
           <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M19 12H5M11 6l-6 6 6 6" />
           </svg>
           <span></span>
         </a>
-        <!-- Lesson 6 isn't built yet, so a click shows the note at the bottom of the screen; the moment it is, it is a link.
+        <!-- Lesson 8 isn't built yet, so a click shows the note at the bottom of the screen; the moment it is, it is a link.
              The label follows the student's choice of names. Not locked: the lesson only recommends. -->
         <button class="button primary next" type="button"
-                data-next-zabar="Next: Paish" data-next-fatha="Next: Damma" data-soon="The next lesson isn’t built yet."
+                data-next-zabar="Next: Zabar and alif" data-next-fatha="Next: Fatha and alif" data-soon="The next lesson isn’t built yet."
                 data-words-attr="data-next-zabar|Next lesson button (zabar names);data-next-fatha|Next lesson button (fatha names);data-soon|Note: the next lesson is not built yet">
           <span></span>
           <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

@@ -14,6 +14,11 @@ Qaida with one line: the current step, its skills, and the next step.
 practice engine (`practice.js`) that lessons 4–14 reuse, and Lesson 3, letter shapes. Steps 4 and 5 have not been seen
 in a browser yet.
 
+**Step 8, Lesson 7 (tanween), is built** (2026-09-27, the user, choosing to build it despite the standing "plain no":
+lessons 4–6's own tile-size question was still open at the time — see "Step 8 built — Lesson 7" in the step log for
+what changed to make a lesson hold more than one mark, and for what is still the user's own to check). **Not yet
+previewed.**
+
 **Step 5, Lesson 3, is built** (2026-09-20): `docs/lesson-3/` is the specification and its `README.md` lists where the
 build differs. It needed no change to `practice.js`. **Six groups, not five** — the user split the big one in two.
 
@@ -435,6 +440,73 @@ whether **بَ and بُ can be told apart at the tile's size** (`05` §4 item 2)
 quartet as a whole. `recordings.html` should now list 29 damma rows on its own. `design-system/quran-landing/pages/qaida.md` is
 not updated: it is written once the user has seen the pages.
 
+### Step 8 built — Lesson 7, tanween
+
+*2026-09-27. The user, asked directly whether "the next in line" meant Lesson 7 despite the standing block
+(`docs/lesson-7/06` §0's "plain no" — lessons 4–6's tile-size question was answered "hard to tell apart" earlier the
+same day, then a tile-size fix went in, but not yet re-confirmed by the user): "Lesson 7 (tanween)."* Built from
+`docs/lesson-7/`, following its build order (`05` §2) exactly, checking after every step.
+
+**The one genuinely new idea, built as specified: a lesson can hold more than one mark.** `marks.js` gained `SETS`
+(`data-mark="tanween"` resolves to `[fathatain, kasratain, dammatain]`), `setOf`/`marksOf`, and `partsOf(list)` (one
+mark → the same two parts lessons 4–6 already have; several → one part per mark, then a last part covering all 29
+letters, one mark each by rotation through the alphabet). Every item gained a `parts` array in place of a single
+`group` number, so a letter met in a warm-up *and* drilled again in the last part is one item, not two — `inPart`,
+`poolFor`, `sizes` and `stats` all read `.parts` now. **The one-mark case is unchanged by all of it**: `marks.allItems`,
+`boardRows` and `sampleOf` all still accept a bare mark object and a plain part number (1 or 2), exactly as lessons
+4–6 already call them, so **none of the four existing check scripts needed a rewrite** — only four assertions that
+read `item.group` directly became `item.parts.includes(n)` / `item.parts.length === 0`, in `qaida-check.js`.
+
+**`mark-lesson.js`'s `mark` is now the OPEN PART's mark**, not a fixed one, kept current by `setGroup()`: `say()`,
+the title glyph, the rail's glyph and every board caption already read from it, so they update correctly across all
+four parts with no further change. `twinMarksFor(item)` decides per item, not per page, which marks it is told
+apart from: a warm-up part's single counterpart (بً against بَ — "one or two?"), or, in the last part, the OTHER
+two doubled marks (بً against بٌ and بٍ — "which two?", `docs/lesson-7/03` §5's whole point). `markTile` writes
+`data-sits` per tile (moved off `:root` in `qaida.css`, `.mark-tile[data-sits='below']`), since the last part's
+quartet puts marks above *and* below in the same row — the one CSS change this lesson needed. The board's quartet
+(`ب بً بٌ بٍ`) needed no new markup: `boardRows`'s `others` argument is `own.slice(1)` in the last part (the two
+tanweens besides the row's own/final one) and the single counterpart in a warm-up, so the existing pair/trio/quad
+code drew both without a structural change.
+
+**One real bug found and fixed while building, not in the spec:** the last part's rotation (`markAt`, which mark a
+letter gets) was keyed to `shell.lettersOf()`'s own order — which differs between Madani and Indo-Pak (و/ه swap) —
+so the same letter could land on a different tanween depending on script, breaking "switching script keeps every
+letter's credit" for the first time in the Qaida. Fixed by keying the rotation to the letter's place in the
+**Madani** order always, resolved separately from which script is currently drawn.
+
+**Where the build differs from `docs/lesson-7/`:**
+1. **The halo stays single-mark, not per-tile** (docs `03` §8 suggested `markBox`/`positionHalos` take an explicit
+   stroke). Not needed: a halo has only ever appeared on the one `.mark-tile.marked` cell in a row, which is always
+   the open part's own mark already — 'other'-kind tiles never had one, on any lesson. Simpler, and provably
+   equivalent; noted here rather than silently done.
+2. **The quartet's tile order** is bare, then the two other tanweens, then the row's own (the existing pair/trio/quad
+   code's order), not literally "bare, then the three doubled marks in lesson order" as `04` §4 pictures it. All
+   four are present and correctly labelled either way; only the left-to-right order differs.
+3. **The "twins row's label depends on the part" and "board row" panel refinements** (`04` §7, items 2 and 3) are
+   built in substance (the Part row is built from the lesson's own parts; "auto" is offered and defaults) but the
+   twins row's *title* text still reads the same regardless of which part is open — a cosmetic gap, not a functional
+   one, left for a later pass.
+
+**Checked, and passing:** every `node --check`; the full suite (`qaida-check.js` — including a new Lesson 7 block:
+the three rows, `against` on all three, `partsOf` for one mark and for the set, the four parts' sizes `[6,6,6,29]`,
+the last part's spread `10/10/9`, seven distinct ids for one letter, mastery surviving both a script switch and the
+one-part/other-part split, `masteredCount` with `cp` as a list — `qaida-marks-check.js`, `qaida-lesson5-check.js`,
+`qaida-lesson6-check.js` (all three unchanged), `qaida-lesson3-check.js`, `qaida-voice-check.js`, `qaida-page-check.js`,
+and the new `qaida-lesson7-check.js` (the real page in a hand-made DOM: four rail buttons naming their own mark, a
+trio in a warm-up and a quartet in the last part, kasratain's tiles alone carrying `data-sits="below"` even inside a
+mixed row, **the one check that matters most — 300 doubled-mark questions in a row, every one offering another
+doubled mark among the wrong answers and never the single one** — finishing gated by the last part alone, the name
+set changing all four rail names, Indo-Pak, and the markup). `recordings.html` confirmed: 203 rows now (was 116),
+the 87 new ones all tanween sounds, none of them a letter's name.
+
+**Seen working in the browser pane** (not by the user): all four parts, the quartet with all three doubled marks
+correctly attached and correctly placed above/below, the options panel's Part row (four buttons, named correctly)
+and its new "A trio, then all three" board default, and — read directly off a live question — "Ghayn with
+fathatain" offered against "Ghayn with kasratain" as a wrong answer, exactly the contrast the lesson is for. **Not
+seen by the user.** The blocking browser checklist is `docs/lesson-7/05` §4; item 1 (بَ against بً, and بُ against
+بٌ, at the tile's size, in both faces and both themes) is the one that answers the question this lesson was built
+ahead of.
+
 ### Step 8 planned (Lesson 7) — tanween, and a lesson with three marks
 
 *2026-09-21. The user: "i guess plan next lesson."*
@@ -643,6 +715,192 @@ enough are known) — is still a real question for the teacher.
 **Checked, and passing:** `node --check` on every script in `site/qaida/`; `qaida-check.js`, `qaida-page-check.js`,
 `qaida-marks-check.js`, `qaida-lesson3-check.js`, `qaida-lesson5-check.js`, `qaida-lesson6-check.js` and
 `qaida-voice-check.js`. Every WebP (166) was identical on both PCs.
+
+### First preview, 2026-09-27 — the tile-size fix, and a new request
+
+*The user previewed lessons 4–6 for the first time and answered `docs/lesson-7/06` §0's blocking question:*
+**"بَ and بُ are hard to tell apart at this size."**
+
+**Built.** The quartet board's tiles (`.pair.feature.quad` in `qaida.css`, Lesson 6 only) had been given a smaller
+`--tile` than the trio's for no reason tied to legibility — a four-across row measured tighter than a three-across
+one. Raised to match the trio (`clamp(4rem, 3.25rem + 3.4vw, 6rem)`, `clamp(4rem, 22vw, 5.5rem)` under 479px), with
+the quartet's column floor widened to match (25rem → 27rem). Separately: the options panel's existing **Letter
+size: Large** switch had never reached any of the three comparison boards (`.pair.feature`, `.pair.feature.trio`,
+`.pair.feature.quad`) — each declares its own `--tile` at the same specificity as the switch's selector, so whichever
+rule sat later in the file always won regardless of the setting. Added `:root[data-size='large']` overrides for all
+three, scaled by the same ~1.2x the switch already applies to the root tile. **Not yet re-checked by the user** —
+this is the fix for the exact question just answered, so the tile-size half of `docs/lesson-7/06` §0 wants a second
+look before Lesson 7 is unblocked.
+
+**The bigger ask, the same message:** real words, not just isolated letter+mark tiles — the traditional Qaida
+*hijjey* (spelling) method, the user's own example: "kaf zabar ka, ta zabar ta, kata (read from the back), ba zabar
+ba, kataba (altogether)." This is now in scope (`QAIDA-CONTENT.md`, "Connected reading").
+
+**Answered in chat, 2026-09-27:** inside each mark lesson, right after the drill (not a separate step at the end).
+Scoring was "i don't know" — Claude's call, following the precedent already set: shown only, never scored, the same
+rule "Write it" and "Say it" already live under. Words: Claude proposes, the teacher confirms — not supplied blind.
+
+**Built, the same day.** `site/qaida/spell.js`, a new small module (loaded after `mark-lesson.js`, before
+`qaida-options.js`), and a `<section class="spell">` block added to `lesson-4.html`, `lesson-5.html` and
+`lesson-6.html`, right after `.drill` and before the footer. One word per lesson, real and correctly diacritized —
+never invented, the same rule the aayat overlay lives under — built only from marks the student has met by that
+lesson:
+- **Lesson 4 (fatha):** كَتَبَ, *kataba*, "he wrote" — the user's own example, and the only real Form I pattern that
+  is fatha throughout (فَعَلَ).
+- **Lesson 5 (kasra):** شَرِبَ, *shariba*, "he drank" — middle letter kasra (this lesson's own mark), outer two
+  fatha (already known from Lesson 4), so the word itself is the fatha/kasra contrast the lesson drills.
+- **Lesson 6 (damma):** كَرُمَ, *karuma*, "he was generous" — middle letter damma against fatha either side, paish's
+  own contrast (`docs/lesson-6/03` §1: paish is told apart from zabar, not zair, so no kasra needed here).
+
+**These three are Claude's candidates, not the teacher's own — check them, the same care as the aayat, before they
+ship.** The step-through matches the user's own five stages exactly: name a letter with its mark, and once a second
+letter has been named, blend everything revealed so far; the last blend is the whole word, with its meaning. A word
+is resolved through `shell.lettersOf()` by key, not a hardcoded glyph, so it still reads correctly in Indo-Pak (moot
+for these six letters, none of which differ between the scripts, but it costs nothing to do it the way the rest of
+the page does). "Hear it" plays each letter's own recording (or the wordless stand-in hum, exactly as everywhere
+else) — there is no whole-word recording yet, so the blend and final steps have no sound button.
+
+Every line is tagged `data-words`/`data-words-attr`, so it picked up a "Words (lesson N)" text field automatically —
+no changes to `qaida-options.js` were needed. `marks.js` is untouched; `mark-lesson.js` gained a few lines (below).
+
+**Second round, the same day, before the user had even previewed the first:** four notes from a first look. (1)
+**"We should know where we are in the entire words, and keep it separate from the introduction of zabar/zair/paish,
+like Part 1 and Part 2"** — one word was never going to be enough to show a real range, and a single "Spell a word"
+block bolted on under the drill read as part of the same progression as the Part 1/2 rail, which it isn't. Built: a
+small, deliberately distinct tracker (`.spell-words`, numbered circular buttons, class `.word-step` — never `.band`)
+showing "Word {n} of {total}", with **three words now walked through per lesson** instead of one, each reachable by
+tapping its number. (2) **"2-3 words for the walkthrough and more words"** — added a second, separate list,
+**"More words"**, shown whole and never stepped through (no tracker, no controls): four more per lesson, real words
+in the same pattern, for a wider look once the walkthrough is done. (3) **"No speech for now"** — the "Hear it"
+button is gone from this block entirely; nothing here plays audio until there is a real recording to attach to a
+word (Lesson 1–6's own "Hear it" buttons, on individual letters, are untouched). (4) **"There is a next lesson but
+no way to go back"** — `mark-lesson.js` gained a `paintPrev()` (called from `render()`, beside `paintNext()`) and
+each page gained a `.prev` link in `.onward`, beside "Back to the Qaida": Lesson 4's is a plain link to Lesson 3
+("Previous: Letter shapes" — Lesson 3's title has no zabar/fatha variant, so it needs no JS); Lessons 5 and 6's carry
+`data-prev-zabar`/`data-prev-fatha`, exactly mirroring how "Next" already works, and are always live links (the
+lesson before this one is always built by the time this page is reached, unlike "Next", which may not be).
+**Unrelated, filed under the same message:** `qaida-options.js`'s **Options panel now starts closed everywhere** — it
+used to auto-open on any screen wider than 767px, which is why it appeared already expanded in a screenshot; now
+`panel.open = false` unconditionally.
+
+**Words, walked through and extra, per lesson (all candidates — check every one, the aayat's own rule):**
+- **Lesson 4 (fatha):** كَتَبَ *kataba* "he wrote" (the user's own example) → ذَهَبَ *dhahaba* "he went" →
+  خَرَجَ *kharaja* "he went out". More: جَلَسَ "he sat", فَتَحَ "he opened", دَخَلَ "he entered", رَجَعَ "he returned".
+- **Lesson 5 (kasra):** شَرِبَ *shariba* "he drank" → عَلِمَ *'alima* "he knew" → سَمِعَ *sami'a* "he heard" — all
+  fatha/kasra, the lesson's own contrast. More: فَهِمَ "he understood", حَسِبَ "he thought", وَرِثَ "he inherited".
+- **Lesson 6 (damma):** كَرُمَ *karuma* "he was generous" → كَبُرَ *kabura* "he was great" → قَرُبَ *qaruba*
+  "he was near" — all fatha/damma, paish's own contrast (`docs/lesson-6/03` §1: told apart from zabar, not zair).
+  More: صَغُرَ "he was small", بَعُدَ "he was far", حَسُنَ "he was good".
+
+A word is resolved through `shell.lettersOf()` by key, not a hardcoded glyph — load-bearing here, not just tidy:
+`dhahaba` and `fahima` both use ه, one of the letters that really differs in Indo-Pak (ہ), so a hardcoded Madani
+glyph would have been wrong the moment someone switched scripts. `marks.js` and `mark-lesson.js`'s existing behaviour
+are otherwise untouched (`paintPrev()`/`.prev` is the only new surface on the page's own script), so every existing
+check still passes (`qaida-check.js`, `qaida-marks-check.js`, `qaida-lesson5-check.js`, `qaida-lesson6-check.js`,
+`qaida-lesson3-check.js`, `qaida-voice-check.js`, `qaida-page-check.js`); `spell.js` has no check script of its own
+yet. **Seen working in the browser pane:** the tile-size fix (confirmed via computed style, `--tile` changes under
+"Large"), the options panel closed on load, all three lessons' word pickers (clicking "2" jumps straight to word 2,
+step 0), the full walkthrough of Lesson 4's first word end to end including "Next word" handing off to word 2, the
+"More words" list, and Lesson 6's "Previous: Kasra" following the name-set switch.
+
+### Fourth round, the same day — a real font bug found, and the extra words become their own page
+
+*The user's first look at the above, three screenshots and a photo of a printed Qaida's own "mashq" (exercise) page.*
+
+**"The haa in urdu and arabic should be the same."** Checked in the browser pane by forcing the script both ways on
+the word دَهَبَ *dhahaba*: in Madani the medial haa shapes normally; **switched to Indo-Pak, it renders broken** —
+not a bug in `spell.js` (the letter resolves correctly, ہ against ه, exactly as designed), but the **known font
+stand-in** (`WEBSITE-BUILD.md` §8, `QAIDA-CONTENT.md`: "Google Fonts has no true Indo-Pak mushaf font") failing in a
+place nothing before this had tested: Noto Naskh Arabic, an Arabic font pressed into service for Urdu, does not join
+ہ (U+06C1) properly when it sits between two other letters. Every earlier Indo-Pak surface on the site shows letters
+**one at a time** (Lesson 1's tiles, the mark lessons' own tiles), so this is the **first place connected Indo-Pak
+text exists at all**, and the first place the gap actually shows. **Confirmed working:** switching **Indo-Pak
+lettering** to **Scheherazade New** in Settings joins ہ correctly. Not changed as the site's default — that is a
+sitewide choice (every Indo-Pak letter everywhere, not just this feature) already covered by the existing "before
+launch, get a licensed Indo-Pak font" blocker; noted here so it isn't lost, with a working stopgap in hand.
+
+**"Don't you think there should be a separate page for the more words... make a table of 12 words, keep the meanings
+out"** (with the photo). Agreed, and built that way: a printed Qaida's own exercise page is a real precedent, not
+just a tidier layout, and keeping the walkthrough and the reading practice on two different pages stops the lesson
+page from reading as one long, mixed activity. **Built:** `exercise.js` (a new, small data layer — glyphs only, no
+meanings, no transliteration) and `exercise-4.html`, `exercise-5.html`, `exercise-6.html`, one page per lesson in
+exactly mark-lesson.js's own shape (one script, `data-mark` says which). Twelve real words per lesson, in a plain
+RTL grid (hairline dividers, no cards), a header reusing the ending's own gold ornament, and a "back to Lesson N"
+link. **Deliberately thin:** no drill (no `practice.js`), no audio anywhere (no `audio.js`/`voice*.js`/echo dialog —
+"no speech for now" extended to the whole page, not just the walkthrough), and **no options panel** — wiring
+`qaida-options.js` into a page with neither `window.qaida` nor `window.qaidaHome` was more than this round's
+worth, so it is a known, plainly-stated gap rather than something quietly skipped. Board and Settings still work
+(`trace.js`, `shell.js`), since script, names and theme still matter here. `spell.js`'s own "More words" section is
+now a single line and a "Practice reading →" link to the matching exercise page; its `more` data and `paintMore()`
+are deleted, not left dead.
+
+**Words: nine more per lesson** (three walkthrough + nine new, all real Form I verbs, same three patterns as
+before — candidates, check every one): **Lesson 4** adds نَصَرَ "helped", ذَكَرَ "remembered", شَكَرَ "thanked",
+سَجَدَ "prostrated", حَمَدَ "praised" to the four already in the walkthrough's "more" list (now folded into the
+twelve). **Lesson 5** adds حَفِظَ "memorized", لَبِسَ "wore", تَعِبَ "got tired", رَكِبَ "rode", عَمِلَ "did",
+فَرِحَ "was happy". **Lesson 6** adds سَهُلَ "was easy", صَعُبَ "was difficult", جَمُلَ "was beautiful",
+عَظُمَ "was great", شَرُفَ "was noble", طَهُرَ "was pure".
+
+**"There is no button for previous lesson"** — checked directly: it is there (`.prev`, "Previous: Letter shapes",
+`href="lesson-3.html"`), confirmed present in the DOM and visible on screen at the bottom of the page, right where
+"Back to the Qaida" and "Next" already sit. Likely just not scrolled to; flagged here rather than assumed fixed,
+since the user should see it for themselves on the next look.
+
+**Checked, and passing:** every `node --check`, and the full suite (`qaida-check.js`, `qaida-marks-check.js`,
+`qaida-lesson3-check.js`, `qaida-lesson5-check.js`, `qaida-lesson6-check.js`, `qaida-voice-check.js`,
+`qaida-page-check.js`) — none of them touch `spell.js` or `exercise.js`, which still have no check scripts of their
+own. **Seen working in the browser pane:** all three exercise pages (twelve words each, correctly diacritized,
+Board opens without error, no console errors anywhere), the Indo-Pak font finding (reproduced, then confirmed fixed
+by the Scheherazade New option), and the "Practice reading" link. **Not yet seen by the user.**
+
+### Fifth round, the same day — the ring, zair's place, the exercise table, and the ways back
+
+*The user's look at the fourth round, five screenshots, then two more: "there is still no back lesson or previous
+lesson button, and no options expand button, and none of the options are selected... add in all lessons"; "when the
+meaning is revealed, and we move next, the buttons move up... there should be adequate space"; "the circle stays and
+the ba paish rises and intersects with the circle"; "the zair isn't placed good"; "make a perfect table for the
+exercise".*
+
+1. **The ring left behind (lessons 4–6; also `fixes/lesson 4 5/`, "circle remains and the letter jumps").** A tapped
+   tile gets `.peek`, and `.letter.peek .glyph` is Lesson 1's peek — the letter steps up 20% and shrinks to 75% to make
+   room for its name. A mark tile has no name, and its halo is the *tile's* child, not the letter's, so the letter
+   moved and the ring stayed. `qaida.css`: `.letter.mark-tile.peek .glyph` (and under any `[data-peek]`) is
+   `transform: none; opacity: 1`. The tile's own 1.04 scale still moves both together. Measured on Lesson 6: the
+   letter now moves 0px against its ring on a tap.
+2. **Zair's place: Madani lettering on the mark pages is now Scheherazade New.** Measured, not eyeballed — each
+   letter drawn on a canvas with and without the mark, and the closest distance between the two inks taken, across
+   all 29 letters. Amiri Quran's zair swings from 4 to 36 (units of 1/100 of the font size): it touches م and ج and
+   falls far below ت د ط ف ك ه; its zabar and paish swing 15–60. Scheherazade New: zair 6–22, zabar 13–32, paish
+   11–31, nothing touching. `data-madani-font="scheherazade"` on `lesson-4/5/6.html` and `exercise-4/5/6.html` only;
+   lessons 1–3 (no marks) keep Amiri Quran. The options panel's **Madani lettering** row still switches it back. The
+   dotted circle's zair (Step 1, "Look at the mark") now sits clearly under the circle instead of against it.
+3. **Zair and the answers:** a mark lesson's question (`:root[data-mark] .prompt`) has 1.25rem under it — وِ's zair
+   was coming to rest a few pixels above the answer buttons. `shell.centerInk` centres the font's line box, not the
+   ink, so it can't see a mark below; the margin is the fix, Lesson 2 unchanged.
+4. **The walkthrough's buttons no longer move.** `spell.js` kept the meaning line out of the layout (`[hidden]`)
+   until the last step, so the buttons dropped when it appeared and rose when the next word began. It now always
+   holds this word's meaning and is only `visibility: hidden` until the last step. More room throughout: the glyph's
+   line box 1.6 → 1.9 with 0.75rem under it (سَمِ's zair was touching the caption), the buttons 1.75rem below.
+   Measured on Lesson 5: the button row sat at exactly the same height through all 15 steps of all three words.
+5. **The exercise table.** `auto-fill` put twelve words in five columns and the grid's line colour showed through
+   the two empty cells as grey blocks. Now always a column count twelve divides by — 4, 3 under 640px, 2 under 420px —
+   inside a rounded frame, words 1.875–2.5rem with line-height 2 so no mark is clipped.
+6. **The exercise pages were half-wired.** `exercise.js` never called `shell.renderSetup()`, so `<html>` had no
+   script, names or grouping and the Settings dialog opened with nothing ticked; it does now. It also publishes
+   `window.qaida = { kind: 'exercise' }`, so `qaida-options.js` builds a panel: a new "The word table" section
+   (words in a row: auto/2/3/4/6; lines: every cell / between rows / none; numbers in the cells: show/hide; word size;
+   room around each word; background; room below the buttons), plus Script and names and the page's Words. The
+   Lesson 1 branch of the panel now asks for `kind === 'letters'` rather than "not a drill", so an exercise page
+   doesn't get Lesson 1's rows. Each exercise page ends with the lesson's own row of ways out: The lessons, Back to
+   Lesson N, and Next (Lesson 5/6, the label following the names; exercise 6 has no Next until Lesson 7 exists).
+7. **"Previous" on every lesson from 2 on.** Lessons 4–6 had it from the first round; `lesson-2.html` ("Previous: The
+   letters") and `lesson-3.html` ("Previous: Letters out of order") now do too, as plain links (neither title has a
+   zabar/fatha variant).
+
+**Checked, and passing:** `node --check` on every script; all seven check scripts. **Seen in the browser pane:** the
+table (4 × 3, full rows), the panel and its sections, the chooser ticked, the three links on each exercise page,
+the walkthrough's buttons, a tapped tile's ring on lessons 5 and 6, zair under ا ب ت ث and the dotted circle in
+Scheherazade New. **Not yet seen by the user.**
 
 ### Step 6 planned (Lesson 5) — the mark below
 

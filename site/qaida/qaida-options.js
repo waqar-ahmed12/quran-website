@@ -23,12 +23,12 @@
 
   // Which page this is, so the per-page sections don't collide in one exported block: the home and a lesson both
   // have a "Words" section, and without this the home's "Page title" would land on the lesson's when imported.
-  const numbered = location.pathname.match(/lesson-(\d+)/);
-  const page = home ? 'home' : numbered ? `lesson ${numbered[1]}` : 'lesson';
+  const numbered = location.pathname.match(/(lesson|exercise)-(\d+)/);
+  const page = home ? 'home' : numbered ? `${numbered[1]} ${numbered[2]}` : 'lesson';
 
   const panel = document.createElement('details');
   panel.className = 'tryout';
-  panel.open = !matchMedia('(max-width: 767px)').matches; // closed to start with on phones
+  panel.open = false; // closed to start with everywhere (the user, 2026-09-27): it used to pop open on desktop
   panel.append(el('summary', 'Options'));
   document.body.append(panel);
 
@@ -383,7 +383,7 @@
 
   // Lesson 1 shows a page of letter tiles; Lesson 2 is a drill and has different rows. `kind` tells them apart, so a
   // drill lesson never gets a slider for "how long a name stays" that would do nothing.
-  if (lesson && lesson.kind !== 'drill') {
+  if (lesson && lesson.kind === 'letters') {
     section('Letters', true);
     option('Letter tiles', { Paper: 'paper', Outline: 'line', 'Gold ink': 'gold' }, 'tiles');
     option('Letters grouped', { 'In shape families': 'families', 'Even grid': 'grid' }, 'grouping', (v) => {
@@ -442,7 +442,9 @@
 
     if (marked) {
       section('The mark', true);
-      option('Part', { 'Meet the mark': '1', 'All the letters': '2' }, 'group', (v) => lesson.setGroup(Number(v)));
+      // Built from the lesson's own parts (docs/lesson-7/04 §7), so lessons 4-6 render the same two entries they
+      // always have and Lesson 7 renders four, one per doubled mark plus the last, plain one.
+      option('Part', Object.fromEntries(lesson.parts.map((p) => [p.name, String(p.n)])), 'group', (v) => lesson.setGroup(Number(v)));
 
       // Two parts or one decides how soon a student reaches something finished, so the panel prints what each asks for.
       const costs = el('div');
@@ -508,6 +510,10 @@
       }
       option('The board shows',
         {
+          // A lesson with several marks of its own (Lesson 7) needs a trio in a warm-up and a quartet in the last
+          // part — no single fixed choice is right for the whole lesson, so "auto" is offered first and is the
+          // page's own default (docs/lesson-7/04 §7).
+          ...(lesson.markCount > 1 ? { 'A trio, then all three': 'auto' } : {}),
           ...(lesson.otherCount > 1 ? { 'The quartet: letter, each earlier mark, this mark': 'quad' } : {}),
           ...(twinned ? { 'The trio: letter, other mark, this mark': 'trio' } : {}),
           'The pairs': 'pairs',
@@ -618,6 +624,23 @@
     gapSlider('--drill-end-gap', 'Gap: tally to the star');
     starGapSlider();
     textGapSlider();
+    footSlider();
+  }
+
+  // A reading exercise (exercise-4/5/6.html): twelve words and nothing to tap, so only how the table looks.
+  if (lesson && lesson.kind === 'exercise') {
+    section('The word table', true);
+    option('Words in a row', { Auto: 'auto', Two: '2', Three: '3', Four: '4', Six: '6' }, 'mashqCols');
+    option('Lines', { 'Every cell': 'grid', 'Between rows only': 'rows', None: 'none' }, 'mashqLines');
+    option('Numbers in the cells', { Show: 'show', Hide: 'hide' }, 'mashqNumbers');
+    // Both custom properties are written in rem in qaida.css, so they read back as "2.25rem", not pixels.
+    const table = document.querySelector('.mashq');
+    const remOf = (name, fallback) => (table && parseFloat(getComputedStyle(table).getPropertyValue(name))) || fallback;
+    const size = remOf('--mashq-size', 2.25);
+    slider('Word size', 1.5, 3.5, 0.125, size, show, (v) => root.style.setProperty('--mashq-size', `${v}rem`));
+    const room = remOf('--mashq-room', 1.75);
+    slider('Room around each word', 0.75, 3, 0.125, room, show, (v) => root.style.setProperty('--mashq-room', `${v}rem`));
+    option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
     footSlider();
   }
 

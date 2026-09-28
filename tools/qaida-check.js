@@ -695,8 +695,8 @@ console.log('\nLesson 5: the mark below');
   check(JSON.stringify(marks.sizes(items)) === '[6,29]', 'the two parts still hold 6 and 29', marks.sizes(items).join(','));
   const one = marks.poolFor(items, 1);
   check(one.length === 6 && one.every((item) => item.required && mark.first.includes(item.key)), 'poolFor(1) is the six letters of kasra, all required');
-  check(items.slice().filter((item) => item.group === 1).map((item) => item.key).sort().join() === mark.first.slice().sort().join(), "and each item knows it is in part 1 by the mark's own list");
-  check(fatha.first.every((key) => marks.allItems(shell, fatha, { looks }).find((item) => item.key === key).group === 1), "fatha's own six are unchanged by all this");
+  check(items.slice().filter((item) => item.parts.includes(1)).map((item) => item.key).sort().join() === mark.first.slice().sort().join(), "and each item knows it is in part 1 by the mark's own list");
+  check(fatha.first.every((key) => marks.allItems(shell, fatha, { looks }).find((item) => item.key === key).parts.includes(1)), "fatha's own six are unchanged by all this");
 
   // Ids and glyphs.
   check(items.length === 29 && indopak.items.length === 29, 'allItems() is 29 in both scripts');
@@ -711,7 +711,7 @@ console.log('\nLesson 5: the mark below');
   const twins = marks.twinItems(shell, mark, { keys: one.map((item) => item.key), looks, distractors: 'which-mark' });
   check(twins.length === 6 && marks.twinItems(shell, fatha, { keys: ['ب'] }).length === 0, 'six twins for six letters, and the first mark has none to carry');
   check(twins.every((twin) => twin.id === twin.key + FATHA && twin.glyph === twin.base + FATHA && twin.mark === 'fatha' && twin.marked), 'a twin is the letter with U+064E, and says it is zabar\'s');
-  check(twins.every((twin) => twin.required === false && twin.group === 0), 'a twin is review: never required, and in no part');
+  check(twins.every((twin) => twin.required === false && twin.parts.length === 0), 'a twin is review: never required, and in no part');
   check(twins.every((twin) => twin.audio.kind === 'fatha'), "a twin plays the other mark's recording, not this lesson's");
   const bare = marks.reviewItems(shell, mark, { count: 8 });
   const ids = [...items, ...twins, ...bare].map((item) => item.id);
@@ -853,7 +853,7 @@ console.log('\nLesson 6: the third mark');
   const keys = marks.poolFor(items, 1).map((item) => item.key);
   const both = marks.twinItems(shell, mark, { keys, looks, distractors: 'which-mark' });
   check(both.length === 12, 'twinItems with the default gives both marks: 2 x 6 twins', String(both.length));
-  check(both.every((twin) => twin.group === 0 && twin.required === false && twin.marked), 'every twin is review: group 0, never required');
+  check(both.every((twin) => twin.parts.length === 0 && twin.required === false && twin.marked), 'every twin is review: in no part, never required');
   check(both.filter((twin) => twin.mark === 'fatha').length === 6 && both.filter((twin) => twin.mark === 'kasra').length === 6, 'six of each mark');
   check(both.every((twin) => twin.id === twin.key + String.fromCharCode(marks.MARKS[twin.mark].cp) && twin.audio.kind === marks.MARKS[twin.mark].audio), 'each carries its own mark id and its own recording');
   check(both.every((twin) => twin.name === `${twin.letterName} with ${twin.mark}`), 'and its own mark\'s word', both[0].name);
@@ -927,6 +927,98 @@ console.log('\nLesson 6: the third mark');
   // The lesson's row on the home.
   const row = shell.LESSONS.find((entry) => entry.n === 6);
   check(row.built === true && row.href === 'lesson-6.html' && row.progress === 'drill' && row.cp === 0x064F, 'the home has Lesson 6 as a real link that counts the drill by its mark');
+}
+
+// ---- 9d. Lesson 7: the doubled marks, and a lesson with more than one mark ----------------------------------------
+// docs/lesson-7/05 §3. The data layer only: marks.js in node, no page. The page is tools/qaida-lesson7-check.js.
+// Written first, per the spec: the one-mark case (lessons 4-6) must come out of every change below exactly as it
+// always has, so that assertion is not new — it is every check already above, still passing.
+
+console.log('\nLesson 7: the doubled marks');
+{
+  const FATHA = String.fromCharCode(0x064E);
+  const KASRA = String.fromCharCode(0x0650);
+  const DAMMA = String.fromCharCode(0x064F);
+  const FATHATAIN = String.fromCharCode(0x064B);
+  const KASRATAIN = String.fromCharCode(0x064D);
+  const DAMMATAIN = String.fromCharCode(0x064C);
+  const looks = GROUPS.split(',').map((g) => g.trim().split(/\s+/).filter(Boolean));
+  const world = (script) => {
+    const w = boot();
+    if (script) w.shell.state.script = script;
+    w.own = w.marks.marksOf('tanween');
+    w.items = w.marks.allItems(w.shell, w.own, { looks, distractors: 'which-mark' });
+    return w;
+  };
+  const madani = world();
+  const indopak = world('indopak');
+  const { shell, marks, own, items } = madani;
+  const [fathatain, kasratain, dammatain] = own;
+  const { fatha, kasra, damma } = marks.MARKS;
+
+  check(marks.setOf('tanween').marks.join() === 'fathatain,kasratain,dammatain', 'the tanween set names its three marks, in lesson order');
+  check(own.map((m) => m.id).join() === 'fathatain,kasratain,dammatain', 'marksOf resolves the set to the same three, as mark objects');
+  check(marks.marksOf('damma').length === 1 && marks.marksOf('damma')[0] === damma, 'a single mark still resolves to a list of one, unchanged');
+
+  // The three rows themselves.
+  check(fathatain.cp === 0x064B && kasratain.cp === 0x064D && dammatain.cp === 0x064C, 'the three code points are right');
+  check(fathatain.sits === 'above' && dammatain.sits === 'above' && kasratain.sits === 'below', 'two sit above, one below, exactly as their single counterparts do');
+  check([fathatain, kasratain, dammatain].every((m) => m.lesson === 7), 'all three belong to lesson 7');
+  check(fathatain.against.join() === 'fatha' && kasratain.against.join() === 'kasra' && dammatain.against.join() === 'damma',
+    'against is the single counterpart on all three, not every earlier mark');
+  check(fathatain.first === fatha.first && dammatain.first === damma.first, "first is BORROWED from the single mark's own row, not copied");
+  check(!/[ً-ْ]/.test(fs.readFileSync(path.join(dir, 'marks.js'), 'utf8')), 'marks.js holds no literal combining mark: none of the six');
+  check(!/[ً-ْ]/.test(fs.readFileSync(path.join(dir, 'lesson-7.html'), 'utf8')), 'and lesson-7.html holds none either: the title glyph is a numeric reference');
+
+  // partsOf: the one-mark case is unchanged, and the tanween set is four parts.
+  const onePart = marks.partsOf([damma]);
+  check(onePart.length === 2 && onePart[0].first === true && onePart[0].mark === damma && onePart[1].mark === damma,
+    "partsOf for a single mark is still two parts, the one-mark case lessons 4-6 already are");
+  const parts = marks.partsOf(own);
+  check(parts.length === 4 && parts.slice(0, 3).every((p, i) => p.first && p.mark === own[i]), 'partsOf for the tanween set is four parts, the first three carrying one mark each in lesson order');
+  check(parts[3].first === false && parts[3].mark === fathatain, "the last part's mark is the lesson's first (its own word, {set}, is what names the lesson)");
+
+  // allItems: every id is two characters, distinct, and the last part has 29 required, spread across the three marks.
+  check(items.length >= 29 && items.length <= 47, 'allItems() for the tanween set is between 29 (all shared) and 47 (none shared)', String(items.length));
+  check(items.every((item) => item.id.length === 2), 'every id is two characters: the letter, folded to Madani, then the mark');
+  check(new Set(items.map((item) => item.id)).size === items.length, 'every id is unique');
+  check(JSON.stringify(items.map((item) => item.id).sort()) === JSON.stringify(indopak.items.map((item) => item.id).sort()), 'Madani and Indo-Pak produce the same id set');
+  const sizes = marks.sizes(items, parts);
+  check(JSON.stringify(sizes) === '[6,6,6,29]', 'the four parts hold 6, 6, 6 and 29', sizes.join(','));
+  const lastKeys = items.filter((item) => marks.inPart(item, 4)).map((item) => item.mark);
+  const spread = ['fathatain', 'kasratain', 'dammatain'].map((id) => lastKeys.filter((m) => m === id).length);
+  check(spread.reduce((a, b) => a + b, 0) === 29 && spread.every((n) => n >= 9 && n <= 10), 'the last part spreads its 29 across the three marks evenly (10, 10, 9)', spread.join(','));
+
+  // Six distinct ids for one letter (docs/lesson-7/05 §3): bare, and each of the six marks.
+  const ba = ['ب', 'ب' + FATHA, 'ب' + KASRA, 'ب' + DAMMA, 'ب' + FATHATAIN, 'ب' + KASRATAIN, 'ب' + DAMMATAIN];
+  check(new Set(ba).size === 7, 'a letter has seven distinct ids: bare, and each of the six marks');
+
+  // A pair belonging to a warm-up part AND the last part is the SAME item, not two.
+  const bothParts = items.filter((item) => item.parts.length > 1);
+  check(bothParts.length > 0 && bothParts.every((item) => item.parts.includes(4)), 'a letter whose rotation lands on its warm-up mark gains a second part, on the same item');
+
+  // sizes()/stats() count each id once, whichever parts it is in.
+  const recorded = world();
+  for (const item of bothParts.length ? [items.find((i) => i.parts.length > 1)] : []) {
+    for (let k = 0; k < 3; k += 1) recorded.shell.recordAnswer(7, item.id, true);
+  }
+  if (bothParts.length) {
+    const doubleCounted = recorded.marks.stats(recorded.shell, 7, recorded.items, 4, { target: 2 }).known
+      + recorded.marks.stats(recorded.shell, 7, recorded.items, bothParts[0].parts.find((n) => n !== 4), { target: 2 }).known;
+    check(doubleCounted === 2, 'stats counts a pair known in two parts as known in each, not twice in one', String(doubleCounted));
+  }
+
+  // {set}: "tanween" in both name sets, empty on lessons 4-6.
+  check(marks.setOf('tanween').names.fatha === 'tanween' && marks.setOf('tanween').names.zabar === 'tanween', '{set} is "tanween" in both name sets');
+  check(marks.setOf('damma') === null, 'and lessons 4-6 have no set of their own — data-mark names a single mark');
+
+  // The home's row.
+  const row = shell.LESSONS.find((entry) => entry.n === 7);
+  check(row.built === true && row.href === 'lesson-7.html' && row.progress === 'drill' && JSON.stringify(row.cp) === JSON.stringify([0x064B, 0x064C, 0x064D]),
+    'the home has Lesson 7 as a real link, its cp a list of three');
+  const homeCounted = world();
+  for (const item of homeCounted.items.slice(0, 4)) for (let k = 0; k < 3; k += 1) homeCounted.shell.recordAnswer(7, item.id, true);
+  check(homeCounted.shell.masteredCount(7, 3) === 4, "masteredCount accepts cp as a list: four of the lesson's own known reads four", String(homeCounted.shell.masteredCount(7, 3)));
 }
 
 // ---- 10. The engine keeps to its boundaries ---------------------------------------------------------------------

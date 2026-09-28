@@ -7,8 +7,17 @@ skills, is in `QAIDA-BUILD.md`. Change this freely; nothing here is locked.
 ## Scope for this pass
 
 Alphabet through jazam only: letters, recognition, positional forms, zabar/zair/paish,
-tanween, madd, standing harakaat, leen, jazam. Shadda, tajweed rules (noon/meem sakinah,
-qalqalah, etc.), and connected reading are a later pass — not in this document yet.
+tanween, madd, standing harakaat, leen, jazam. Shadda and tajweed rules (noon/meem sakinah,
+qalqalah, etc.) are a later pass — not in this document yet.
+
+**Connected reading (spelling it out) is now in scope, brought forward 2026-09-27** (the user, after previewing
+lessons 4–6: "there should be actual words... an actual exercise, like eg kataba, i teach, kaf zabar ka, ta zabar ta,
+kata (read from the back), ba zabar ba, kataba (altogether)"). This is the traditional Qaida *hijjey* (spelling)
+method: name each letter with its mark, blend two into a syllable read right to left, then carry on letter by letter
+until the whole word is read. Every mark lesson already plans "3–4 example words per exercise" for audio (see
+Decided, below); this turns that from a sound clip into a step-through teaching block the student works through
+themselves, the same shape as Lesson 1's tracing board — shown, not scored. See `QAIDA-BUILD.md` for where it lands
+in the build order; open questions are there too, since they need the teacher's answers before it's built.
 
 ## Sequence
 

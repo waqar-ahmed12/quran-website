@@ -115,8 +115,8 @@
       lede: 'The short “i”, written under the letter.' },
     { n: 6, title: { fatha: 'Damma', zabar: 'Paish' }, href: 'lesson-6.html', built: true, progress: 'drill', cp: 0x064F,
       lede: 'The short “u”, written above the letter.' },
-    { n: 7, title: { fatha: 'Tanween', zabar: 'Tanween' },
-      lede: 'The doubled marks: an, in and un at the end of a word.' },
+    { n: 7, title: { fatha: 'Tanween', zabar: 'Tanween' }, href: 'lesson-7.html', built: true, progress: 'drill',
+      cp: [0x064B, 0x064C, 0x064D], lede: 'The doubled marks: an, in and un at the end of a word.' },
     { n: 8, title: { fatha: 'Fatha and alif', zabar: 'Zabar and alif' },
       lede: 'The long “aa”.' },
     { n: 9, title: { fatha: 'Standing marks', zabar: 'Standing harakaat' },
@@ -291,12 +291,14 @@
     const drill = drillOf(n);
     const need = target || drill.target;
     const entry = LESSONS.find((lessonRow) => lessonRow.n === n);
-    const suffix = entry && entry.cp ? String.fromCharCode(entry.cp) : '';
+    // `cp` is a code point, or a list of them (Lesson 7's three doubled marks): whichever, an id counts if it ends
+    // in any one of them. A lesson with no `cp` at all (not yet a lesson of marks) counts everything, as it always did.
+    const cps = entry && entry.cp ? [].concat(entry.cp).map((cp) => String.fromCharCode(cp)) : [];
     const wanted = ids ? new Set(ids) : null;
     return Object.entries(drill.streak).filter(([id, run]) => {
       if (run < need) return false;
       if (wanted) return wanted.has(id);
-      return !suffix || (id.length === 2 && id.endsWith(suffix));
+      return !cps.length || (id.length === 2 && cps.includes(id[1]));
     }).length;
   }
 

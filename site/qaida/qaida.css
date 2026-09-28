@@ -2003,6 +2003,13 @@ a.crumb:hover {
   overflow: hidden;
 }
 
+/* A mark lesson's question can carry zair, which hangs below even a letter that already has a tail (وِ): it came to
+   rest a few pixels above the answers (fixes/lesson 4 5/zair touching the buttons.png). A clear gap under the question
+   on these pages; Lesson 2's bare letters keep theirs. */
+:root[data-mark] .prompt {
+  margin-bottom: 1.25rem;
+}
+
 .prompt-glyph {
   font-family: var(--font-letter);
   font-size: var(--prompt-size);
@@ -2902,6 +2909,16 @@ a.crumb:hover {
   transform: scale(1.04);
 }
 
+/* A tapped mark tile only plays its sound: it has no name to reveal, so the letter must not do Lesson 1's peek (step up
+   and shrink, or turn away). The halo is the tile's child, not the letter's, so the letter moving on its own left the
+   ring behind — round empty space, with the mark risen into its edge (the user, 2026-09-27: "the circle stays and the
+   ba paish rises and intersects with the circle"; fixes/lesson 4 5/). The tile's own scale still moves both together. */
+[data-peek] .letter.mark-tile.peek .glyph,
+.letter.mark-tile.peek .glyph {
+  opacity: 1;
+  transform: none;
+}
+
 /* Pointing at the mark without touching the text: a soft ring over the top of the tile. A combining mark in a span of its
    own can break its attachment to the letter in some faces, so the halo is drawn beside it (docs/lesson-4/04 §3b). */
 /* Sized and placed by mark-lesson.js from where the mark's ink really falls, so it fits every letter; hidden until it is. */
@@ -2970,6 +2987,245 @@ a.crumb:hover {
   color: var(--color-muted-foreground);
 }
 
+/* Spelling a real word (added 2026-09-27, QAIDA-BUILD.md's "First preview" entry): one glyph that grows letter by
+   letter, the same size family as the board's own examples. Shown, never scored — the same rule "Write it" and
+   "Say it" already live under, so there is no right/wrong colour anywhere in this block. */
+/* 2026-09-27, the user: "there should be adequate space", and a screenshot with سَمِ's zair touching the caption under
+   it. The glyph gets a taller line box and room below it, the caption and the meaning each hold a fixed height, and
+   the buttons sit further down — so nothing between the word and the buttons moves from step to step. */
+.spell-stage {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  margin: 2rem auto 0;
+  text-align: center;
+}
+
+.spell-glyph {
+  margin: 0;
+  padding-bottom: 0.75rem; /* zair and a descender (مِ, جَ) hang below the line box; this keeps them off the caption */
+  font-family: var(--font-letter);
+  font-size: clamp(3.5rem, 2.8rem + 3.5vw, 5.5rem);
+  line-height: 1.9;
+  color: var(--color-accent);
+  min-height: 1.9em; /* the shortest step is one letter; nothing below it should jump as it grows */
+}
+
+.spell-caption {
+  max-width: 34ch;
+  min-height: 1.5em;
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: var(--color-foreground);
+}
+
+.spell-meaning {
+  min-height: 1.45em; /* reserved on every step: spell.js only hides it with visibility */
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--color-muted-foreground);
+}
+
+.spell-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.75rem;
+}
+
+/* Which word: its own small tracker (added 2026-09-27, the user: "we should know where we are in the entire
+   words... keep it seperate from the introduction of the zabar zair or paish"). Deliberately not .bands/.band: that
+   rail is about meeting the mark; this one is about which word, and the two should never look like the same thing. */
+.spell-words {
+  display: grid;
+  justify-items: center;
+  gap: 0.625rem;
+  margin-top: 1.5rem;
+}
+
+.spell-words-label {
+  margin: 0;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--color-muted-foreground);
+}
+
+.spell-words-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.word-step {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1.5px solid var(--line);
+  border-radius: 50%;
+  background: none;
+  color: var(--color-muted-foreground);
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: border-color 200ms ease, color 200ms ease, background-color 200ms ease;
+}
+
+@media (hover: hover) {
+  .word-step:hover {
+    border-color: rgb(var(--rgb-accent) / 0.6);
+    color: var(--color-accent);
+  }
+}
+
+.word-step.current {
+  border-color: var(--color-accent);
+  background: rgb(var(--rgb-accent) / 0.12);
+  color: var(--color-accent);
+}
+
+/* More words: no longer a list on this page (moved to its own exercise-N.html, below) — just a line and a link, once
+   the walkthrough above is done. */
+.spell-more {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.spell-more-title {
+  margin: 0 0 0.375rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+}
+
+.spell-more-guide {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-muted-foreground);
+}
+
+/* The reading exercise (exercise-4/5/6.html, added 2026-09-27 — the user, sharing a photo of a printed Qaida's own
+   "mashq" page: "make a table of 12 words, keep the meanings out"). Its own small page: a header with the same
+   ornament the lesson's ending uses, then a plain word grid — no walkthrough, no meanings, no audio, nothing to
+   tap. Reading it silently is the whole exercise, same as the printed page it is modelled on. */
+.exercise-head {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: clamp(2rem, 6vh, 3.5rem) var(--gutter) 0;
+  text-align: center;
+}
+
+.exercise-head .ornament {
+  width: clamp(6rem, 8vw, 8rem);
+}
+
+.exercise-head h1 {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+}
+
+.exercise-lede {
+  max-width: 34ch;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+}
+
+.back-to-lesson {
+  margin-top: 0.5rem;
+}
+
+/* A table, not a flow of cells (2026-09-27, the user: "make a perfect table for the exercise"). auto-fill left the last
+   row part-empty — twelve words in five columns — and the grid's own line colour showed through the gaps as two grey
+   blocks. The column count is now always one that twelve divides by (4, then 3, then 2 as the screen narrows, or the
+   options panel's pick), so every row is full. The lines are the 1px gaps between cells, over the line colour, inside
+   a rounded frame. */
+.mashq {
+  --mashq-cols: 4;
+  --mashq-size: clamp(1.875rem, 1.5rem + 1.2vw, 2.5rem);
+  --mashq-room: 1.75rem;
+  display: grid;
+  grid-template-columns: repeat(var(--mashq-cols), minmax(0, 1fr));
+  gap: 1px;
+  width: min(100%, 44rem);
+  margin: clamp(2rem, 5vh, 3rem) auto 0;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--line);
+  direction: rtl;
+}
+
+@media (max-width: 639px) {
+  .mashq {
+    --mashq-cols: 3;
+  }
+}
+
+@media (max-width: 419px) {
+  .mashq {
+    --mashq-cols: 2;
+  }
+}
+
+:root[data-mashq-cols='2'] .mashq { --mashq-cols: 2; }
+:root[data-mashq-cols='3'] .mashq { --mashq-cols: 3; }
+:root[data-mashq-cols='4'] .mashq { --mashq-cols: 4; }
+:root[data-mashq-cols='6'] .mashq { --mashq-cols: 6; }
+
+:root[data-mashq-lines='rows'] .mashq {
+  column-gap: 0;
+}
+
+:root[data-mashq-lines='none'] .mashq {
+  gap: 0;
+}
+
+.mashq-word {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: var(--mashq-room) 0.5rem;
+  background: var(--color-background);
+  font-family: var(--font-letter);
+  font-size: var(--mashq-size);
+  line-height: 2; /* room for zair below and paish above, so neither is clipped by the cell */
+  color: var(--color-accent);
+}
+
+/* Small numbers in the corner, for a teacher to say "read number 5". Hidden unless the options panel shows them. */
+.mashq-n {
+  position: absolute;
+  inset-block-start: 0.4rem;
+  inset-inline-start: 0.55rem;
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--color-muted-foreground);
+}
+
+:root:not([data-mashq-numbers='show']) .mashq-n {
+  display: none;
+}
+
+.exercise-end {
+  margin-top: clamp(2rem, 5vh, 3rem);
+}
+
 @media (max-width: 599px) {
   .marks-board,
   :root[data-size='large'] .marks-board {
@@ -3000,15 +3256,20 @@ a.crumb:hover {
 /* Lesson 5 — a mark below the letter ----------------------------------------------------------------
    docs/lesson-5/02 §2 and 04 §7. The stroke lands in the strip that the dots below (ب ي ج) and every tail and bowl that
    crosses the line (ر و م ن ص ق ع غ) already use, so a tile that was measured for a stroke above needs room at the bottom as
-   well as the top. Lesson 4's own tile rules above are untouched: this only applies when the page says the mark sits below.
-   Tall letters (ا ل ك ط) still need the top, so the room is added, not moved. */
+   well as the top. Lesson 4's own tile rules above are untouched: this only applies when the mark sits below.
+   Tall letters (ا ل ك ط) still need the top, so the room is added, not moved.
 
-:root[data-sits='below'] .mark-tile {
+   Moved from :root[data-sits='below'] to the tile itself (docs/lesson-7/03 §7, 2026-09-27): Lesson 7's last part
+   puts marks above and below in the SAME row (بً بٌ above, بٍ below), so a page-wide rule can no longer be right
+   for every tile in it. mark-lesson.js's markTile() writes data-sits on each tile from its own stroke; on lessons
+   4-6, where every tile in a row shares one value, this is identical to the old rule. */
+
+.mark-tile[data-sits='below'] {
   aspect-ratio: 5 / 7.4;
   padding: 0.375rem 0 0.875rem;
 }
 
-:root[data-sits='below'] .mark-tile .glyph {
+.mark-tile[data-sits='below'] .glyph {
   line-height: 1.85;
 }
 
@@ -3040,9 +3301,12 @@ a.crumb:hover {
 
 /* Lesson 6 — the quartet: the letter, then with each mark taught so far, then with this one (docs/lesson-6/04 §3). Four tiles
    across on a wide screen, two by two on a narrow one, where the arrows are dropped because the row no longer reads in a line.
-   The tile itself is Lesson 4's and is not touched here. */
+   The tile itself is Lesson 4's and is not touched here.
+   Raised to the trio's size 2026-09-27, after the user found the quartet's own marks (fatha vs damma — the same short
+   stroke, once above and once as a small loop) hard to tell apart at the old, smaller size: a four-across row had been
+   given less room than a three-across one for no reason tied to legibility. The column's floor grows to match. */
 .pairs[data-board='quad'] {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 25rem), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 27rem), 1fr));
 }
 
 .pair.quad {
@@ -3055,7 +3319,7 @@ a.crumb:hover {
 }
 
 .pair.feature.quad {
-  --tile: clamp(3.5rem, 2.75rem + 3vw, 5.25rem);
+  --tile: clamp(4rem, 3.25rem + 3.4vw, 6rem);
   gap: 0.375rem;
 }
 
@@ -3074,7 +3338,37 @@ a.crumb:hover {
   }
 
   .pair.feature.quad {
-    --tile: clamp(3.75rem, 20vw, 5rem);
+    --tile: clamp(4rem, 22vw, 5.5rem);
+  }
+}
+
+/* "Letter size: Large" (the options panel's existing tile-size switch) used to stop at the drill's own tiles and the mark-
+   alone circle: these boards each declare their own --tile, at the same specificity as the switch's selector, so whichever
+   rule came later in the file always won regardless of the setting. Wired in 2026-09-27, scaled by the same ~1.2x the
+   switch already applies to the root tile, so a student who still can't tell fatha from damma at the size above has
+   somewhere further to go. */
+:root[data-size='large'] .pair.feature {
+  --tile: clamp(6rem, 4.8rem + 5vw, 9rem);
+}
+
+:root[data-size='large'] .pair.feature.trio,
+:root[data-size='large'] .pair.feature.quad {
+  --tile: clamp(4.75rem, 3.9rem + 4vw, 7.25rem);
+}
+
+@media (max-width: 599px) {
+  :root[data-size='large'] .pair.feature {
+    --tile: clamp(4.75rem, 22vw, 6.5rem);
+  }
+
+  :root[data-size='large'] .pair.feature.trio {
+    --tile: clamp(3.75rem, 19vw, 5.25rem);
+  }
+}
+
+@media (max-width: 479px) {
+  :root[data-size='large'] .pair.feature.quad {
+    --tile: clamp(4.75rem, 24vw, 6.25rem);
   }
 }
 

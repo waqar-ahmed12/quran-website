@@ -15,14 +15,21 @@
   if (!shell || !engine || !marks) return;
 
   const root = document.documentElement;
-  const mark = marks.markOf(root.dataset.mark);
-  if (!mark) return;
+  // `own` is every mark this lesson teaches, in lesson order: a list of one on lessons 4-6 (data-mark names a
+  // single mark), three on Lesson 7 (data-mark="tanween" names a SET — docs/lesson-7/03 §2). `parts` is what
+  // partsOf() makes of it: two parts for one mark (unchanged), one part per mark plus a last "every letter" part
+  // for several. `mark` is a moving target from here on: the OPEN PART's mark, kept current by setGroup(), and it
+  // is what every "the lesson's own mark" read in this file now means (docs/lesson-7/03 §2's table) unless a
+  // comment says otherwise.
+  const own = marks.marksOf(root.dataset.mark);
+  if (!own.length) return;
+  const set = marks.setOf(root.dataset.mark); // the lesson's own word ("tanween"); null on lessons 4-6
+  const parts = marks.partsOf(own);
+  let mark = own[0];
 
-  const LESSON = mark.lesson;
-  const LAST = marks.COUNT;
-  // Where the stroke sits, for the stylesheet: a mark below the letter shares its strip with the dots below and the tails, so
-  // the tiles need room at the other end (docs/lesson-5/02 §2). Set before anything is drawn.
-  root.dataset.sits = mark.sits;
+  const LESSON = own[0].lesson;
+  const LAST = parts[parts.length - 1].n;
+  const DRILLING = parts.map((p) => p.n); // the one-mark case is [1, 2]; Lesson 7's is [1, 2, 3, 4]
   const $ = (selector) => document.querySelector(selector);
 
   const lesson = $('.lesson');
@@ -66,6 +73,7 @@
   const lookSource = $('[data-groups]');
   const endLine = $('.end-line');
   const next = $('.next');
+  const prev = $('.prev');
 
   const audio = () => window.qaidaAudio;
   const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -98,13 +106,19 @@
   // What the drill runs with. The engine is measured against these, so the rail can measure both parts the same way.
   const target = () => (drill ? drill.settings.target : 3);
   const readyAt = () => (drill ? drill.settings.readyAt : 0.8);
+  const partOf = (n = group) => parts.find((p) => p.n === n) || parts[0];
+  const currentPart = () => partOf();
   // A mark with nothing before it (the first) has no "other mark" to be told apart from, so which-mark falls back to the
-  // look-alike wrong answers there instead of asking a question with no contrast in it.
-  const others = marks.othersOf(mark);
-  const other = marks.otherOf(mark);
+  // look-alike wrong answers there instead of asking a question with no contrast in it. On a lesson with several marks
+  // (Lesson 7), the LAST part is shown against the lesson's OTHER marks — own.slice(1), since `mark` is own[0] there
+  // (partsOf's own choice) — never its single counterpart, which is last lesson's skill (docs/lesson-7/03 §5). A
+  // one-mark lesson's own "every" part has nothing else in `own` to slice, so it falls through to the single
+  // counterpart unchanged, exactly as lessons 5 and 6 already read it.
+  const others = () => (currentPart().every && own.length > 1 ? own.slice(1) : marks.othersOf(mark));
+  const other = () => others()[0] || null;
   const distractors = () => {
     const wanted = root.dataset.distractors;
-    if (wanted === 'which-mark') return other ? 'which-mark' : 'look-alike';
+    if (wanted === 'which-mark') return other() ? 'which-mark' : 'look-alike';
     return ['mark-or-not', 'any'].includes(wanted) ? wanted : 'look-alike';
   };
   // The other marks' letters ride along as wrong answers unless the teacher turns them off (docs/lesson-5/06 §2).
@@ -113,7 +127,7 @@
   //   both:      every letter against every other mark. `on` is the old word for it and still works: it may be in a
   //              teacher's exported setting.txt.
   const twinMode = () => {
-    if (!others.length || root.dataset.twins === 'off') return 'off';
+    if (!others().length || root.dataset.twins === 'off') return 'off';
     return root.dataset.twins === 'alternate' ? 'alternate' : 'both';
   };
   const twinsOn = () => twinMode() !== 'off';
@@ -125,12 +139,14 @@
   };
   // The trio (the letter, the letter with the other mark, the letter with this one) needs an other mark to show, and the quartet
   // (all of the marks taught so far) needs two; a board asked for and not available falls back one step, so a value typed into
-  // another lesson's panel gives that lesson's own board rather than a broken one (docs/lesson-6/04 §3).
+  // another lesson's panel gives that lesson's own board rather than a broken one (docs/lesson-6/04 §3). `auto` (Lesson 7's
+  // default) picks whichever of those the OPEN PART can actually show: a trio in a warm-up, a quartet in the last part.
   const boardMode = () => {
     const wanted = root.dataset.board;
     if (wanted === 'marked') return 'marked';
-    if (wanted === 'quad' && others.length > 1) return 'quad';
-    if ((wanted === 'quad' || wanted === 'trio') && other) return 'trio';
+    if (wanted === 'auto') return others().length > 1 ? 'quad' : other() ? 'trio' : 'pairs';
+    if (wanted === 'quad' && others().length > 1) return 'quad';
+    if ((wanted === 'quad' || wanted === 'trio') && other()) return 'trio';
     return 'pairs';
   };
   // An arrow before a tile says "and now with this mark". Three in a row is noise, so a quartet draws only the last, the mark
@@ -139,8 +155,12 @@
     const wanted = root.dataset.arrows || (boardMode() === 'quad' ? 'last' : 'all');
     return wanted === 'none' ? false : wanted === 'last' ? index === count - 1 : true;
   };
-  // Whose stroke an item carries. A twin and a bare letter are review: never advice, never counted, never the gate.
-  const isOwn = (item) => Boolean(item) && item.mark === mark.id;
+  // Whose stroke an item carries, for the advice: is it one of the OPEN PART's own required items? Reads part
+  // membership directly (docs/lesson-7/03 §4: an item can belong to more than one part), rather than comparing the
+  // item's own mark against the page's current one — on Lesson 7's last part an item may carry any of the three
+  // marks by rotation, and it is still this part's own. A twin and a bare letter are review: never advice, never
+  // counted, never the gate, because they are in no part at all.
+  const isOwn = (item) => Boolean(item) && marks.inPart(item, group);
   const pointMode = () => (['none', 'tint'].includes(root.dataset.point) ? root.dataset.point : 'halo');
 
   // Words -------------------------------------------------------------------------------------------
@@ -159,10 +179,15 @@
       .filter((list) => list.length > 1);
   }
 
-  // {mark} and {Mark} are filled from the student's own set of names, so switching it rewrites the page without a reload.
-  const say = (text, values = {}) => fill(text, { ...marks.wordsFor(mark, shell), ...values });
+  // {mark} and {Mark} are filled from the OPEN PART's own mark (docs/lesson-7/03 §6), so switching part or names
+  // rewrites the page without a reload. {set} is the lesson's own word ("tanween"), empty on lessons 4-6.
+  const say = (text, values = {}) => fill(text, {
+    ...marks.wordsFor(mark, shell), set: set ? set.names[shell.state.names === 'zabar' ? 'zabar' : 'fatha'] : '', ...values,
+  });
 
-  const groupName = (n) => bandsNav.dataset[`group${n}`] || '';
+  // A part's own name, filled from ITS OWN mark — not the page's current one (docs/lesson-7/04 §3): the rail shows
+  // all four parts at once, so "Meet {mark}" has to read "Meet kasratain" on button 2 even while part 1 is open.
+  const groupName = (n) => fill(bandsNav.dataset[`group${n}`] || '', marks.wordsFor(partOf(n).mark, shell));
 
   // The parts -------------------------------------------------------------------------------------------
 
@@ -172,7 +197,7 @@
 
   // The part the student is up to: the first one not yet ready.
   function upTo() {
-    for (const n of marks.DRILLING) if (!stat(n).ready) return n;
+    for (const n of DRILLING) if (!stat(n).ready) return n;
     return LAST;
   }
 
@@ -184,7 +209,7 @@
   // The rail, once; paintRail() keeps it up to date without rebuilding it, so a button never loses the keyboard.
   function buildRail() {
     bandsList.textContent = '';
-    for (const n of marks.DRILLING) {
+    for (const n of DRILLING) {
       const item = document.createElement('li');
       const button = document.createElement('button');
       button.type = 'button';
@@ -219,7 +244,8 @@
       if (now) button.setAttribute('aria-current', 'page');
       else button.removeAttribute('aria-current');
       button.querySelector('.band-n').textContent = String(n);
-      button.querySelector('.band-glyph').textContent = marks.sampleOf(shell, mark, n);
+      const part = partOf(n);
+      button.querySelector('.band-glyph').textContent = marks.sampleOf(shell, part.mark, part);
       button.querySelector('.band-name').textContent = name;
       button.querySelector('.band-state').textContent = state || '';
       button.style.setProperty('--p', s.total ? s.known / s.total : 0);
@@ -256,18 +282,31 @@
     return [...own, ...twins, ...bare];
   }
 
+  // Which marks a given item is told apart from: its own single counterpart, unless this is a lesson with several
+  // marks AND the open part is the last one, where it is the OTHER marks the lesson teaches — "which two?", not
+  // "one or two?" again (docs/lesson-7/03 §5). Per item, not per part: on Lesson 7's last part an item may carry
+  // any of the three marks by rotation, and its twins are always the OTHER two, whichever it is.
+  function twinMarksFor(item) {
+    const self = marks.markOf(item.mark);
+    if (!self) return [];
+    return currentPart().every && own.length > 1 ? own.filter((m) => m !== self) : marks.othersOf(self);
+  }
+
   // Which of the other marks each letter is told apart from. Every own item still has exactly one same-letter twin at least,
   // which is what the engine's familyFirst needs to make one wrong answer "the same letter, another mark". When alternating, the
   // mark for a letter is chosen by its place in a teaching order that does not depend on the part (the mark's own six, then the
   // rest), plus the part: so part 1 is balanced, and every letter drilled against zabar in part 1 meets zair in part 2
   // (docs/lesson-6/03 §4). With one other mark this is every letter against it, as Lesson 5 always was.
-  function twinsFor(own, n, options) {
+  function twinsFor(ownItems, n, options) {
     const keysBy = new Map();
     const every = shell.lettersOf().map(([glyph]) => shell.keyOf(glyph));
     const order = [...mark.first, ...every.filter((key) => !mark.first.includes(key))];
-    own.forEach((item) => {
+    ownItems.forEach((item) => {
       const at = Math.max(0, order.indexOf(item.key));
-      for (const m of twinMode() === 'alternate' ? [others[(at + n) % others.length]] : others) {
+      const wanted = twinMarksFor(item);
+      if (!wanted.length) return;
+      const chosen = twinMode() === 'alternate' ? [wanted[(at + n) % wanted.length]] : wanted;
+      for (const m of chosen) {
         keysBy.set(m, [...(keysBy.get(m) || []), item.key]);
       }
     });
@@ -295,6 +334,11 @@
     clearTimeout(advanceTimer);
     clearTimeout(swapTimer);
     group = n;
+    mark = (parts.find((p) => p.n === n) || parts[0]).mark; // the open part's own mark, from here until the next switch
+    // Where the stroke sits, for the stylesheet: a mark below the letter shares its strip with the dots below and the
+    // tails, so the tiles need room at the other end (docs/lesson-5/02 §2). Page-wide, for things that are not a
+    // .mark-tile (docs/lesson-7/03 §7 moves the tile's own rule to the tile itself, below).
+    root.dataset.sits = mark.sits;
     root.dataset.group = String(n);
     root.dataset.band = String(n); // the stylesheet's hook for the rail and the taller prompt
     view.struggling = null;
@@ -382,11 +426,14 @@
   // `kind` is 'bare', 'marked' (this lesson's stroke, the one that is pointed at) or 'other' (a stroke it is shown against:
   // `stroke` says which, for a board with more than one).
   function markTile(kind, letter, label, stroke) {
-    const strokeOf = kind === 'marked' ? mark : kind === 'other' ? stroke || other : null;
+    const strokeOf = kind === 'marked' ? mark : kind === 'other' ? stroke || other() : null;
     const button = el('button', `letter mark-tile ${kind}`);
     button.type = 'button';
     button.dataset.kind = kind;
     button.dataset.base = letter;
+    // Which end of the tile the stroke needs room at (docs/lesson-7/03 §7): a mixed row (Lesson 7's last part) can
+    // hold marks above and below at once, so the rule that used to hang off the whole page now hangs off the tile.
+    button.dataset.sits = strokeOf ? strokeOf.sits : 'above';
     // The same id the engine gives that item, so "the letter just missed" can be found by comparing them.
     button.dataset.id = shell.keyOf(letter) + (strokeOf ? String.fromCharCode(strokeOf.cp) : '');
     button.dataset.audio = strokeOf ? strokeOf.audio : 'letters';
@@ -394,7 +441,7 @@
     const glyph = arabic(el('span', 'glyph'));
     if (kind === 'marked' && pointMode() === 'tint') {
       // Fragile on purpose: the mark in a span of its own, so the teacher can see what that does to the attachment.
-      glyph.append(document.createTextNode(letter), el('span', 'tinted', String.fromCharCode(mark.cp)));
+      glyph.append(document.createTextNode(letter), el('span', 'tinted', String.fromCharCode(strokeOf.cp)));
     } else {
       glyph.textContent = strokeOf ? marks.glyphOf(letter, strokeOf) : letter;
     }
@@ -582,12 +629,15 @@
 
   function renderBoard() {
     const words = boardBox.dataset;
-    const rows = marks.boardRows(shell, mark, group);
+    const rows = marks.boardRows(shell, mark, currentPart(), { others: others() });
+    // {where} says which end of the letter the OPEN PART's mark sits at — a warm-up part's mark can be either
+    // (docs/lesson-7/04 §4), unlike lessons 4-6 where it never changes on the same page.
+    const where = mark.sits === 'below' ? words.whereBelow : words.whereAbove;
 
     // The mark on its own, and where it sits.
     aloneGlyph.textContent = marks.aloneOf(mark);
     aloneLabel.textContent = say(words.markAlone);
-    aloneSits.textContent = say(words.markSits);
+    aloneSits.textContent = say(words.markSits, { where });
 
     // The featured pair: one letter twice, bare and marked, the two ways of saying it under each.
     featureBox.textContent = '';
@@ -943,7 +993,7 @@
   // after `setItems`; every part is measured here instead. A part already ready on the way in is not congratulated.
   function watchReady(quiet) {
     let crossed = 0;
-    for (const n of marks.DRILLING) {
+    for (const n of DRILLING) {
       const now = stat(n).ready;
       if (now && !ready.has(n)) {
         ready.add(n);
@@ -1057,6 +1107,16 @@
     next.querySelector('span').textContent = entry ? text : '';
   }
 
+  // The previous lesson: always built by the time this page can be reached, so a plain link (Lesson 4's own is a
+  // static <a>, with no dataset here, and paints nothing). Lessons 5 and 6's follow the student's choice of names,
+  // the same way the "next" button's own label does.
+  function paintPrev() {
+    if (!prev || !prev.dataset.prevZabar) return;
+    const name = shell.state.names === 'zabar' ? 'zabar' : 'fatha';
+    const span = prev.querySelector('span');
+    if (span) span.textContent = say(name === 'zabar' ? prev.dataset.prevZabar : prev.dataset.prevFatha);
+  }
+
   function paintHead() {
     const name = shell.state.names === 'zabar' ? 'zabar' : 'fatha';
     const title = heading.dataset[name === 'zabar' ? 'titleZabar' : 'titleFatha'] || '';
@@ -1089,19 +1149,23 @@
     replayBoard();
   }
 
+  // The lesson's own marks, not the open part's (own.map) — the whole point of this string is to catch a change
+  // that means the ITEMS must be rebuilt (script, wrong-answer choice, review count...), and switching part is not
+  // one of those; setGroup()/usePool() already handle it on their own.
   const shapeOf = () => [
-    shell.state.script, mark.id, distractors(), reviewCount(), twinMode(), lookAlikes().map((list) => list.join('')).join(','),
+    shell.state.script, own.map((m) => m.id).join(','), distractors(), reviewCount(), twinMode(),
+    lookAlikes().map((list) => list.join('')).join(','),
   ].join('|');
 
   function build() {
-    items = marks.allItems(shell, mark, { templates: templates(), distractors: distractors(), looks: lookAlikes() });
+    items = marks.allItems(shell, own, { templates: templates(), distractors: distractors(), looks: lookAlikes() });
     usePool(group);
   }
 
   // Seen quietly: whatever is already ready on the way in, or after the letters changed, is not "just now".
   function seedReady() {
     ready.clear();
-    for (const n of marks.DRILLING) if (stat(n).ready) ready.add(n);
+    for (const n of DRILLING) if (stat(n).ready) ready.add(n);
   }
 
   function render() {
@@ -1111,6 +1175,8 @@
       build();
       shape = wanted;
       group = upTo();
+      mark = partOf(group).mark; // the open part's own mark, before anything reads it (setGroup() isn't called yet)
+      root.dataset.sits = mark.sits;
       root.dataset.group = String(group);
       root.dataset.band = String(group);
       usePool(group);
@@ -1160,6 +1226,7 @@
     paintAdvice();
     paintSound();
     paintNext();
+    paintPrev();
   }
 
   shell.onChange(render);
@@ -1199,8 +1266,13 @@
       return reviewCount();
     },
     // Whether there is a mark before this one to be told apart from, and whether its letters are riding along.
-    hasOther: Boolean(other),
-    otherCount: others.length,
+    // Getters, not values: on a lesson with several marks this depends on the OPEN PART (docs/lesson-7/03 §5).
+    get hasOther() {
+      return Boolean(other());
+    },
+    get otherCount() {
+      return others().length;
+    },
     get twins() {
       return twinsOn();
     },
@@ -1221,9 +1293,18 @@
     // Any part, at any time: nothing is locked.
     setGroup: (n) => setGroup(n),
     // What each part costs, so the options panel can show the teacher the numbers before asking (docs/lesson-4/09 §2).
-    groupCosts: () => marks.sizes(items).map((count, i) => ({
-      n: i + 1, items: count, answers: Math.ceil(count * readyAt() - 1e-9) * target(),
+    groupCosts: () => marks.sizes(items, parts).map((count, i) => ({
+      n: parts[i].n, items: count, answers: Math.ceil(count * readyAt() - 1e-9) * target(),
     })),
+    // The parts themselves, so the options panel can build a Part row for however many there are (docs/lesson-7/04 §7).
+    get parts() {
+      return parts.map((p) => ({ n: p.n, name: groupName(p.n) }));
+    },
+    // How many marks this lesson teaches: 1 on lessons 4-6, 3 on Lesson 7 — what the options panel's board row uses
+    // to decide whether "A trio, then all three" (auto) is worth offering at all (docs/lesson-7/04 §7).
+    get markCount() {
+      return own.length;
+    },
     // How many bare letters ride along. The option has set the attribute; the pool is rebuilt to match.
     setReview: () => render(),
     setDistractors: () => render(),
