@@ -395,15 +395,17 @@ a.crumb:hover {
   list-style: none;
 }
 
+/* Each dash may shrink, so the twenty-nine of the second pass fit a phone; the fourteen of the first never need to. */
 .track li {
-  width: 1rem;
+  flex: 0 1 1rem;
+  min-width: 3px;
   height: 2px;
   border-radius: 1px;
   background: rgb(var(--rgb-foreground) / 0.16);
 }
 
 .track .now {
-  width: 1.75rem;
+  flex-basis: 1.75rem;
   background: var(--color-accent);
 }
 
@@ -898,6 +900,16 @@ a.crumb:hover {
 
 .lesson-end > .onward {
   margin-top: var(--gap-below-text, clamp(0.6rem, 1vh, 0.75rem));
+}
+
+/* Lesson 14's line above the ways out (docs/lesson-14/04 §5): quieter than the end line, and only on the last lesson. */
+.lesson-end > .last-line {
+  max-width: 32ch;
+  margin: var(--gap-below-text, clamp(0.6rem, 1vh, 0.75rem)) 0 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  text-wrap: balance;
+  color: var(--color-muted-foreground);
 }
 
 /* A drill page's own tally sits right above this (2026-09-25): --end-gap is shared with Lesson 1's "letter last
@@ -1675,6 +1687,33 @@ a.crumb:hover {
   display: flex;
 }
 
+/* The home's two headings (docs/lesson-15/03 §7): "Learning to read" over 1-14, "Reading the Qur'an" over 15-29. An item
+   of the same list, spanning every column, so the cards under it start a fresh row. */
+.part-head {
+  grid-column: 1 / -1;
+  margin-top: clamp(0.75rem, 2vh, 1.25rem);
+}
+
+.part-head:first-child {
+  margin-top: 0;
+}
+
+.part-head h2 {
+  margin: 0;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+[data-cards='paper'] .part-head h2 {
+  color: var(--ink-accent);
+}
+
 /* One card: the number, what the lesson teaches, and a mark saying whether it can be opened. */
 .card {
   display: grid;
@@ -1774,12 +1813,12 @@ a.crumb:hover {
 }
 
 /* Open: gold, with an arrow that leans forward when pointed at. */
-[data-state='open'] .card-icon,
+[data-state='next'] .card-icon,
 [data-state='done'] .card-icon {
   color: var(--color-accent);
 }
 
-[data-cards='paper'] [data-state='open'] .card-icon,
+[data-cards='paper'] [data-state='next'] .card-icon,
 [data-cards='paper'] [data-state='done'] .card-icon {
   color: var(--ink-accent);
 }
@@ -1790,40 +1829,102 @@ a.crumb:hover {
 }
 
 [data-state='done'] .card-meta,
-[data-state='open'] .card-meta {
+[data-state='next'] .card-meta {
   color: var(--color-accent);
 }
 
 [data-cards='paper'] [data-state='done'] .card-meta,
-[data-cards='paper'] [data-state='open'] .card-meta {
+[data-cards='paper'] [data-state='next'] .card-meta {
   color: var(--ink-accent);
 }
 
 @media (hover: hover) {
-  [data-state='open'] .card:hover,
+  [data-state='next'] .card:hover,
   [data-state='done'] .card:hover {
     border-color: rgb(var(--rgb-accent) / 0.6);
     transform: translateY(-2px);
   }
 
-  [data-state='open'] .card:hover .card-icon {
+  [data-state='next'] .card:hover .card-icon {
     translate: 3px 0;
   }
 }
 
-[data-state='open'] .card:active,
+[data-state='next'] .card:active,
 [data-state='done'] .card:active {
   transform: scale(0.995);
 }
 
-/* Not open yet: still reachable and still says why, but plainly not a way forward. */
-[data-state='locked'] .card {
+/* Further on: a real link, just quieter than the next one — nothing is locked (docs/lesson-2/09-going-in-order.md).
+   The arrow still leans forward when pointed at. */
+@media (hover: hover) {
+  [data-state='later'] .card:hover {
+    border-color: rgb(var(--rgb-accent) / 0.35);
+  }
+
+  [data-state='later'] .card:hover .card-icon {
+    translate: 3px 0;
+  }
+}
+
+/* Not built yet: still says so when tapped, but plainly not a way forward. The only card with a lock. */
+[data-state='soon'] .card {
   color: var(--color-muted-foreground);
   cursor: not-allowed;
 }
 
-[data-state='locked'] .card-title {
+[data-state='soon'] .card-title {
   color: var(--color-muted-foreground);
+}
+
+/* The advice before a lesson taken out of turn: the chooser's panel, smaller and quieter. */
+.order-advice {
+  width: min(28rem, calc(100vw - 2rem));
+  max-width: none;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-foreground);
+}
+
+.order-advice::backdrop {
+  background: rgb(var(--rgb-background) / 0.8);
+}
+
+.order-advice-body {
+  padding: clamp(1.5rem, 5vw, 2.25rem);
+}
+
+.order-advice h2 {
+  margin: 0;
+  font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.75rem);
+  font-weight: 300;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.order-advice .intro {
+  margin: 0.75rem 0 0;
+  line-height: 1.6;
+  color: var(--color-muted-foreground);
+}
+
+.order-advice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .order-advice[open] {
+    animation: rise 500ms var(--ease-out);
+  }
+
+  .order-advice[open]::backdrop {
+    animation: fade 300ms ease;
+  }
 }
 
 [data-state='done'] .card {
@@ -2121,6 +2222,12 @@ a.crumb:hover {
   border: solid var(--tile-mark);
   border-width: 0 2px 2px 0;
   rotate: 45deg;
+}
+
+/* A name that wraps to two lines ran under the tick (fixes/lesson 3/, "tick mark intersects with the text"): the
+   words keep clear of the corner it sits in, on both sides so they stay centred. */
+.choice[data-face='name'] .choice-name {
+  padding-inline: 1rem;
 }
 
 .choice[data-verdict='wrong'] {
@@ -2831,6 +2938,51 @@ a.crumb:hover {
   color: var(--color-foreground);
 }
 
+/* Lesson 10's one line naming the jazam: under the feature row, quieter than what the mark does, and centred with it. */
+.jazam-note {
+  max-width: 46ch;
+  margin: 0 auto;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-muted-foreground);
+}
+
+/* Lesson 14's lines (docs/lesson-14/04 §3), one voice with the notes above them: the line that says why the alif is in
+   front of every letter, the other two leads (composed in code), and the wow-and-yaa note in part 2. Every one is
+   [hidden] on every other page, and a page without the element never reaches them. Lesson 15's hum line (docs/lesson-15/
+   03 §4) is one more of them. */
+.lead-line,
+.leads-note,
+.hum-note,
+.wy-note {
+  max-width: 46ch;
+  margin: 0.5rem auto 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-muted-foreground);
+}
+
+.lead-line {
+  margin-top: 0.25rem;
+  font-size: 0.9375rem;
+  color: var(--color-foreground);
+}
+
+.leads-note {
+  margin-top: 1.25rem;
+}
+
+.leads-example {
+  font-family: var(--font-letter);
+  font-size: 1.5rem;
+  line-height: 1.6;
+  color: var(--color-foreground);
+}
+
 /* Right to left, like the script: the letter on its own is on the right, with the mark on the left, and the pairs run the same
    way. The words under each stay left to right. */
 .pairs {
@@ -2866,6 +3018,17 @@ a.crumb:hover {
   stroke-linecap: round;
   stroke-linejoin: round;
   scale: -1 1; /* it points from the letter on the right to the marked one on the left */
+}
+
+/* Lesson 9's same-sound tile (docs/lesson-9/03 §7): "=" rather than the arrow, since the two spellings are not a
+   sequence — the same sound, twice. */
+.pair-equals {
+  align-self: center;
+  flex: none;
+  margin-bottom: 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-muted-foreground);
 }
 
 .pair-cell {
@@ -2950,6 +3113,28 @@ a.crumb:hover {
   color: var(--color-accent);
 }
 
+/* Two letters side by side (Lesson 8's "baa"; lessons 10-13 the same shape, docs/lesson-8/03 §6). WIDER, never
+   taller: the tiles of one row share one height, or the row looks broken (see the ONE HEIGHT PER ROW rule below,
+   fixes/lesson 6/ — "why is the zair box is weird"). The glyph's own font-size does not change (still
+   calc(var(--tile) * 0.58)), so a tailed letter reads the same size as its bare neighbour, only the tile widens
+   to fit both. Every board that declares its own --tile (.pair.feature, .trio, .quad and their large-size
+   overrides) inherits this, since the rule multiplies whatever --tile already is. */
+.mark-tile[data-tail] {
+  width: calc(var(--tile) * 1.5);
+  aspect-ratio: 7.5 / 6.6;
+}
+
+/* The options panel's other choice (docs/lesson-8/04 §9, "Two-letter tiles: Same width, smaller letters"): the
+   tile keeps its ordinary width and the tailed glyph shrinks instead, to about 0.72 of its usual size. */
+:root[data-tailfit='shrink'] .mark-tile[data-tail] {
+  width: var(--tile);
+  aspect-ratio: 5 / 6.6;
+}
+
+:root[data-tailfit='shrink'] .mark-tile[data-tail] .glyph {
+  font-size: calc(var(--tile) * 0.58 * 0.72);
+}
+
 .bare-under {
   font-family: var(--font-letter);
   font-size: 1.375rem;
@@ -3007,8 +3192,45 @@ a.crumb:hover {
   font-family: var(--font-letter);
   font-size: clamp(3.5rem, 2.8rem + 3.5vw, 5.5rem);
   line-height: 1.9;
-  color: var(--color-accent);
   min-height: 1.9em; /* the shortest step is one letter; nothing below it should jump as it grows */
+}
+
+/* fixes/lesson 4 5/, "should be animated, and be shown in complete word and the word that is being read is
+   highlighted" (2026-09-27): the whole word is on screen from the first step (spell.js's unitsFor), and each
+   letter's own state — not yet reached, already read, or the part being read right now — is a class on its own
+   span, so nothing here ever needs to touch a letter's text. Docs/lesson-8/05 §2 routes Lesson 8's words through
+   the same three states. */
+.spell-glyph .unit {
+  color: var(--color-accent);
+}
+
+.spell-glyph .unit.unread {
+  color: var(--color-muted-foreground);
+  opacity: 0.4;
+}
+
+.spell-glyph .unit.read {
+  opacity: 0.75;
+}
+
+.spell-glyph .unit.active {
+  /* display stays the default `inline` — an inline-block here would shape on its own and could break the letter's
+     join to its neighbour (docs/lesson-8/05 §2's warning). text-shadow and opacity both work on a plain inline
+     span, so nothing here needs a box of its own. */
+  opacity: 1;
+  text-shadow: 0 0 0.55em rgb(var(--rgb-accent) / 0.5);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .spell-glyph .unit.active {
+    animation: spell-unit-in 420ms var(--ease-out);
+  }
+}
+
+@keyframes spell-unit-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .spell-caption {
@@ -3261,16 +3483,72 @@ a.crumb:hover {
 
    Moved from :root[data-sits='below'] to the tile itself (docs/lesson-7/03 §7, 2026-09-27): Lesson 7's last part
    puts marks above and below in the SAME row (بً بٌ above, بٍ below), so a page-wide rule can no longer be right
-   for every tile in it. mark-lesson.js's markTile() writes data-sits on each tile from its own stroke; on lessons
-   4-6, where every tile in a row shares one value, this is identical to the old rule. */
+   for every tile in it. mark-lesson.js's markTile() writes data-sits on each tile from its own stroke.
 
-.mark-tile[data-sits='below'] {
+   ONE HEIGHT PER ROW (fixes/lesson 6/, "why is the zair box is weird", 2026-09-27, and fixes/lesson 7/, "two zair
+   brings the box down" / "two zair out of place"): scoping the taller aspect-ratio to the tile ALONE, as above,
+   left a lone taller tile jutting past its row's siblings in the flex row (align-items: flex-start doesn't stretch
+   them to match) — the row after it visibly dropped. The rule now reads the whole row `:has()` a below-sitting
+   tile in it, and taller then applies to every tile in that row, not just the one that sits below (docs/lesson-8/03
+   §6 builds Lesson 8's wide tile on this same rule, so it had to be settled first). */
+
+.pair:has(.mark-tile[data-sits='below']) .mark-tile {
   aspect-ratio: 5 / 7.4;
   padding: 0.375rem 0 0.875rem;
 }
 
-.mark-tile[data-sits='below'] .glyph {
+.pair:has(.mark-tile[data-sits='below']) .mark-tile .glyph {
   line-height: 1.85;
+}
+
+/* Lesson 13 (docs/lesson-13/02 §4): the first row with a mark below AND a tail. The rule above sets the ratio for the
+   narrow tile, so a wide (data-tail) tile in the same row kept 5 / 7.4 at 1.5x the width and came out 1.5x TALLER
+   than its neighbours (measured 2026-09-29: 176px against 117px) — the row drop of fixes/lesson 6/ and lesson 7/
+   again, by another road. Same height, one and a half times the width: 1.5 * 5 / 7.4. The "shrink" option keeps the
+   ordinary width, so it keeps the ordinary ratio. Lesson 9's Madani khari zair (a mark below with a small yaa
+   after it) had the same fault: with the old ratio forced back, all 7 rows of its part 2 came out uneven.
+
+   Measured after the fix (2026-09-29, browser pane, every tile of Lesson 13's part 1 and part 2, ink box against
+   tile box, both scripts, default and Large): no row uneven, nothing clipped, no horizontal overflow, at 1280px
+   and at 375px. Tightest gap between ink and tile edge: 13.2px at 1280px, 8.3px at 375px (Madani, ص and ض
+   sideways; 8.5px at the bottom, ع with zair). The drill's prompt is tightest at 4px (Madani, عِي, Large, 375px).
+   The zair and the yaa's bowl do not touch on any joining letter: Scheherazade New and Noto Naskh draw a plain bowl
+   to the left, not the returning yaa (docs/lesson-13/02 §4). No `data-tail-below` rule was needed. */
+.pair:has(.mark-tile[data-sits='below']) .mark-tile[data-tail] {
+  aspect-ratio: 7.5 / 7.4;
+}
+
+:root[data-tailfit='shrink'] .pair:has(.mark-tile[data-sits='below']) .mark-tile[data-tail] {
+  aspect-ratio: 5 / 7.4;
+}
+
+/* Lesson 9's Madani khari zabar (zabar plus a small alif standing on top of it) was flagged as the tallest stack
+   the Qaida draws (docs/lesson-9/02 §3.1) and might have needed a mirror of the rule above, an `above-tall` data
+   attribute and its own row-height bump. Measured instead of added blind (docs/lesson-9/03 §4's own instruction):
+   in the browser pane, laam's row in the last part (ل with khari zabar, the tallest letter under the tallest
+   stack) does not overlap the row above it, in either script, at the default tile size. No CSS change needed here. */
+
+/* Lesson 10's wow hangs below the line, which Lesson 8's alif never did, so the wide tile might have clipped it
+   (docs/lesson-10/03 §3). Measured 2026-09-28 in the browser pane, ink box against tile box for all 27 tiles of the
+   last part: nothing crosses any edge, Madani or Indo-Pak, default or Large — the closest is 7px clear at the
+   bottom (Madani). No `data-tail-below` row rule needed. */
+
+/* Lesson 15 - a shadda AND a vowel, both above (docs/lesson-15/02 §3, measured 2026-09-29). Scheherazade New and Noto
+   Naskh both stack the vowel under the shadda above the letter, and the kasra joins them there, so the top of a tall
+   letter (ط ظ ك ل, and the lead's alif beside it) has the tallest stack the Qaida draws. Measured in the browser pane
+   on a phone (375px), every tile of the four parts, both scripts: the tightest gap between ink and tile top was 1.4px
+   (Madani, taa with shadda and paish) with the ordinary ratio. A little taller, for this lesson only, keeps every tile clear. The part with
+   the plain zair beside it (a mark BELOW) keeps its own, taller ratio from the rule above. */
+:root[data-mark='shadda'] .mark-tile {
+  aspect-ratio: 5 / 7.3;
+}
+
+:root[data-mark='shadda'] .mark-tile[data-tail] {
+  aspect-ratio: 7.5 / 7.3;
+}
+
+:root[data-mark='shadda'][data-tailfit='shrink'] .mark-tile[data-tail] {
+  aspect-ratio: 5 / 7.3;
 }
 
 /* The trio: the letter, then with the stroke of the lesson before, then with this one. Three tiles and two arrows in a row,

@@ -255,9 +255,9 @@ async function main() {
   check(htmlEl.attrs['data-mark'] === 'tanween', 'data-mark names the tanween SET, not a single mark');
   check(JSON.stringify(qaida.groupCosts().map((p) => [p.n, p.items])) === '[[1,6],[2,6],[3,6],[4,29]]', 'groupCosts() is four parts: 6, 6, 6 and 29', JSON.stringify(qaida.groupCosts()));
   check(rail().length === 4 && rail().every((b) => b.attrs.disabled === undefined), 'four parts, all enabled: nothing is locked');
-  check(railButton(1).querySelector('.band-name').textContent === 'Meet fathatain'
-    && railButton(2).querySelector('.band-name').textContent === 'Meet kasratain'
-    && railButton(3).querySelector('.band-name').textContent === 'Meet dammatain'
+  check(railButton(1).querySelector('.band-name').textContent === 'Meet two fatha'
+    && railButton(2).querySelector('.band-name').textContent === 'Meet two kasra'
+    && railButton(3).querySelector('.band-name').textContent === 'Meet two damma'
     && railButton(4).querySelector('.band-name').textContent === 'All the letters',
   'the rail names all four parts, each with its own mark filled in',
   rail().map((b) => b.querySelector('.band-name').textContent).join(' | '));
@@ -355,8 +355,8 @@ async function main() {
   shell.state.names = 'zabar';
   shell.renderSetup();
   await sleep(10);
-  check(rail().map((b) => b.querySelector('.band-name').textContent).join('|') === 'Meet do zabar|Meet do zair|Meet do paish|All the letters',
-    'do zabar, do zair, do paish, then the plain last name', rail().map((b) => b.querySelector('.band-name').textContent).join(' | '));
+  check(rail().map((b) => b.querySelector('.band-name').textContent).join('|') === 'Meet two zabar|Meet two zair|Meet two paish|All the letters',
+    'two zabar, two zair, two paish, then the plain last name', rail().map((b) => b.querySelector('.band-name').textContent).join(' | '));
   check($('h1').textContent === 'Tanween', 'the lesson\'s own name, tanween, does not change');
   shell.state.names = 'fatha';
   shell.renderSetup();
@@ -380,7 +380,10 @@ async function main() {
   check(!/\b(incorrect|wrong|try again)\b/i.test(visible), 'no scolding anywhere on the page');
   check(all('[data-words], [data-words-attr]').length > 30, 'every line of wording is tagged for a text field of its own');
   check(!fs.existsSync(path.join(dir, 'lesson-7.js')), 'there is no lesson-7.js: mark-lesson.js is the page');
-  check(!/section class="spell"/.test(raw), 'no Spell-a-word section: tanween teaches no words');
+  // 2026-09-28 (fixes/lesson 7/fixes.txt: "there is no walkthrough words for all tanween"): it does now.
+  check(/section class="spell"/.test(raw) && raw.includes('src="spell.js"'), 'a Spell-a-word section, and spell.js to draw it');
+  check(raw.includes('href="exercise-7.html"') && fs.existsSync(path.join(dir, 'exercise-7.html')), 'and a link to its reading page, which exists');
+  check(/come after the next lesson/.test(raw), 'with the line saying why there are no two-zabar words yet');
   check(raw.includes('data-titlemark="ban"'), 'the layout slug is "ban"');
 
   console.log(failed === 0 ? '\nAll checks passed.' : `\n${failed} check(s) FAILED.`);

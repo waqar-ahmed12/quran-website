@@ -222,6 +222,7 @@ const click = (el, detail = 1) => {
   for (let n = el; n; n = n.parent) for (const fn of n.listeners.click || []) fn.call(n, event);
 };
 const J = String.fromCharCode(0x200D);
+const T = String.fromCharCode(0x0640); // the connecting stroke shapes.js draws a join with
 const choices = () => $('.choices').children;
 const rail = () => all('.band');
 const railButton = (n) => rail().find((b) => b.attrs['data-band'] === String(n));
@@ -268,7 +269,7 @@ async function main() {
   check(!$('.shapes-note').hidden, 'and it is shown');
   const firstTile = tiles[0];
   check(firstTile.attrs['aria-label'] === 'Alif, on its own' && rows[0].querySelectorAll('button.letter')[1].attrs['aria-label'] === 'Alif, joined', 'names built from the position words', firstTile.attrs['aria-label']);
-  check(rows[0].querySelectorAll('button.letter')[1].querySelector('.glyph').textContent === `${J}ا`, 'the joined shape is a letter with a joiner in front');
+  check(rows[0].querySelectorAll('button.letter')[1].querySelector('.glyph').textContent === 'با', 'the joined shape is shown joined to a baa before it (fixes/aunn.txt: با، بد، بو)');
 
   const heads = $('.shapes-heads-track').children.map((c) => c.textContent);
   check(heads.join('|') === 'Letter|On its own|Joined to the letter before|Between two letters', 'the sticky bar names every column, and the last one says what it is', heads.join('|'));
@@ -277,7 +278,7 @@ async function main() {
 
   console.log('\nThe first question');
   check($('.ask').textContent === 'Which letter is this, and where does it sit?', 'the question is asked', $('.ask').textContent);
-  check($('.prompt-glyph') && $('.prompt-glyph').attrs['aria-hidden'] === 'true' && $('.prompt-glyph').textContent.includes(J), 'a joined shape is shown, hidden from a screen reader');
+  check($('.prompt-glyph') && $('.prompt-glyph').attrs['aria-hidden'] === 'true' && $('.prompt-glyph').textContent.length >= 2, 'a joined shape is shown, hidden from a screen reader');
   check(choices().length === 4, 'four answers', String(choices().length));
   check(choices().every((c) => /, /.test(c.firstChild.textContent)), 'each answer names a letter AND where it sits', choices().map((c) => c.firstChild.textContent).join(' | '));
   check($('.progress-text').textContent === 'Just starting' && !/\d/.test($('.progress-text').textContent), 'the lesson line is words, not a count', $('.progress-text').textContent);
@@ -360,17 +361,30 @@ async function main() {
   for (const n of [1, 2, 3, 4, 5]) {
     qaida.setBand(n);
     await sleep(3);
+    // Group 1 also offers its letters' lone shapes as wrong answers (fixes/aunn.txt): still its own letters.
     const own = new Set(all68().filter((it) => it.band === n).map((it) => it.name));
+    if (n === 1) for (const it of all68()) if (it.band === 1) own.add(it.name.replace(/, joined$/, ', on its own'));
+    let sameLetter = 0;
+    let loneAsked = 0;
     let foreign = 0;
     let asked = 0;
     for (let i = 0; i < 40; i += 1) {
       const names = choices().map((c) => c.firstChild.textContent);
       asked += 1;
       if (!names.every((name) => own.has(name))) foreign += 1;
+      if (n === 1) {
+        if (names.some((name) => / on its own$/.test(name))) sameLetter += 1;
+        // A lone shape is one character; every group-1 question shows a joined one (با، بو…).
+        if ($('.prompt-glyph') && $('.prompt-glyph').textContent.length < 2) loneAsked += 1;
+      }
       qaida.next();
       await sleep(2);
     }
     check(foreign === 0, `group ${n}: every answer offered is one of its own shapes`, `${foreign} of ${asked} questions had another group's shape`);
+    if (n === 1) {
+      check(sameLetter === asked, 'group 1: every question offers a lone shape beside the joined ones, so the join has to be read', `${sameLetter} of ${asked}`);
+      check(loneAsked === 0, 'and a lone shape is never itself the question');
+    }
   }
   qaida.setBand(6);
   await sleep(3);
@@ -464,7 +478,7 @@ async function main() {
   qaida.setBand(5);
   await sleep(5);
   const hehRow = all('.shapes-table tbody tr').find((tr) => tr.querySelector('th .row-name').textContent === 'Haa');
-  check(hehRow && hehRow.querySelectorAll('button.letter')[2].querySelector('.glyph').textContent === `${J}ہ${J}`, 'and the board redraws in the other script (Indo-Pak ہ)');
+  check(hehRow && hehRow.querySelectorAll('button.letter')[2].querySelector('.glyph').textContent === `${T}ہ${T}`, 'and the board redraws in the other script (Indo-Pak ہ)');
   shell.state.script = 'madani';
   shell.renderSetup();
   await sleep(5);

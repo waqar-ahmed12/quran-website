@@ -46,6 +46,7 @@
   const struggle = $('.advice .struggle');
   const struggleText = $('.advice .struggle-text');
   const readyNote = $('.ready-note');
+  const nextGroup = $('.next-group');
   const practiseButton = $('.practise');
   const drillTitle = $('#drill-title');
   const wordsBox = $('[data-name-isolated]');
@@ -179,7 +180,7 @@
     drillBox.classList.remove('leaving');
 
     // The drill is handed only this group's shapes, or all of them for the table. No engine change.
-    pool = shapes.poolFor(items, n);
+    pool = poolOf(n);
     byId = new Map(pool.map((item) => [item.id, item]));
     drill.setItems(pool);
 
@@ -505,14 +506,16 @@
   // The three ways to ask (docs/lesson-3/03 §3): Lesson 2's three, with different items behind them. Hearing a letter
   // narrows the answer to that letter's shapes and no further, so it is only asked when the wrong answers are other
   // letters; it is off by default until the teacher has heard it.
-  const FORM_TO_NAME = { id: 'form-to-name', ask: 'glyph', answerWith: 'name', minStreak: 0, available: () => true };
-  const NAME_TO_FORM = { id: 'name-to-form', ask: 'name', answerWith: 'glyph', minStreak: 1, available: () => true };
+  // A wrong-answer-only shape (shapes.wrongOnly) is never itself the question.
+  const asked = (item) => !item.wrongOnly;
+  const FORM_TO_NAME = { id: 'form-to-name', ask: 'glyph', answerWith: 'name', minStreak: 0, available: asked };
+  const NAME_TO_FORM = { id: 'name-to-form', ask: 'name', answerWith: 'glyph', minStreak: 1, available: asked };
   const SOUND_TO_FORM = {
     id: 'sound-to-form',
     ask: 'sound',
     answerWith: 'glyph',
     minStreak: 1,
-    available: (item) => recorded(item) && distractors() !== 'same-letter',
+    available: (item) => asked(item) && recorded(item) && distractors() !== 'same-letter',
   };
 
   // Mixed, a shape is first named from its picture; only once that has been answered is it asked the other way round.
@@ -749,6 +752,17 @@
     const here = band !== TABLE && stat(band).ready;
     readyNote.textContent = all ? readyNote.dataset.templateLesson : readyNote.dataset.template;
     readyNote.hidden = !(all || here);
+    if (nextGroup) nextGroup.hidden = !here || all;
+  }
+
+  // The group after this one that still needs work; the table once none does.
+  const groupAfter = () => shapes.DRILLING.find((n) => n > band && !stat(n).ready) || upTo();
+
+  if (nextGroup) {
+    nextGroup.addEventListener('click', () => {
+      setBand(groupAfter(), { user: true });
+      boardBox.scrollIntoView({ behavior: still() ? 'auto' : 'smooth', block: 'start' });
+    });
   }
 
   function paintFinished() {
@@ -903,9 +917,15 @@
 
   const shapeOf = () => `${shell.state.script}|${drilled()}|${distractors()}`;
 
+  let extras = []; // group 1's lone shapes, as wrong answers only (shapes.wrongOnly)
+
+  // What the drill is handed for a group: its shapes, and for group 1 the lone shapes to tell them from.
+  const poolOf = (n) => shapes.poolFor(items, n).concat(n === 1 ? extras : []);
+
   function build() {
     items = shapes.allItems(shell, { drilled: drilled(), templates: templates(), distractors: distractors() });
-    pool = shapes.poolFor(items, band);
+    extras = shapes.wrongOnly(shell, { drilled: drilled(), templates: templates() });
+    pool = poolOf(band);
     byId = new Map(pool.map((item) => [item.id, item]));
   }
 
@@ -922,7 +942,7 @@
       shape = wanted;
       band = upTo();
       root.dataset.band = String(band);
-      pool = shapes.poolFor(items, band);
+      pool = poolOf(band);
       byId = new Map(pool.map((item) => [item.id, item]));
       seedReady();
       buildRail();
@@ -957,6 +977,7 @@
       // Only the names changed (or a line of wording): the same shapes, so the same items with new names.
       shapes.rename(items, shell, templates());
       shapes.rename(pool, shell, templates());
+      shapes.rename(extras, shell, templates());
       labelChoices();
       renderBoard();
     }

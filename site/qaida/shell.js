@@ -117,30 +117,66 @@
       lede: 'The short “u”, written above the letter.' },
     { n: 7, title: { fatha: 'Tanween', zabar: 'Tanween' }, href: 'lesson-7.html', built: true, progress: 'drill',
       cp: [0x064B, 0x064C, 0x064D], lede: 'The doubled marks: an, in and un at the end of a word.' },
-    { n: 8, title: { fatha: 'Fatha and alif', zabar: 'Zabar and alif' },
-      lede: 'The long “aa”.' },
-    { n: 9, title: { fatha: 'Standing marks', zabar: 'Standing harakaat' },
-      lede: 'The same three long vowels, written as marks on their own.' },
-    { n: 10, title: { fatha: 'Fatha and wow', zabar: 'Zabar and wow' },
+    { n: 8, title: { fatha: 'Fatha and alif', zabar: 'Zabar and alif' }, href: 'lesson-8.html', built: true,
+      progress: 'drill', cp: 0x064E, tail: [0x0627], lede: 'The long “aa”: an alif after the mark.' },
+    { n: 9, title: { fatha: 'Standing marks', zabar: 'Standing harakaat' }, href: 'lesson-9.html', built: true,
+      progress: 'drill', cp: [0x0670, 0x0656, 0x0657], lede: 'The same three long vowels, written as marks on their own.' },
+    { n: 10, title: { fatha: 'Fatha and waw', zabar: 'Zabar and wow' }, href: 'lesson-10.html', built: true,
+      progress: 'drill', cp: 0x064E, tail: [0x0648, 0x0652],
       lede: 'The “au” sound, where wow carries no mark of its own.' },
-    { n: 11, title: { fatha: 'Damma and wow', zabar: 'Paish and wow' },
+    { n: 11, title: { fatha: 'Damma and waw', zabar: 'Paish and wow' }, href: 'lesson-11.html', built: true,
+      progress: 'drill', cp: 0x064F, tail: [0x0648, 0x0652],
       lede: 'The long “oo”, told apart from the lesson before.' },
-    { n: 12, title: { fatha: 'Fatha and yaa', zabar: 'Zabar and yaa' },
+    { n: 12, title: { fatha: 'Fatha and yaa', zabar: 'Zabar and yaa' }, href: 'lesson-12.html', built: true,
+      progress: 'drill', cp: 0x064E, tail: [0x064A, 0x0652],
       lede: 'The “ai” sound, where yaa carries no mark of its own.' },
-    { n: 13, title: { fatha: 'Kasra and yaa', zabar: 'Zair and yaa' },
+    { n: 13, title: { fatha: 'Kasra and yaa', zabar: 'Zair and yaa' }, href: 'lesson-13.html', built: true,
+      progress: 'drill', cp: 0x0650, tail: [0x064A, 0x0652],
       lede: 'The long “ee”, told apart from the lesson before.' },
-    { n: 14, title: { fatha: 'Sukoon', zabar: 'Jazam' },
-      lede: 'The mark that stops a letter, on any letter at all.' },
+    // Lesson 14's own ids are two characters ending in the jazam (the lead is drawn, never part of an id), and its
+    // twins are two characters ending in a vowel, so masteredCount needs no change (docs/lesson-14/03 §8).
+    { n: 14, title: { fatha: 'Sukoon', zabar: 'Jazam' }, href: 'lesson-14.html', built: true, progress: 'drill',
+      cp: 0x0652, lede: 'The mark that stops a letter, on any letter at all.' },
+    // The second pass (docs/pass-2/): lessons 15-29, from shadda to the last surahs. `part: 2` puts a lesson under the
+    // home's second heading; a row with no `part` is in the first. Lesson 15's marks are a vowel and a shadda on one
+    // letter, so its `cp` is a list of lists, one suffix per mark (docs/lesson-15/03 §1). Titles and ledes are from
+    // docs/pass-2/README.md §2; none of 16-29 is built, so each says so when tapped and nothing is locked.
+    { n: 15, part: 2, title: { fatha: 'Shadda', zabar: 'Tashdeed' }, href: 'lesson-15.html', built: true,
+      progress: 'drill', cp: [[0x064E, 0x0651], [0x0650, 0x0651], [0x064F, 0x0651]],
+      lede: 'A letter said twice: once to close the sound before it, once with its own vowel.' },
+    { n: 16, part: 2, title: { fatha: 'Hamza', zabar: 'Hamza' }, lede: 'One sound written on four seats.' },
+    { n: 17, part: 2, title: { fatha: 'The round taa and the end yaa', zabar: 'The round taa and the end yaa' },
+      lede: 'Two end shapes that are not among the 29 letters.' },
+    { n: 18, part: 2, title: { fatha: 'Al-', zabar: 'Al-' },
+      lede: 'The laam that is read before some letters and not before others, and the name Allah.' },
+    { n: 19, part: 2, title: { fatha: 'The joining alif', zabar: 'The joining alif' },
+      lede: 'An alif that is read at the start of a word and skipped in the middle.' },
+    { n: 20, part: 2, title: { fatha: 'The wavy line', zabar: 'The wavy line' }, lede: 'Hold a long vowel a little longer.' },
+    { n: 21, part: 2, title: { fatha: 'Letters that are not read', zabar: 'Letters that are not read' },
+      lede: 'Written on the page, and left out when it is read.' },
+    { n: 22, part: 2, title: { fatha: 'Stopping', zabar: 'Stopping' }, lede: 'How a word changes when you stop on it.' },
+    { n: 23, part: 2, title: { fatha: 'Al-Fatiha', zabar: 'Al-Fatiha' }, lede: 'The first surah, read whole.' },
+    { n: 24, part: 2, title: { fatha: 'Noon and tanween', zabar: 'Noon and tanween' },
+      lede: 'Four ways to read them: clear, merged, turned into meem, hidden.' },
+    { n: 25, part: 2, title: { fatha: 'Meem with jazam', zabar: 'Meem with jazam' }, lede: 'Three ways to read it: merged, hidden, clear.' },
+    { n: 26, part: 2, title: { fatha: 'The bounce', zabar: 'The bounce' },
+      lede: 'Five letters that echo when they carry a jazam.' },
+    { n: 27, part: 2, title: { fatha: 'Heavy and light letters', zabar: 'Heavy and light letters' },
+      lede: 'The seven heavy letters, raa, and the laam of Allah.' },
+    { n: 28, part: 2, title: { fatha: 'The opening letters', zabar: 'The opening letters' },
+      lede: 'Letters read by their names, at the start of twenty-nine surahs.' },
+    { n: 29, part: 2, title: { fatha: 'The last surahs', zabar: 'The last surahs' },
+      lede: 'Real surahs, 105 to 114, read from the mushaf.' },
   ];
 
   // What the student chose and how far they've reached, on this device only (no accounts) ------
-  // { v, script, names, grouping, chosen, muted,
+  // { v, script, names, grouping, chosen, muted, skipped,
   //   lessons: { "1": { seen: ["ا", …], done: false, drill: { total, target, right, wrong, streak } } } }
   // `drill` belongs to the practice engine (practice.js): lifetime right and wrong answers and the current run of right
   // answers, each a map from an item's id to a count. Lesson 1 never has one, so it stays empty there.
 
   const blank = () => ({
-    v: 1, script: 'madani', names: 'fatha', grouping: 'families', chosen: false, muted: false, lessons: {},
+    v: 1, script: 'madani', names: 'fatha', grouping: 'families', chosen: false, muted: false, skipped: false, lessons: {},
   });
 
   const DRILL_TARGET = 2; // right answers in a row that make an item known, until the lesson says otherwise (2026-09-23: was 3)
@@ -194,6 +230,7 @@
     if (saved.grouping === 'families' || saved.grouping === 'grid') state.grouping = saved.grouping;
     state.chosen = saved.chosen === true;
     state.muted = saved.muted === true;
+    state.skipped = saved.skipped === true;
 
     // The first draft kept one flat list of lesson-1 positions. Carry it over, once, as letters.
     if (!saved.v && Array.isArray(saved.seen)) {
@@ -291,14 +328,21 @@
     const drill = drillOf(n);
     const need = target || drill.target;
     const entry = LESSONS.find((lessonRow) => lessonRow.n === n);
-    // `cp` is a code point, or a list of them (Lesson 7's three doubled marks): whichever, an id counts if it ends
-    // in any one of them. A lesson with no `cp` at all (not yet a lesson of marks) counts everything, as it always did.
-    const cps = entry && entry.cp ? [].concat(entry.cp).map((cp) => String.fromCharCode(cp)) : [];
+    // `cp` is a code point, or a list of them (Lesson 7's three doubled marks): whichever, an id counts if it is one
+    // letter followed by the mark (lessons 4-7) — or, for a lesson whose row carries `tail` (Lesson 8's alif;
+    // lessons 10-13's wow/yaa with a sukun), by the mark AND its tail together. Lesson 8 SHARES zabar's code point
+    // with Lesson 4, so on `cp` alone its twins ("ba", riding along as review) would count toward Lesson 8's own
+    // total; the LENGTH is what keeps them out (docs/lesson-8/03 §3). A lesson with no `cp` at all (not yet a lesson
+    // of marks) counts everything, as it always did.
+    const tail = entry && entry.tail ? String.fromCharCode(...entry.tail) : '';
+    // Lesson 15's marks are two code points on one letter (a vowel and the shadda), so an entry of `cp` may itself be a
+    // list: one suffix per mark, each of them the list joined (docs/lesson-15/03 §1).
+    const suffixes = entry && entry.cp ? [].concat(entry.cp).map((cp) => String.fromCharCode(...[].concat(cp)) + tail) : [];
     const wanted = ids ? new Set(ids) : null;
     return Object.entries(drill.streak).filter(([id, run]) => {
       if (run < need) return false;
       if (wanted) return wanted.has(id);
-      return !cps.length || (id.length === 2 && cps.includes(id[1]));
+      return !suffixes.length || suffixes.some((s) => id.length === 1 + s.length && id.endsWith(s));
     }).length;
   }
 
@@ -348,8 +392,17 @@
     save();
   }
 
-  // A lesson opens when the one before it is finished. Lesson 1 is always open.
-  const isOpen = (n) => n === 1 || isDone(n - 1);
+  // Every lesson opens (the user, 2026-09-19: "nothing is locked"; docs/lesson-2/09-going-in-order.md). What is kept
+  // is which lesson is next up: the first one not finished. The home marks it "Start here", and a lesson opened ahead
+  // of it gets a word of advice first — once, then never again (`skipped`).
+  const nextUp = () => (LESSONS.find(({ n }) => !isDone(n)) || LESSONS[LESSONS.length - 1]).n;
+  const inOrder = (n) => n === nextUp();
+
+  function setSkipped(skipped) {
+    if (state.skipped === skipped) return;
+    state.skipped = skipped;
+    save();
+  }
 
   const doneCount = () => LESSONS.filter(({ n }) => isDone(n)).length;
 
@@ -582,7 +635,9 @@
     clearDrill,
     isDone,
     setDone,
-    isOpen,
+    nextUp,
+    inOrder,
+    setSkipped,
     doneCount,
     renderSetup,
     applyMute,

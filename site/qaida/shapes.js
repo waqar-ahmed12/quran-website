@@ -9,16 +9,21 @@
 
 (() => {
   const ZWJ = String.fromCharCode(0x200D);
+  // 2026-09-28 (fixes/aunn.txt problem 1): an invisible joiner gives a letter its joined shape but draws no join, so
+  // تـ and ـتـ looked the same, and a joined alif looked exactly like a lone one. The connecting stroke (U+0640, the
+  // tatweel a printed Qaida draws) makes each join visible; a letter that never joins forward is shown the way the
+  // user asked, with baa joined on before it — با، بد، بذ، بو.
+  const TATWEEL = String.fromCharCode(0x0640);
   const POSITIONS = ['isolated', 'initial', 'medial', 'final'];
 
   const FORM = {
     isolated: (g) => g,
-    initial: (g) => g + ZWJ,
-    medial: (g) => ZWJ + g + ZWJ,
-    final: (g) => ZWJ + g,
+    initial: (g) => g + TATWEEL,
+    medial: (g) => TATWEEL + g + TATWEEL,
+    final: (g) => TATWEEL + g,
+    // A letter that never joins forward has one joined shape, the final one, shown after a real letter.
+    joined: (g) => 'ب' + g,
   };
-  // A letter that never joins forward has one joined shape, and it is the final one.
-  FORM.joined = FORM.final;
 
   // The letter groups ("bands"), easy shapes first. Six, not the five first specified: the user, 2026-09-20, chose to
   // split the big band of joining letters in two rather than shorten the lesson (docs/lesson-3/09-open-questions.md §1).
@@ -70,9 +75,29 @@
   // finds, so what the wrong answers look like is decided by which tags exist, not by their order.
   //   position:    the same position, another letter (ـبـ against ـتـ): the sharpest wrong answer.
   //   same-letter: another shape of the same letter: a harder question, offered as a tryout.
+  //   a letter that never joins forward: always its other shape (fixes/aunn.txt: with every wrong answer another
+  //   letter, "only 1 of the options show waaw so its pretty obvious"). Group 1 is handed the lone shapes to be those
+  //   wrong answers (wrongOnly, below).
   function familyFor(key, position, distractors) {
-    if (distractors === 'same-letter') return [`letter:${key}`];
+    if (distractors === 'same-letter' || classOf(key) === 'back-only') return [`letter:${key}`];
     return [`pos:${position}`];
+  }
+
+  // The lone shapes of the letters that never join forward, as wrong answers only: never asked, never counted. With
+  // them, "Waaw, joined" is offered beside "Waaw, on its own", and the student has to look at the join.
+  function wrongOnly(shell, options = {}) {
+    if (options.drilled === 'all') return []; // they are real items already
+    const { templates = TEMPLATES } = options;
+    return shell.lettersOf()
+      .filter(([glyph]) => classOf(shell.keyOf(glyph)) === 'back-only')
+      .map(([glyph, name]) => {
+        const key = shell.keyOf(glyph);
+        return {
+          id: `${key}:isolated`, glyph, name: fill(templates.isolated, { name }), family: [`letter:${key}`],
+          audio: { kind: 'letters', glyph }, required: false, wrongOnly: true, traceable: true, base: glyph, key,
+          letterName: name, position: 'isolated', band: bandOf(key),
+        };
+      });
   }
 
   const bandOf = (key) => BAND_OF.get(key) || 0;
@@ -169,7 +194,7 @@
   }
 
   window.qaidaShapes = {
-    ZWJ, POSITIONS, FORM, BANDS, TABLE, DRILLING, TEMPLATES,
-    classOf, positionsOf, bandOf, allItems, poolFor, rename, sizes, stats, rowFor, boardRows, sampleOf, fill,
+    ZWJ, TATWEEL, POSITIONS, FORM, BANDS, TABLE, DRILLING, TEMPLATES,
+    classOf, positionsOf, bandOf, allItems, wrongOnly, poolFor, rename, sizes, stats, rowFor, boardRows, sampleOf, fill,
   };
 })();

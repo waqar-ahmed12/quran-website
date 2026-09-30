@@ -526,6 +526,13 @@
           + 'Applies to the quartet only.';
       }
       option('Point at the mark', { 'A halo': 'halo', Nothing: 'none', 'Tint it': 'tint' }, 'point', () => lesson.render());
+      // Lesson 8's own row (docs/lesson-8/04 §9): shown only where the mark is followed by a letter, the way the
+      // arrows row above is shown only where it means something.
+      if (lesson.hasTail) {
+        option('Two-letter tiles', { Wider: 'wide', 'Same width, smaller letters': 'shrink' }, 'tailfit', () => lesson.render());
+        group.lastElementChild.title = 'Wider: the tile widens to fit both letters at their usual size. Same width, smaller letters: '
+          + 'the tile stays its usual width and the tailed glyph shrinks to fit.';
+      }
     }
 
     if (shapes) {

@@ -68,8 +68,8 @@
     <header class="lesson-head">
       <div class="head-text">
         <p class="eyebrow" data-words="Small heading over the title">Free Qaida</p>
-        <h1 data-words="Page title">Fourteen lessons, from the letters up</h1>
-        <p class="lede" data-words="Line under the title">Start with the letters and work through to the marks. Nothing to sign up for and nothing to pay. Your place is kept on this device.</p>
+        <h1 data-words="Page title">Twenty-nine lessons, from the letters to the Qur’an</h1>
+        <p class="lede" data-words="Line under the title">Start with the letters, work through the marks, and go on to reading the Qur’an itself. Nothing to sign up for and nothing to pay. Your place is kept on this device.</p>
         <!-- What the student chose on their first visit, and a way to change it. shell.js fills in the spans. -->
         <p class="setup"
            data-madani="Madani script" data-indopak="Indo-Pak script"
@@ -98,18 +98,20 @@
                 data-label="Start again" data-confirm="Tap again to clear everything"
                 data-words-attr="data-label|Start again link;data-confirm|Start again, asking to be sure"></button>
       </div>
-      <div class="bar" role="progressbar" aria-labelledby="course-progress" aria-valuemin="0" aria-valuemax="14" aria-valuenow="0">
+      <div class="bar" role="progressbar" aria-labelledby="course-progress" aria-valuemin="0" aria-valuemax="29" aria-valuenow="0">
         <span class="fill"></span>
       </div>
     </div>
 
-    <!-- home.js draws the fourteen lessons here, from the list in shell.js. -->
+    <!-- home.js draws the twenty-nine lessons here, from the list in shell.js, under two headings: the first pass
+         (1-14) and the second (15-29, docs/pass-2/). -->
     <ol class="lessons" id="lessons" tabindex="-1"
-        data-open="Open" data-locked="Finish the lesson before this one" data-finished="Finished"
+        data-part1="Learning to read" data-part2="Reading the Qur’an"
+        data-next="Start here" data-later="Comes later" data-finished="Finished"
         data-progress="{seen} of {total} letters seen" data-known="{known} of {total} letters known"
         data-soon="Not built yet"
-        data-standin="This lesson isn’t built yet." data-locked-note="Finish Lesson {n} first."
-        data-words-attr="data-open|Card: open lesson;data-locked|Card: locked lesson;data-finished|Card: finished lesson;data-progress|Card: letters seen ({seen} and {total} are filled in);data-known|Card: letters known ({known} and {total} are filled in);data-soon|Card: lesson not built yet;data-standin|Note: lesson not built yet;data-locked-note|Note: locked lesson ({n} is filled in)"></ol>
+        data-standin="This lesson isn’t built yet."
+        data-words-attr="data-part1|Home: heading over lessons 1 to 14;data-part2|Home: heading over lessons 15 to 29;data-next|Card: the next lesson;data-later|Card: a lesson further on;data-finished|Card: finished lesson;data-progress|Card: letters seen ({seen} and {total} are filled in);data-known|Card: letters known ({known} and {total} are filled in);data-soon|Card: lesson not built yet;data-standin|Note: lesson not built yet"></ol>
 
     <footer class="home-end">
       <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
@@ -126,6 +128,21 @@
   </main>
 
   <p class="note" role="status"></p>
+
+  <!-- Opening a lesson ahead of the next one: advice, not a lock (docs/lesson-2/09-going-in-order.md). Asked once;
+       "Carry on anyway", Escape and a click outside all go on to the lesson. home.js fills in the back link. -->
+  <dialog class="order-advice" aria-labelledby="order-advice-title">
+    <div class="order-advice-body">
+      <h2 id="order-advice-title" data-words="Advice: title">This one comes later</h2>
+      <p class="intro" data-words="Advice: line">If you’re new, it’s best to go in order — each lesson builds on the one before.</p>
+      <div class="order-advice-actions">
+        <a class="button primary order-advice-back" href="lesson-1.html"
+           data-template="Take me to Lesson {n}"
+           data-words-attr="data-template|Advice: back button ({n} is filled in)">Take me to Lesson 1</a>
+        <button class="button order-advice-on" type="button" data-words="Advice: carry on button">Carry on anyway</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- First visit: script, names and grouping. Opens by itself the first time, and from Settings or Change after. -->
   <dialog class="chooser" aria-labelledby="chooser-title">

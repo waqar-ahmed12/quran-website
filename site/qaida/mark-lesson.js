@@ -56,6 +56,21 @@
   const joinedGlyph = $('.joined-glyph');
   const joinedText = $('.joined-text');
   const joinedNote = $('.joined-note');
+  // New on Lesson 8 (docs/lesson-8/04 §4): null on lessons 4-7, which don't have these elements at all.
+  const lamAlifNote = $('.lam-alif-note');
+  const skipNote = $('.skip-note');
+  // New on Lesson 9 (docs/lesson-9/04 §4): null on lessons 4-8, which teach no mark with `same` and never turn the
+  // joined block off.
+  const metNote = $('.met-note');
+  // New on Lesson 10: null everywhere else.
+  const jazamNote = $('.jazam-note');
+  const madaniNote = $('.madani-note');
+  // New on Lesson 14 (docs/lesson-14/04 §3): the three lines a lead needs. Null on every other page.
+  const leadLine = $('.lead-line');
+  const leadsNote = $('.leads-note');
+  const wyNote = $('.wy-note');
+  // New on Lesson 15 (docs/lesson-15/03 §4): the hum on noon and meem. Null on every other page.
+  const humNote = $('.hum-note');
   const drillBox = $('.drill');
   const askLine = $('.ask');
   const prompt = $('.prompt');
@@ -181,8 +196,12 @@
 
   // {mark} and {Mark} are filled from the OPEN PART's own mark (docs/lesson-7/03 §6), so switching part or names
   // rewrites the page without a reload. {set} is the lesson's own word ("tanween"), empty on lessons 4-6.
+  // {jazam} and {lead} (Lesson 15, docs/lesson-15/04 §3) are the student's own words for the jazam and for the vowel on
+  // the lead alif; a line that names either does not have to know which set of names is showing.
   const say = (text, values = {}) => fill(text, {
-    ...marks.wordsFor(mark, shell), set: set ? set.names[shell.state.names === 'zabar' ? 'zabar' : 'fatha'] : '', ...values,
+    ...marks.wordsFor(mark, shell), set: set ? set.names[shell.state.names === 'zabar' ? 'zabar' : 'fatha'] : '',
+    Set: set ? marks.cap(set.names[shell.state.names === 'zabar' ? 'zabar' : 'fatha']) : '',
+    jazam: marks.nameOf(marks.markOf('sukun'), shell), lead: marks.nameOf(marks.markOf('fatha'), shell), ...values,
   });
 
   // A part's own name, filled from ITS OWN mark — not the page's current one (docs/lesson-7/04 §3): the rail shows
@@ -411,6 +430,34 @@
   };
 
   const ARROW = '<svg class="pair-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6" /></svg>';
+  // Lesson 9's same-sound tile (docs/lesson-9/03 §7): joined by an "=" sign, not the arrow that means "and now with
+  // this mark" — the two spellings are not a sequence, they are the same sound twice.
+  const EQUALS = '<span class="pair-equals" aria-hidden="true">=</span>';
+
+  // "Where you will meet it" (docs/lesson-9/04 §4): one real word per warm-up mark, the same three the walkthrough
+  // and the exercise page already use (docs/lesson-9/05 §2-3) — small on purpose, so this stays a page-local look-up
+  // rather than a reach into spell.js's own word list. `standing-kasra` and `inverted-damma` are the words the Qur'an
+  // actually carries them in: on ه, after a letter with a vowel (docs/lesson-9/02 §5).
+  const MET_WORDS = {
+    'standing-fatha': [['ه', 'standing-fatha'], ['ذ', 'fatha-alif']], // haadhaa, "this"
+    'standing-kasra': [['ب', 'kasra'], ['ه', 'standing-kasra']], // bihii, "with it"
+    'inverted-damma': [['ل', 'fatha'], ['ه', 'inverted-damma']], // lahuu, "for him"
+  };
+  // The active script's own glyph for a letter, by its key, the same map spell.js and exercise.js build.
+  function glyphOfRoot(root) {
+    const names = new Map(shell.lettersOf().map(([glyph, name]) => [shell.keyOf(glyph), glyph]));
+    return root.map(([key, id]) => marks.glyphOf(names.get(key) || key, marks.markOf(id))).join('');
+  }
+  // The consonant a letter is said with, for the sounds in Lesson 15's captions (a-ba, ab, ab-ba - docs/lesson-15/01
+  // §3): the row that is featured is the part's first letter, which is baa in three parts and taa in the other. The
+  // caption's own wording is the page's text field; only the letter is filled in, as {c}. The Arabic letters are keys
+  // (the Madani form, as everywhere), so nothing here is a combining mark.
+  const CONSONANT = {
+    ا: "'", ب: 'b', ت: 't', ث: 'th', ج: 'j', ح: 'h', خ: 'kh', د: 'd', ذ: 'dh', ر: 'r', ز: 'z', س: 's', ش: 'sh', ص: 's', ض: 'd',
+    ط: 't', ظ: 'z', ع: "'", غ: 'gh', ف: 'f', ق: 'q', ك: 'k', ل: 'l', م: 'm', ن: 'n', ه: 'h', و: 'w', ي: 'y', ء: "'",
+  };
+  // 'standing-fatha' -> 'StandingFatha', to match data-met-standing-fatha's camelCased dataset key.
+  const pascalOf = (id) => id.replace(/(?:^|-)([a-z])/g, (_, letter) => letter.toUpperCase());
 
   // Tap a tile and it is said: a marked one asks for its own mark's recordings (the SOUND, "ba"), the bare ones for the
   // letter's name. Where there is no recording yet the stand-in plays, exactly as on Lessons 1 and 3. The tile says which.
@@ -426,7 +473,7 @@
   // `kind` is 'bare', 'marked' (this lesson's stroke, the one that is pointed at) or 'other' (a stroke it is shown against:
   // `stroke` says which, for a board with more than one).
   function markTile(kind, letter, label, stroke) {
-    const strokeOf = kind === 'marked' ? mark : kind === 'other' ? stroke || other() : null;
+    const strokeOf = kind === 'marked' ? mark : kind === 'other' || kind === 'same' ? stroke || other() : null;
     const button = el('button', `letter mark-tile ${kind}`);
     button.type = 'button';
     button.dataset.kind = kind;
@@ -434,16 +481,27 @@
     // Which end of the tile the stroke needs room at (docs/lesson-7/03 §7): a mixed row (Lesson 7's last part) can
     // hold marks above and below at once, so the rule that used to hang off the whole page now hangs off the tile.
     button.dataset.sits = strokeOf ? strokeOf.sits : 'above';
+    // Two letters, not one (Lesson 8's alif; lessons 10-13's wow and yaa; Lesson 9's Madani khari zair and ulta
+    // paish, whose small yaa/waw take room after the letter too — docs/lesson-9/03 §4): wider, never taller
+    // (docs/lesson-8/03 §6). Read through formOf so a form with no tail of its own (every Indo-Pak stroke) never
+    // widens, even when the SAME mark has one in the other script.
+    //
+    // The lead (Lesson 14's alif with zabar, docs/lesson-14/03 §2): drawn in front of every tile but the bare one,
+    // and it makes the tile two letters wide as a tail does. The other mark's own lead if it has one, else the
+    // lesson's; '' on every lesson but 14.
+    const lead = strokeOf ? marks.leadOf(strokeOf) || marks.leadOf(mark) : '';
+    button.toggleAttribute('data-tail', Boolean(strokeOf && (marks.formOf(strokeOf).tail.length > 0 || lead)));
     // The same id the engine gives that item, so "the letter just missed" can be found by comparing them.
-    button.dataset.id = shell.keyOf(letter) + (strokeOf ? String.fromCharCode(strokeOf.cp) : '');
+    button.dataset.id = shell.keyOf(letter) + (strokeOf ? marks.suffixOf(strokeOf) : '');
     button.dataset.audio = strokeOf ? strokeOf.audio : 'letters';
     button.setAttribute('aria-label', label);
     const glyph = arabic(el('span', 'glyph'));
     if (kind === 'marked' && pointMode() === 'tint') {
-      // Fragile on purpose: the mark in a span of its own, so the teacher can see what that does to the attachment.
-      glyph.append(document.createTextNode(letter), el('span', 'tinted', String.fromCharCode(strokeOf.cp)));
+      // Fragile on purpose: the mark (and, with a tail, what follows it — docs/lesson-8/03 §2) in a span of its
+      // own, so the teacher can see what that does to the attachment.
+      glyph.append(document.createTextNode(lead + letter), el('span', 'tinted', marks.drawnOf(strokeOf)));
     } else {
-      glyph.textContent = strokeOf ? marks.glyphOf(letter, strokeOf) : letter;
+      glyph.textContent = strokeOf ? lead + marks.glyphOf(letter, strokeOf) : letter;
     }
     if (kind === 'marked') {
       // Where the text sits on its line, so the halo can be measured from it (positionHalos).
@@ -469,7 +527,13 @@
   function markBox(letter, spec) {
     const family = spec.replace(/^\S+\s+\S+\s+/, '');
     const weight = spec.split(/\s+/)[0];
-    const key = `${letter}|${spec}`;
+    const script = shell.state.script;
+    // The stroke AND the script join the cache key (docs/lesson-8/03 §7, docs/lesson-9/03 §5): a page can hold a
+    // tailed and an untailed stroke ("baa" and its twin "ba") at once, and the two need two different boxes for the
+    // same letter; and a mark whose Madani and Indo-Pak forms differ (Lesson 9's) needs two boxes even for the
+    // letter, spec and mark id alone — the two scripts can share a face (Scheherazade New set for both) and would
+    // otherwise collide.
+    const key = `${letter}|${spec}|${mark.id}|${script}`;
     if (boxes.has(key)) return boxes.get(key);
     let box = null;
     try {
@@ -479,20 +543,43 @@
         const S = 100; // font size, in pixels; the box is kept in units of it
         const W = 420;
         const H = 420;
-        const X = W / 2; // the text is centred here, and its baseline sits here
+        const form = marks.formOf(mark, script);
+        const tailed = form.tail.length > 0;
+        // A mark with a tail (docs/lesson-8/03 §7) draws from the RIGHT edge, not centred: "baa" is wider than
+        // "ba", so centring each draw on its own would slide the shared letter sideways between the two and the diff below
+        // would see the whole letter move, not just the alif. Anchored at the right edge instead, the shared
+        // letter+mark prefix lands on the same pixels in both draws (Arabic runs right to left from there).
+        // Lesson 14's lead (docs/lesson-14/03 §3) is drawn right-anchored the same way: the lead is on the right and
+        // the letter to its left, so the shared "lead + letter" lands on the same pixels in both draws and the diff
+        // is the jazam alone. positionHalos anchors right for the same tiles, which carry data-tail.
+        const lead = marks.leadOf(mark, script);
+        const wide = tailed || Boolean(lead);
+        const X = wide ? W - 40 : W / 2; // the text is anchored here (centre, or the right edge), baseline at Y
         const Y = 270;
         canvas.width = W;
         canvas.height = H;
         const draw = (text) => {
           c.clearRect(0, 0, W, H);
           c.font = `${weight} ${S}px ${family}`;
-          c.textAlign = 'center';
+          c.textAlign = wide ? 'right' : 'center';
           c.textBaseline = 'alphabetic';
           c.fillText(text, X, Y);
           return c.getImageData(0, 0, W, H).data;
         };
-        const plain = draw(letter);
-        const withMark = draw(marks.glyphOf(letter, mark));
+        // The ring should say "look at what THIS lesson added", not "look at everything that changed" (docs/lesson-8/03
+        // §7, generalised for docs/lesson-9/03 §5): `head` is the letter already carrying every mark but the last one a
+        // form draws, plus, when the form has a tail, an invisible joiner (U+200D — Lesson 3's trick for a start
+        // shape) so the letter is in the shape it takes before that tail. The difference against the WHOLE glyph is
+        // then just the one new stroke — the alif on Lesson 8, the small alif/yaa/waw on Lesson 9's Madani forms, the
+        // standing mark itself on Lesson 9's Indo-Pak forms (whose `head` is plainly the bare letter, `form.cp` being
+        // one mark long). On a letter that never joins forward the joiner does nothing; on laam and alif together the
+        // head (laam's start shape) and the whole (one ligature) differ almost entirely, which is honest — the whole
+        // shape really is what is new there.
+        const head = tailed
+          ? letter + String.fromCharCode(...form.cp) + String.fromCharCode(0x200D)
+          : letter + String.fromCharCode(...form.cp.slice(0, -1));
+        const plain = draw(lead + head);
+        const withMark = draw(lead + marks.glyphOf(letter, mark, script));
         let x0 = W;
         let x1 = -1;
         let y0 = H;
@@ -507,6 +594,28 @@
               if (y > y1) y1 = y;
             }
           }
+        }
+        // Measured 2026-09-29 in the browser pane (docs/lesson-14/03 §3): with the lead, Scheherazade New re-draws laam
+        // as another variant when a Madani jazam is added (the string is 6px wider at 100px), so the diff above holds
+        // the whole letter and the ring came out 0.47 x 1.03em, not the jazam's 0.26 x 0.17em. A mark is never taller
+        // than a third of an em, so when the box is, the mark is the highest new ink: keep only a band of its own
+        // height (0.2em) from the top of it. Only with a lead, so lessons 4-13's rings are measured exactly as before.
+        if (lead && x1 >= 0 && y1 - y0 + 1 > S * 0.3) {
+          const bottom = Math.min(H, Math.round(y0 + S * 0.2));
+          let bx0 = W;
+          let bx1 = -1;
+          let by1 = -1;
+          for (let y = y0; y < bottom; y += 1) {
+            for (let x = 0; x < W; x += 1) {
+              const at = (y * W + x) * 4 + 3;
+              if (withMark[at] - plain[at] > 60) {
+                if (x < bx0) bx0 = x;
+                if (x > bx1) bx1 = x;
+                by1 = y;
+              }
+            }
+          }
+          if (bx1 >= 0) { x0 = bx0; x1 = bx1; y1 = by1; }
         }
         if (x1 >= 0) box = { x0: (x0 - X) / S, x1: (x1 + 1 - X) / S, y0: (y0 - Y) / S, y1: (y1 + 1 - Y) / S };
       }
@@ -551,7 +660,11 @@
       const g = glyph.getBoundingClientRect();
       const b = baseline.getBoundingClientRect();
       const inset = (tile.clientLeft || 0);
-      const cx = g.left + g.width / 2 - t.left - inset;
+      // A tailed tile's box was measured from the glyph's right edge, not its centre (markBox, docs/lesson-8/03
+      // §7): anchor the ring the same way, or it would be placed as if "baa" were centred like "ba".
+      const cx = tile.hasAttribute('data-tail')
+        ? g.right - t.left - inset
+        : g.left + g.width / 2 - t.left - inset;
       const by = b.top - t.top - inset;
       const pad = size * 0.1;
       const left = cx + box.x0 * size - pad;
@@ -618,7 +731,10 @@
       // That mark's own word, not this lesson's: "Baa with zabar" beside "Baa with zair". The caption's {other} is this column's.
       const stroke = marks.markOf(one.id);
       const withOther = say(words.marked, { name: row.name, mark: one.name });
-      const caption = labels ? say(labels.other, { other: one.name, Other: marks.cap(one.name) }) : withOther;
+      // A column may have a caption of its own (Lesson 15: the same row says "a-ba" for a vowel and "ab" for a jazam),
+      // keyed by the mark's id: `data-pair-other-sukun` beats `data-pair-other`. Every earlier page has only the latter.
+      const template = (labels && boardBox.dataset[`pairOther${pascalOf(one.id)}`]) || (labels && labels.other);
+      const caption = labels ? say(template, { other: one.name, Other: marks.cap(one.name), c: CONSONANT[row.key] || '' }) : withOther;
       if (arrowBefore(i, count)) pair.insertAdjacentHTML('beforeend', ARROW);
       pair.append(pairCell('other', row.glyph, withOther, caption, stroke));
     });
@@ -634,18 +750,33 @@
     // (docs/lesson-7/04 §4), unlike lessons 4-6 where it never changes on the same page.
     const where = mark.sits === 'below' ? words.whereBelow : words.whereAbove;
 
-    // The mark on its own, and where it sits.
+    // The mark on its own, and where it sits. Ulta paish is not standing, it is TURNED OVER (docs/lesson-9/04 §4):
+    // a mark can override the shared `markSits` line with its own, keyed `data-mark-sits-{its own id}`, and every
+    // other mark simply has none to find.
     aloneGlyph.textContent = marks.aloneOf(mark);
     aloneLabel.textContent = say(words.markAlone);
-    aloneSits.textContent = say(words.markSits, { where });
+    aloneSits.textContent = say(words[`markSits${pascalOf(mark.id)}`] || words.markSits, { where });
 
     // The featured pair: one letter twice, bare and marked, the two ways of saying it under each.
     featureBox.textContent = '';
     if (rows.length) {
-      featureBox.append(pairOf(rows[0], {
-        // `other` is the template: each middle column fills its own {other}.
-        feature: true, labels: { bare: say(words.pairBare), other: words.pairOther, marked: say(words.pairMarked) },
-      }));
+      const c = CONSONANT[rows[0].key] || '';
+      const feature = pairOf(rows[0], {
+        // `other` is the template: each middle column fills its own {other}, and {c} is the letter's consonant.
+        feature: true, labels: { bare: say(words.pairBare, { c }), other: words.pairOther,
+          marked: say(words[`pairMarked${pascalOf(mark.id)}`] || words.pairMarked, { c }),
+        },
+      });
+      // The same-sound tile (docs/lesson-9/03 §7, `04` §4): part 1 only, and only for a mark that HAS a `same` — no
+      // other lesson's row does, so this is a no-op everywhere but Lesson 9's khari zabar. A plain pair-cell, never
+      // an answer: it says "this is the same sound, spelled the other way", not "which one is it".
+      const sameMark = currentPart().first && mark.same ? marks.markOf(mark.same) : null;
+      if (sameMark) {
+        const caption = say(words.same, { name: rows[0].name, sameMark: marks.nameOf(sameMark, shell) });
+        feature.insertAdjacentHTML('beforeend', EQUALS);
+        feature.append(pairCell('same', rows[0].glyph, caption, caption, sameMark));
+      }
+      featureBox.append(feature);
     }
     featureBox.append(el('p', 'mark-does', say(words.markDoes)));
 
@@ -657,14 +788,103 @@
       pairsBox.append(pair);
     });
 
-    // The mark travels with the letter wherever it sits. Not drilled, and not a word.
-    if (rows.length) {
-      joinedGlyph.textContent = rows[0].joined;
+    // The mark travels with the letter wherever it sits. Not drilled, and not a word. A tailed mark (Lesson 8's
+    // alif) shows something different here (docs/lesson-8/03 §8): joinedOf would be "baa" repeated as if it were
+    // one made-up word, so instead the block shows HOW the alif joins — the part's first joining letter and first
+    // non-joining letter, side by side, and in the "every" part laam and alif together as a third (docs/lesson-8/02 §4's lam-alif).
+    // Lesson 9 switches the whole block off (docs/lesson-9/03 §7, `04` §4): the Madani small yaa and waw do not
+    // join, so "the same letter twice" has nothing true to show, and the "where you will meet it" / Madani lines
+    // below take its place. The elements still exist on the page (so a null check is never needed here), they are
+    // simply left empty and hidden.
+    const joinedOff = boardBox.dataset.joined === 'off';
+    if (rows.length && !joinedOff) {
+      if (mark.tail) {
+        const joining = rows.find((row) => !marks.NEVER_JOIN.includes(row.key));
+        const apart = rows.find((row) => marks.NEVER_JOIN.includes(row.key));
+        const examples = [joining, apart].filter(Boolean);
+        // The alif is exactly an alif (not a future lesson's wow or yaa sukun): laam only forms a required
+        // ligature with an alif after it, so only here does the joined block need a third example.
+        if (mark.tail.length === 1 && mark.tail[0] === 0x0627) {
+          const laam = rows.find((row) => row.key === 'ل');
+          if (laam) examples.push(laam);
+        }
+        joinedGlyph.textContent = examples.map((row) => row.marked).join('  ');
+      } else {
+        joinedGlyph.textContent = rows[0].joined;
+      }
       arabic(joinedGlyph);
     }
-    joinedText.textContent = say(words.joined);
-    joinedNote.textContent = say(words.joinedNote);
-    joinedBox.hidden = !rows.length;
+    joinedText.textContent = joinedOff ? '' : say(words.joined);
+    joinedNote.textContent = joinedOff ? '' : say(words.joinedNote);
+    // Both shown in the part that holds every letter only — the one-mark case's part 2 (docs/lesson-8/04 §4), which
+    // has `first: false` but never gets `every: true` (that flag is only set on a multi-mark lesson's own last
+    // part, marks.js's partsOf): the lam-alif line beside a tile the student has not reached in a warm-up, and the
+    // skip note once the table actually has a gap to explain.
+    const full = currentPart().every || !currentPart().first;
+    // Only an alif tail makes the laam ligature: Lesson 10's wow never does (docs/lesson-10/02 §4).
+    const alifTail = Boolean(mark.tail) && mark.tail.length === 1 && mark.tail[0] === 0x0627;
+    if (lamAlifNote) {
+      lamAlifNote.hidden = !(alifTail && full);
+      if (!lamAlifNote.hidden) lamAlifNote.textContent = say(words.lamAlif);
+    }
+    if (skipNote) {
+      skipNote.hidden = !(mark.skip && mark.skip.length && full);
+      if (!skipNote.hidden) skipNote.textContent = say(words.skipNote);
+    }
+    // Lesson 14's three lines (docs/lesson-14/03 §4, 04 §3): all null on every other page, and all hidden when the
+    // mark has no lead. `lead-line` says why the alif is there; the leads line shows the other two leads, composed
+    // here from the alif and each vowel's own code point and never typed; `wy-note` is part 2 only, where the alif's
+    // table holds wow and yaa.
+    const lead = marks.leadOf(mark);
+    if (leadLine) {
+      leadLine.hidden = !lead;
+      if (lead) leadLine.textContent = say(words.leadLine);
+    }
+    if (leadsNote) {
+      leadsNote.hidden = !lead || !rows.length;
+      if (!leadsNote.hidden) {
+        // The lead's own vowel is its last character: swap it for each vowel the lesson is told apart from.
+        const stem = lead.slice(0, -1);
+        const example = marks.othersOf(mark).map((m) => stem + marks.drawnOf(m) + marks.glyphOf(rows[0].glyph, mark)).join('  ');
+        const [before, after = ''] = say(leadsNote.dataset.template).split('{example}');
+        leadsNote.textContent = '';
+        leadsNote.append(document.createTextNode(before), arabic(el('span', 'leads-example', example)), document.createTextNode(after));
+      }
+    }
+    if (wyNote) {
+      wyNote.hidden = !(lead && full);
+      if (!wyNote.hidden) wyNote.textContent = say(words.wyNote);
+    }
+    // Lesson 15's hum line (docs/lesson-15/03 §4): named once, shown when the open part holds a noon or a meem, never
+    // drilled - the drill cannot hear a hum.
+    if (humNote) {
+      humNote.hidden = !rows.some((row) => row.key === 'ن' || row.key === 'م');
+      if (!humNote.hidden) humNote.textContent = say(words.humNote);
+    }
+    // Lesson 10's one line about the small mark on the wow (docs/lesson-10/04 §3): named once, never taught or asked.
+    // {jazam} is the student's own word for it, from the page's two fields.
+    if (jazamNote) {
+      const d = jazamNote.dataset;
+      // A line per script where the scripts differ (Lesson 11: Indo-Pak marks the wow, Madani leaves it bare -
+      // docs/lesson-11/03 §4). Lesson 10 has only the shared template and reads exactly what it did.
+      const template = d[shell.state.script === 'indopak' ? 'templateIndopak' : 'templateMadani'] || d.template;
+      jazamNote.textContent = say(template, { jazam: shell.state.names === 'zabar' ? d.jazamZabar : d.jazamFatha });
+    }
+    // "Where you will meet it" and the Madani note (docs/lesson-9/04 §4): in the joined block's place, one per mark,
+    // shown only in that mark's own warm-up part — never on the last part, which mixes all three. `MET_WORDS` are
+    // real words already used elsewhere on this lesson's own page (docs/lesson-9/05 §2-3), composed here rather
+    // than typed as Arabic in an attribute (docs/lesson-4/02 §1's rule for any combining mark).
+    if (metNote) {
+      const show = joinedOff && currentPart().first && Boolean(MET_WORDS[mark.id]);
+      metNote.hidden = !show;
+      if (show) metNote.textContent = fill(words[`met${pascalOf(mark.id)}`], { example: glyphOfRoot(MET_WORDS[mark.id]) });
+    }
+    if (madaniNote) {
+      const show = joinedOff && currentPart().first && shell.state.script === 'madani' && Boolean(mark.forms && mark.forms.madani);
+      madaniNote.hidden = !show;
+      if (show) madaniNote.textContent = say(words[`madani${pascalOf(mark.id)}`]);
+    }
+    joinedBox.hidden = joinedOff || !rows.length;
 
     paintMissed();
     positionHalos();
@@ -1094,9 +1314,13 @@
     return shell.LESSONS.find((entry) => entry.n === LESSON + 1);
   }
 
+  // The last lesson has no next one (docs/lesson-14/03 §8): with `data-last` its Next says so and goes back to the
+  // Qaida, until step 11's finish screen gives it somewhere better. No other page has data-last, and no other page
+  // lacks a next lesson, so nothing else changes.
   next.addEventListener('click', () => {
     const entry = nextEntry();
     if (entry && entry.built && entry.href) location.href = entry.href;
+    else if (!entry && next.dataset.last) location.href = 'index.html';
     else shell.say(say(next.dataset.soon));
   });
 
@@ -1104,7 +1328,7 @@
     const entry = nextEntry();
     const name = shell.state.names === 'zabar' ? 'zabar' : 'fatha';
     const text = say(name === 'zabar' ? next.dataset.nextZabar : next.dataset.nextFatha);
-    next.querySelector('span').textContent = entry ? text : '';
+    next.querySelector('span').textContent = entry ? text : next.dataset.last || '';
   }
 
   // The previous lesson: always built by the time this page can be reached, so a plain link (Lesson 4's own is a
@@ -1124,7 +1348,7 @@
     document.title = document.title.replace(/^[^·]*/, `Lesson ${LESSON}: ${title} `);
     // The lesson's subject in one glyph: composed, never pasted (docs/lesson-4/02 §1). The mark's own sample letter: baa
     // carries a dot exactly where zair goes, so it would be the worst letter to show the lesson by (docs/lesson-5/02 §5).
-    titleMark.textContent = marks.glyphOf(mark.sample, mark);
+    titleMark.textContent = marks.leadOf(mark) + marks.glyphOf(mark.sample, mark);
   }
 
   // Sound ------------------------------------------------------------------------------------------
@@ -1272,6 +1496,13 @@
     },
     get otherCount() {
       return others().length;
+    },
+    // Whether ANY of this lesson's own marks is followed by a letter, in the CURRENT script (Lesson 8's alif;
+    // lessons 10-13's wow and yaa; Lesson 9's Madani khari zair and ulta paish, whose small yaa/waw exist only in
+    // Madani — docs/lesson-9/04 §9): so the options panel's two-letter-tiles row appears on Madani and not on
+    // Indo-Pak, rather than being fixed to whichever part happens to be open.
+    get hasTail() {
+      return own.some((m) => marks.formOf(m).tail.length > 0 || Boolean(marks.leadOf(m)));
     },
     get twins() {
       return twinsOn();

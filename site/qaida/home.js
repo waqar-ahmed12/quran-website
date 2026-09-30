@@ -30,30 +30,39 @@
     const letters = shell.lettersOf().length;
     list.textContent = '';
 
+    let part = 0;
     for (const entry of shell.LESSONS) {
       const { n } = entry;
+      // The home is in two parts (docs/lesson-15/03 §7): "Learning to read" (1-14) and "Reading the Qur'an" (15-29). A
+      // heading goes in when the part changes, as an item of the list that spans the whole row, so the list stays one list.
+      if ((entry.part || 1) !== part) {
+        part = entry.part || 1;
+        const head = document.createElement('li');
+        head.className = 'part-head';
+        const title = document.createElement('h2');
+        title.textContent = words[`part${part}`] || '';
+        head.append(title);
+        list.append(head);
+      }
       const done = shell.isDone(n);
-      const open = shell.isOpen(n);
       const built = entry.built === true;
-      const state = done ? 'done' : open ? 'open' : 'locked';
+      // Nothing is locked (docs/lesson-2/09-going-in-order.md): finished, next up, or later. Only a lesson that
+      // isn't built yet leads nowhere, and says so.
+      const state = done ? 'done' : !built ? 'soon' : shell.inOrder(n) ? 'next' : 'later';
 
-      // What the card says under its title: how far through lesson 1, or why it can't be opened yet.
-      let meta = words.open;
+      // What the card says under its title: how far through it, or where it sits in the order.
+      const where = state === 'next' ? words.next : words.later;
+      let meta = where;
       if (done) meta = words.finished;
-      else if (!open) meta = words.locked;
       else if (!built) meta = words.soon;
       else if (entry.progress === 'letters') {
         const seen = shell.seenCount(n);
-        meta = seen > 0
-          ? words.progress.replaceAll('{seen}', seen).replaceAll('{total}', letters)
-          : words.open;
+        if (seen > 0) meta = words.progress.replaceAll('{seen}', seen).replaceAll('{total}', letters);
       } else if (entry.progress === 'drill') {
         // How many are known out of how many the lesson asks about, as the lesson last wrote it down.
         const total = shell.drillOf(n).total || letters;
         const known = Math.min(shell.masteredCount(n), total);
-        meta = known > 0
-          ? words.known.replaceAll('{known}', known).replaceAll('{total}', total)
-          : words.open;
+        if (known > 0) meta = words.known.replaceAll('{known}', known).replaceAll('{total}', total);
       }
 
       const item = document.createElement('li');
@@ -61,17 +70,23 @@
       item.dataset.state = state;
       item.style.setProperty('--i', n - 1);
 
-      // Open and built: a real link. Anything else: a button that says why, so nothing leads nowhere.
-      const card = document.createElement(open && built ? 'a' : 'button');
+      // Built: a real link, whatever the order. Not built: a button that says so, so nothing leads nowhere.
+      const card = document.createElement(built ? 'a' : 'button');
       card.className = 'card';
-      if (open && built) {
+      if (built) {
         card.href = entry.href;
+        // Ahead of the next one: a word of advice first, once (the user, 2026-09-19).
+        if (state === 'later') {
+          card.addEventListener('click', (event) => {
+            if (shell.state.skipped || !advice) return;
+            event.preventDefault();
+            showAdvice(entry.href);
+          });
+        }
       } else {
         card.type = 'button';
         card.setAttribute('aria-disabled', 'true');
-        card.addEventListener('click', () => {
-          shell.say(open ? words.standin : words.lockedNote.replaceAll('{n}', n - 1));
-        });
+        card.addEventListener('click', () => shell.say(words.standin));
       }
 
       // Built as nodes, not as markup: the titles and lines are editable in the options panel, and text stays text.
@@ -86,7 +101,8 @@
       const text = span('card-text', '');
       text.append(span('card-title', entry.title[column]), span('card-lede', entry.lede), span('card-meta', meta));
       card.append(number, text);
-      card.insertAdjacentHTML('beforeend', done ? icon('star', 'done') : open ? icon('arrow', 'go') : icon('lock', 'shut'));
+      // The lock only ever means "not built yet", never "not earned".
+      card.insertAdjacentHTML('beforeend', done ? icon('star', 'done') : built ? icon('arrow', 'go') : icon('lock', 'shut'));
 
       // Screen readers get the number, the title and the state in one go, without the decoration.
       card.setAttribute('aria-label', `Lesson ${n}: ${entry.title[column]}. ${meta}`);
@@ -94,6 +110,40 @@
       item.append(card);
       list.append(item);
     }
+  }
+
+  // The advice, at the door ---------------------------------------------------------------------
+  // A lesson opened ahead of the next one: "it's best to go in order", and two ways out. Escape or a click outside
+  // count as "Carry on anyway" — the lesson is behind it either way, and a dialog you can't dismiss is a lock.
+
+  const advice = $('.order-advice');
+  const adviceBack = advice && advice.querySelector('.order-advice-back');
+  const adviceOn = advice && advice.querySelector('.order-advice-on');
+  let adviceTarget = '';
+
+  function showAdvice(href) {
+    const next = shell.LESSONS.find(({ n }) => n === shell.nextUp());
+    adviceTarget = href;
+    adviceBack.href = next.href;
+    adviceBack.textContent = adviceBack.dataset.template.replaceAll('{n}', next.n);
+    advice.showModal();
+  }
+
+  function carryOn() {
+    shell.setSkipped(true);
+    if (advice.open) advice.close();
+    if (adviceTarget) location.href = adviceTarget;
+  }
+
+  if (advice) {
+    adviceOn.addEventListener('click', carryOn);
+    advice.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      carryOn();
+    });
+    advice.addEventListener('click', (event) => {
+      if (event.target === advice) carryOn();
+    });
   }
 
   // How far through the whole Qaida ------------------------------------------------------------

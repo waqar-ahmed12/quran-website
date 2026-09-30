@@ -38,19 +38,168 @@
   // doubled fatha is told from the single fatha, not from kasra or damma; the other two tanweens are a different
   // list, built per part in mark-lesson.js (docs/lesson-7/03 §5), not from `against`.
   Object.assign(MARKS, {
+    // fixes/lesson 7/fixes.txt, 2026-09-27: "i don't want fathatain, like no tathnia, and no 'do zabar' — two zabar
+    // or two fatha is good." The `id`/`audio` stay the Arabic technical terms (folder and key names, never shown);
+    // only what the student reads changed.
     fathatain: {
-      id: 'fathatain', cp: 0x064B, names: { fatha: 'fathatain', zabar: 'do zabar' }, sits: 'above', lesson: 7,
+      id: 'fathatain', cp: 0x064B, names: { fatha: 'two fatha', zabar: 'two zabar' }, sits: 'above', lesson: 7,
       audio: 'fathatain', first: MARKS.fatha.first, sample: 'ب', against: ['fatha'],
     },
     kasratain: {
-      id: 'kasratain', cp: 0x064D, names: { fatha: 'kasratain', zabar: 'do zair' }, sits: 'below', lesson: 7,
+      id: 'kasratain', cp: 0x064D, names: { fatha: 'two kasra', zabar: 'two zair' }, sits: 'below', lesson: 7,
       audio: 'kasratain', first: MARKS.kasra.first, sample: 'د', against: ['kasra'],
     },
     dammatain: {
-      id: 'dammatain', cp: 0x064C, names: { fatha: 'dammatain', zabar: 'do paish' }, sits: 'above', lesson: 7,
+      id: 'dammatain', cp: 0x064C, names: { fatha: 'two damma', zabar: 'two paish' }, sits: 'above', lesson: 7,
       audio: 'dammatain', first: MARKS.damma.first, sample: 'ب', against: ['damma'],
     },
+    // Lesson 8 (docs/lesson-8/): zabar, and an alif after it — the long aa. The first mark followed by a LETTER:
+    // `tail` is what comes after the mark, as code points (composed, never pasted: lessons 10 and 12's tails carry
+    // a sukun, so the field is composed everywhere, docs/lesson-8/02 §1). `skip`: the letters this mark is never
+    // written on (docs/lesson-8/02 §2). `first` is zabar's own six with laam swapped out, because laam and alif
+    // together (never pasted here either — the same rule, one Arabic ligature) is one joined
+    // shape and part 1 should show the alif doing its ordinary thing (docs/lesson-8/02 §4).
+    'fatha-alif': {
+      id: 'fatha-alif', cp: 0x064E, tail: [0x0627], names: { fatha: 'fatha and alif', zabar: 'zabar and alif' },
+      sits: 'above', lesson: 8, audio: 'fatha-alif',
+      first: MARKS.fatha.first.map((key) => (key === 'ل' ? 'ن' : key)), sample: 'ب', against: ['fatha'],
+      skip: ['ا', 'ء'],
+    },
+    // Lesson 10 (docs/lesson-10/): zabar, then a wow with a jazam — "au". The jazam is Lesson 14's mark, carried
+    // here inside the TAIL as part of the pattern, never as a mark of its own (docs/lesson-10/README.md). `first` is
+    // zabar's own six, laam included: laam and wow are not a ligature (docs/lesson-10/02 §2). `against` is in the
+    // order taught — zabar, then zabar and alif — so the board reads the whole road, short to long to "au", and
+    // {other} is "zabar" (docs/lesson-10/01 §3 put the alif first; with the twins alternating per letter, the order
+    // only decides which comes first).
+    'fatha-waw': {
+      id: 'fatha-waw', cp: 0x064E, tail: [0x0648, 0x0652], names: { fatha: 'fatha and waw', zabar: 'zabar and wow' },
+      sits: 'above', lesson: 10, audio: 'fatha-waw',
+      first: MARKS.fatha.first, sample: 'ب', against: ['fatha', 'fatha-alif'],
+      skip: ['ا', 'ء'],
+      // Measured 2026-09-28 (docs/lesson-10/02 §3): Scheherazade New draws U+0652 as a small circle and U+06E1 as
+      // the open head-of-khaa the Madani mushaf prints, so Madani draws U+06E1. The id stays U+0652 (suffixOf never
+      // reads `forms`), so a switch of script keeps every letter's credit. Indo-Pak draws U+0652, whatever the font.
+      forms: { madani: { cp: [0x064E], tail: [0x0648, 0x06E1] } },
+    },
   });
+
+  // Lesson 9 (docs/lesson-9/): the long vowels again, written as a MARK instead of a letter — khari zabar, khari
+  // zair, ulta paish. The id stays one code point, the Indo-Pak one, the same in both scripts (docs/lesson-9/03 §2):
+  // `cp` never changes with the script, only the DRAWING does. `forms` holds only the script that writes it
+  // differently (docs/lesson-9/02 §2) — a script with no entry here draws `cp` (and `tail`) exactly as every row
+  // always has, which is why lessons 4-8 need no `forms` at all and come out byte-identical (the fence in
+  // tools/qaida-check.js). `same` is new (docs/lesson-9/03 §7): the mark whose SOUND this one shares — khari zabar
+  // is Lesson 8's "baa" again, so its board shows that spelling beside it, never among the answers (docs/lesson-9/01 §3).
+  Object.assign(MARKS, {
+    'standing-fatha': {
+      id: 'standing-fatha', cp: 0x0670, names: { fatha: 'standing fatha', zabar: 'khari zabar' }, sits: 'above',
+      lesson: 9, audio: 'fatha-alif', first: MARKS['fatha-alif'].first, sample: 'ب', against: ['fatha'],
+      skip: ['ا', 'ء'], same: 'fatha-alif',
+      forms: { madani: { cp: [0x064E, 0x0670] } },
+    },
+    'standing-kasra': {
+      id: 'standing-kasra', cp: 0x0656, names: { fatha: 'standing kasra', zabar: 'khari zair' }, sits: 'below',
+      lesson: 9, audio: 'kasra-yaa', first: ['ه', 'د', 'ت', 'ط', 'ك', 'ف'], sample: 'ه', against: ['kasra'],
+      skip: ['ا', 'ء'],
+      forms: { madani: { cp: [0x0650], tail: [0x06E6] } },
+    },
+    'inverted-damma': {
+      id: 'inverted-damma', cp: 0x0657, names: { fatha: 'inverted damma', zabar: 'ulta paish' }, sits: 'above',
+      lesson: 9, audio: 'damma-waw', first: ['ب', 'د', 'ر', 'س', 'م', 'ه'], sample: 'ه', against: ['damma'],
+      skip: ['ا', 'ء'],
+      forms: { madani: { cp: [0x064F], tail: [0x06E5] } },
+    },
+  });
+
+  // Lessons 11-14 (docs/lesson-11/ to docs/lesson-14/). A fourth statement, after Lesson 9's, because these rows
+  // borrow from it (`same`, and Lesson 13's `first`).
+  Object.assign(MARKS, {
+    // Lesson 11 (docs/lesson-11/): paish, then a wow - the long "oo". The minimal pair against Lesson 10 is the point
+    // of the lesson, so Lesson 10's row is in `against` (docs/lesson-11/01 §2). `same`: Lesson 9's ulta paish is this
+    // sound written as a mark, shown beside it on the board and never among the answers (docs/lesson-9/01 §3). The
+    // Indo-Pak mushaf puts a jazam on the wow and the Madani mushaf leaves it bare (docs/lesson-11/02 §2): the base
+    // row is the Indo-Pak spelling, so the id is the same in both scripts (suffixOf never reads `forms`).
+    'damma-waw': {
+      id: 'damma-waw', cp: 0x064F, tail: [0x0648, 0x0652], names: { fatha: 'damma and waw', zabar: 'paish and wow' },
+      sits: 'above', lesson: 11, audio: 'damma-waw',
+      first: MARKS.damma.first, sample: 'ب', against: ['damma', 'fatha-waw'],
+      skip: ['ا', 'ء'], same: 'inverted-damma',
+      forms: { madani: { cp: [0x064F], tail: [0x0648] } },
+    },
+    // Lesson 12 (docs/lesson-12/): zabar, then a yaa with a jazam - "ai". Lesson 10 with a yaa for the wow. The yaa is
+    // a letter the two scripts write differently (Madani U+064A, Indo-Pak U+06CC, dotless at the end of a word), so
+    // BOTH scripts draw from `forms` (docs/lesson-12/02 §2) - the first row with two. The id follows the two rules
+    // every earlier id already does: the letter folds to Madani (U+064A, as shell.keyOf folds ی) and the mark is the
+    // Indo-Pak code point (U+0652). So suffixOf gives one id in both scripts and neither script's drawing is it.
+    // `against`: short "ba", then Lesson 10's "au" - the nearest contrast, one letter apart (docs/lesson-12/01 §2).
+    'fatha-yaa': {
+      id: 'fatha-yaa', cp: 0x064E, tail: [0x064A, 0x0652], names: { fatha: 'fatha and yaa', zabar: 'zabar and yaa' },
+      sits: 'above', lesson: 12, audio: 'fatha-yaa',
+      first: MARKS.fatha.first, sample: 'ب', against: ['fatha', 'fatha-waw'],
+      skip: ['ا', 'ء'],
+      forms: {
+        madani: { cp: [0x064E], tail: [0x064A, 0x06E1] },
+        indopak: { cp: [0x064E], tail: [0x06CC, 0x0652] },
+      },
+    },
+    // Lesson 13 (docs/lesson-13/): zair, then a yaa - the long "ee". Lesson 11's shape with Lesson 12's letter: the
+    // minimal pair is Lesson 12's row, `same` is Lesson 9's khari zair (shown beside it, never an answer), Indo-Pak
+    // marks the yaa with a jazam and Madani leaves it bare, and the yaa itself differs by script, so both scripts draw
+    // from `forms` and the id is the Madani letter with the Indo-Pak mark (docs/lesson-12/02 §2). `first` is khari
+    // zair's six (docs/lesson-9/02 §4): zair's own six less the alif, which never carries this.
+    'kasra-yaa': {
+      id: 'kasra-yaa', cp: 0x0650, tail: [0x064A, 0x0652], names: { fatha: 'kasra and yaa', zabar: 'zair and yaa' },
+      sits: 'below', lesson: 13, audio: 'kasra-yaa',
+      first: MARKS['standing-kasra'].first, sample: 'ف', against: ['kasra', 'fatha-yaa'],
+      skip: ['ا', 'ء'], same: 'standing-kasra',
+      forms: {
+        madani: { cp: [0x0650], tail: [0x064A] },
+        indopak: { cp: [0x0650], tail: [0x06CC, 0x0652] },
+      },
+    },
+    // Lesson 14 (docs/lesson-14/): the jazam on any letter. A jazam has no sound on its own, so every item on this
+    // lesson's page is drawn after a vowelled alif, the LEAD (docs/lesson-14/02 §2): drawn, never asked, never part of
+    // an id. The id is the letter and the jazam, two characters, so masteredCount needs no change. `against`: the same
+    // letter with a vowel instead, "a-ba" against "ab" (docs/lesson-14/01 §2). `skip`: alif is always long or silent and
+    // never a closed consonant, and hamza's seat differs by script (docs/lesson-14/02 §3). The id and `audio` are the
+    // Arabic technical term, like `fathatain`: folder and key names, never shown. Madani draws U+06E1, the head-of-khaa
+    // Lesson 10 measured; the id stays U+0652 because suffixOf never reads `forms`.
+    sukun: {
+      id: 'sukun', cp: 0x0652, names: { fatha: 'sukoon', zabar: 'jazam' }, sits: 'above', lesson: 14, audio: 'sukun',
+      first: MARKS.fatha.first, sample: 'ب', against: ['fatha', 'kasra', 'damma'],
+      skip: ['ا', 'ء'], lead: [0x0627, 0x064E],
+      forms: { madani: { cp: [0x06E1] } },
+    },
+    // Lesson 15 (docs/lesson-15/): the shadda, a letter said twice. Three rows, one per vowel, as Lesson 7's doubled marks.
+    // `cp` is a LIST: the vowel FIRST and the shadda last (docs/lesson-15/02 §2), so the halo rings the shadda, and the id
+    // is the letter, the vowel and U+0651 - three characters, the same in both scripts. Every item is drawn after Lesson
+    // 14's lead (the first half of a shadda closes the syllable before it). `against`: the same letter once with the vowel
+    // and once with a jazam, the two halves of a shadda (docs/lesson-15/01 §3). `sits`: 'above' on all three, kasra
+    // included - measured 2026-09-29 (docs/lesson-15/02 §3): Scheherazade New AND Noto Naskh both draw a kasra under a
+    // shadda ABOVE the letter, and only Amiri Quran keeps it below, so no per-script `sits` is needed with the faces the
+    // site has. Lesson 14's sukun (a jazam) is `against` here, so its Madani form is drawn from its own `forms`.
+    'shadda-fatha': {
+      id: 'shadda-fatha', cp: [0x064E, 0x0651], names: { fatha: 'shadda and fatha', zabar: 'tashdeed and zabar' },
+      sits: 'above', lesson: 15, audio: 'shadda-fatha', lead: [0x0627, 0x064E],
+      first: MARKS.fatha.first, sample: 'ب', against: ['fatha', 'sukun'], skip: ['ا', 'ء'],
+    },
+    'shadda-kasra': {
+      id: 'shadda-kasra', cp: [0x0650, 0x0651], names: { fatha: 'shadda and kasra', zabar: 'tashdeed and zair' },
+      sits: 'above', lesson: 15, audio: 'shadda-kasra', lead: [0x0627, 0x064E],
+      first: MARKS['standing-kasra'].first, sample: 'د', against: ['kasra', 'sukun'], skip: ['ا', 'ء'],
+    },
+    'shadda-damma': {
+      id: 'shadda-damma', cp: [0x064F, 0x0651], names: { fatha: 'shadda and damma', zabar: 'tashdeed and paish' },
+      sits: 'above', lesson: 15, audio: 'shadda-damma', lead: [0x0627, 0x064E],
+      first: MARKS.damma.first, sample: 'ب', against: ['damma', 'sukun'], skip: ['ا', 'ء'],
+    },
+  });
+
+  // The letters that never join the one after them (QAIDA-CONTENT.md's Lesson 3 group, less the alif — د ذ ر ز و,
+  // docs/lesson-8/02 §3): after one of these, an alif stands on its own instead of joining on. Used only to pick
+  // which letters illustrate the joined/apart contrast on a board (mark-lesson.js); it changes no shape — Arabic
+  // fonts already join or don't on their own.
+  const NEVER_JOIN = ['د', 'ذ', 'ر', 'ز', 'و'];
 
   // A lesson usually teaches one mark. Lesson 7 teaches three (the doubled marks), in the order they are drilled,
   // and Lesson 9 (standing harakaat) will teach three more the same way. A page naming a single mark
@@ -59,6 +208,14 @@
     tanween: {
       id: 'tanween', lesson: 7, names: { fatha: 'tanween', zabar: 'tanween' },
       marks: ['fathatain', 'kasratain', 'dammatain'],
+    },
+    standing: {
+      id: 'standing', lesson: 9, names: { fatha: 'standing marks', zabar: 'standing harakaat' },
+      marks: ['standing-fatha', 'standing-kasra', 'inverted-damma'],
+    },
+    shadda: {
+      id: 'shadda', lesson: 15, names: { fatha: 'shadda', zabar: 'tashdeed' },
+      marks: ['shadda-fatha', 'shadda-kasra', 'shadda-damma'],
     },
   };
   const setOf = (id) => SETS[id] || null;
@@ -72,11 +229,53 @@
   const markOf = (id) => MARKS[id] || null;
   // What the STUDENT reads. The recordings are keyed by mark.audio and never by this: the names are per student.
   const nameOf = (mark, shell) => mark.names[shell.state.names === 'zabar' ? 'zabar' : 'fatha'];
-  const glyphOf = (letter, mark) => letter + String.fromCharCode(mark.cp);
+  // What follows the letter: its mark, and — for a mark followed by a letter (Lesson 8's alif; lessons 10-13's wow
+  // and yaa) — that letter too. An item's id is the letter's key plus this, so it is one character on lessons 4-7
+  // (unchanged) and longer wherever there is a tail (docs/lesson-8/03 §2).
+  // A row's own marks: one code point, or (Lesson 15, docs/lesson-15/03 §1) a list of them on the same letter - a vowel
+  // and a shadda. `[].concat(n)` is `[n]`, so every earlier row reads exactly as it did.
+  const cpsOf = (mark) => [].concat(mark.cp);
+  const suffixOf = (mark) => String.fromCharCode(...cpsOf(mark), ...(mark.tail || []));
+
+  // Which script is drawn right now. Read from the shell rather than passed in, so a call site that forgets to pass
+  // it still draws the page's own script (docs/lesson-9/README.md's second likely mistake) — glyphOf has four
+  // callers outside this file and none of them needs to change.
+  const scriptNow = () => (window.qaidaShell && window.qaidaShell.state.script) || 'madani';
+
+  // What a mark looks like in a script: its own marks (combining, on the letter) and its tail (letters after it).
+  // Only Lesson 9 has a script that draws differently (docs/lesson-9/03 §3): every other mark has no `forms`, so
+  // this is `[mark.cp]` and `mark.tail || []` for every script, and drawnOf(mark) === suffixOf(mark) exactly — the
+  // fence tools/qaida-check.js proves for lessons 4-8.
+  const formOf = (mark, script = scriptNow()) => {
+    const own = mark.forms && mark.forms[script];
+    return {
+      // A form without its own `cp` draws the row's (docs/lesson-12/03 §1): without this fallback a form that omits
+      // it would throw in drawnOf and take the whole page down, not one tile.
+      cp: own ? own.cp || cpsOf(mark) : cpsOf(mark),
+      tail: own ? own.tail || [] : mark.tail || [],
+    };
+  };
+  const drawnOf = (mark, script) => {
+    const f = formOf(mark, script);
+    return String.fromCharCode(...f.cp, ...f.tail);
+  };
+  const glyphOf = (letter, mark, script) => letter + drawnOf(mark, script);
+  // What is drawn IN FRONT of every item on a lesson's page (docs/lesson-14/02 §2): Lesson 14's vowelled alif, because
+  // a jazam has no sound on its own. Drawn, never asked, never part of an id. A form may carry its own (docs/lesson-14/
+  // 07 §3), read first. Every other row has none, so this is '' and every glyph of lessons 4-13 is unchanged (the
+  // fence in tools/qaida-check.js). glyphOf itself does not change: spell.js, exercise.js and audio.js call it for words
+  // and for other lessons' items, and none of them wants a lead in front of a letter in the middle of a word.
+  const leadOf = (mark, script = scriptNow()) => {
+    const form = mark && mark.forms && mark.forms[script];
+    const lead = (form && form.lead) || (mark && mark.lead);
+    return lead ? String.fromCharCode(...lead) : '';
+  };
   // A bare combining mark has nothing to sit on, so the dotted circle (U+25CC) is its base: what the character is for.
-  const aloneOf = (mark) => String.fromCharCode(0x25CC) + String.fromCharCode(mark.cp);
+  const aloneOf = (mark, script) => String.fromCharCode(0x25CC) + drawnOf(mark, script);
   // The same letter twice, beside itself, so the mark can be seen to travel with it (docs/lesson-4/04 §3c). Neighbours
-  // join on their own, so no joiner is needed; it is a letter beside itself and not a word.
+  // join on their own, so no joiner is needed; it is a letter beside itself and not a word. Unchanged for a tailed
+  // mark's own sake (docs/lesson-8/03 §8): mark-lesson.js's renderBoard draws Lesson 8's joined example differently,
+  // from NEVER_JOIN, rather than call this with a tail and get "baa" repeated as if it were one made-up word.
   const joinedOf = (letter, mark) => glyphOf(letter, mark).repeat(2);
 
   const cap = (text) => (text ? text[0].toUpperCase() + text.slice(1) : '');
@@ -153,14 +352,14 @@
     const byId = new Map();
 
     const itemFor = (key, mark) => {
-      const id = key + String.fromCharCode(mark.cp);
+      const id = key + suffixOf(mark);
       let item = byId.get(id);
       if (!item) {
         const found = names.get(key) || { glyph: key, name: '' };
         const words = wordsFor(mark, shell);
         item = {
           id,
-          glyph: glyphOf(found.glyph, mark),
+          glyph: leadOf(mark) + glyphOf(found.glyph, mark), // the lead is '' on every lesson but 14 (docs/lesson-14/03 §2)
           name: fill(templates.marked, { ...words, name: found.name }),
           family: familyFor(key, distractors, looks),
           audio: { kind: mark.audio, glyph: found.glyph }, // the SOUND, "ba", not the letter's name
@@ -193,7 +392,11 @@
       const keys = shell.lettersOf().map(([glyph]) => shell.keyOf(glyph));
       keys.forEach((key) => {
         const at = madaniOrder.indexOf(key);
-        const item = itemFor(key, markAt(list, at < 0 ? 0 : at));
+        const mark = markAt(list, at < 0 ? 0 : at);
+        // A letter this mark is never written on (Lesson 8's ا and ء, docs/lesson-8/02 §2): no item at all, not a
+        // required one that never appears. `skip` is read here and in boardRows, nowhere else needs to know.
+        if ((mark.skip || []).includes(key)) return;
+        const item = itemFor(key, mark);
         if (!item.parts.includes(last.n)) item.parts.push(last.n);
       });
     }
@@ -203,6 +406,7 @@
     for (const part of parts) {
       if (!part.first) continue;
       for (const key of part.mark.first) {
+        if ((part.mark.skip || []).includes(key)) continue;
         const item = itemFor(key, part.mark);
         if (!item.parts.includes(part.n)) item.parts.push(part.n);
       }
@@ -227,8 +431,11 @@
       return keys.filter((key) => names.has(key)).map((key) => {
         const { glyph, name } = names.get(key);
         return {
-          id: key + String.fromCharCode(other.cp),
-          glyph: glyphOf(glyph, other),
+          id: key + suffixOf(other),
+          // The twin is "baa with zabar, after the alif", drawn on THIS page: the other mark's own lead if it has one
+          // (Lesson 15's twins will), else the lesson's (docs/lesson-14/03 §2, §8). Lesson 14's twins carry none of their
+          // own, so they draw the lesson's.
+          glyph: (leadOf(other) || leadOf(mark)) + glyphOf(glyph, other),
           name: fill(templates.marked, { ...words, name }),
           family: familyFor(key, distractors, looks),
           audio: { kind: other.audio, glyph }, // the other mark's SOUND, "ba", not the letter's name
@@ -263,7 +470,7 @@
     // Mixed review reaches back (docs/lesson-5/03 §2, docs/lesson-6/03 §6): the letters missed in Lesson 2, and, when this mark
     // has others before it, the letters missed in each of those lessons. Their ids are the letter and its mark, so a letter is
     // the first character.
-    const earlier = (mark ? othersOf(mark) : []).map((m) => ({ rec: shell.drillOf(m.lesson), suffix: String.fromCharCode(m.cp) }));
+    const earlier = (mark ? othersOf(mark) : []).map((m) => ({ rec: shell.drillOf(m.lesson), suffix: suffixOf(m) }));
     const shaky = (rec, id) => (rec.wrong[id] || 0) > 0 && (rec.streak[id] || 0) < (rec.target || 3);
     const hard = keys
       .map((key, i) => {
@@ -360,11 +567,15 @@
     const p = typeof part === 'object' ? part : { n: part, first: part === 1, every: part !== 1 };
     const { others = othersOf(mark) } = options;
     const keys = p.every || !p.first ? null : mark.first;
+    const skip = mark.skip || [];
+    // The lead goes in front of the marked tile and every "other" tile, never the bare letter (docs/lesson-14/03 §2).
+    const lead = leadOf(mark);
     return shell.lettersOf()
       .filter(([glyph]) => !keys || keys.includes(shell.keyOf(glyph)))
+      .filter(([glyph]) => !skip.includes(shell.keyOf(glyph)))
       .map(([glyph, name]) => ({
-        key: shell.keyOf(glyph), glyph, name, marked: glyphOf(glyph, mark), joined: joinedOf(glyph, mark),
-        others: others.map((m) => ({ id: m.id, glyph: glyphOf(glyph, m), name: nameOf(m, shell) })),
+        key: shell.keyOf(glyph), glyph, name, marked: lead + glyphOf(glyph, mark), joined: joinedOf(glyph, mark),
+        others: others.map((m) => ({ id: m.id, glyph: (leadOf(m) || lead) + glyphOf(glyph, m), name: nameOf(m, shell) })),
       }));
   }
 
@@ -375,13 +586,13 @@
     const p = typeof part === 'object' ? part : { first: part === 1, every: part !== 1 };
     const key = p.every || !p.first ? 'ع' : mark.sample;
     const found = shell.lettersOf().find(([glyph]) => shell.keyOf(glyph) === key);
-    return found ? glyphOf(found[0], mark) : '';
+    return found ? leadOf(mark) + glyphOf(found[0], mark) : '';
   }
 
   window.qaidaMarks = {
-    MARKS, TEMPLATES, GROUP_ONE, COUNT, DRILLING,
+    MARKS, TEMPLATES, GROUP_ONE, COUNT, DRILLING, NEVER_JOIN,
     SETS, setOf, marksOf, partsOf, markAt,
-    markOf, otherOf, othersOf, nameOf, glyphOf, aloneOf, joinedOf, wordsFor, fill, cap,
+    markOf, otherOf, othersOf, nameOf, cpsOf, suffixOf, formOf, drawnOf, glyphOf, leadOf, aloneOf, joinedOf, wordsFor, fill, cap,
     allItems, twinItems, reviewItems, reviewKeys, poolFor, inPart, rename, sizes, stats, boardRows, sampleOf,
   };
 })();

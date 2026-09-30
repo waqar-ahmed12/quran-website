@@ -31,8 +31,6 @@
   if (!shell || !marks) return;
 
   const root = document.documentElement;
-  const section = document.querySelector('.spell');
-  if (!section) return;
 
   // {root} is [key, markId] pairs in reading order (right to left, matching how they are typed here); {syll} is each
   // one's romanised sound, in the same order, for the blend line only — this never turns transliteration on
@@ -55,9 +53,98 @@
       { root: [['ك', 'fatha'], ['ب', 'damma'], ['ر', 'fatha']], syll: ['ka', 'bu', 'ra'], meaning: 'he was great' },
       { root: [['ق', 'fatha'], ['ر', 'damma'], ['ب', 'fatha']], syll: ['qa', 'ru', 'ba'], meaning: 'he was near' },
     ],
+    // Lesson 7 (fixes/lesson 7/fixes.txt: "there is no walkthrough words for all tanween"; docs/lesson-10/07 §7):
+    // nouns ending in two paish and two zair. None in two zabar — that ending is written with an alif after it,
+    // which is Lesson 8. Word 2 carries a paish in the middle, word 3 ends in two zair.
+    tanween: [
+      { root: [['ق', 'fatha'], ['ل', 'fatha'], ['م', 'dammatain']], syll: ['qa', 'la', 'mun'], meaning: 'a pen' }, // qalamun
+      { root: [['ر', 'fatha'], ['ج', 'damma'], ['ل', 'dammatain']], syll: ['ra', 'ju', 'lun'], meaning: 'a man' }, // rajulun
+      { root: [['ب', 'fatha'], ['ل', 'fatha'], ['د', 'kasratain']], syll: ['ba', 'la', 'din'], meaning: 'a town' }, // baladin
+    ],
+    // docs/lesson-8/05 §3: three words that together show everything the board says — the alif joining on, the
+    // alif standing apart, and the long vowel in the middle of a longer word that also carries a zair and two
+    // paish (every mark lesson so far, in one word). A ligature (laam then alif) is never split across two steps:
+    // an alif cannot begin a syllable, so it is always part of the letter-before-it's own step.
+    'fatha-alif': [
+      { root: [['ق', 'fatha-alif'], ['ل', 'fatha']], syll: ['qaa', 'la'], meaning: 'he said' }, // qaala, the alif joins on
+      { root: [['ز', 'fatha-alif'], ['ر', 'fatha']], syll: ['zaa', 'ra'], meaning: 'he visited' }, // zaara, the alif stands apart
+      { root: [['ك', 'kasra'], ['ت', 'fatha-alif'], ['ب', 'dammatain']], syll: ['ki', 'taa', 'bun'], meaning: 'a book' }, // kitaabun
+    ],
+    // docs/lesson-10/05 §2: the wow joined to the letter before it (word 1), standing apart after zaa (word 2), and
+    // "au" at the start of a longer word with a zair and two paish after it (word 3). A wow with a jazam is never a
+    // step of its own: it is part of its letter's tail, so qaw is one step, not qa then w.
+    'fatha-waw': [
+      { root: [['ق', 'fatha-waw'], ['م', 'dammatain']], syll: ['qaw', 'mun'], meaning: 'a people' }, // qawmun
+      { root: [['ز', 'fatha-waw'], ['ج', 'dammatain']], syll: ['zaw', 'jun'], meaning: 'a pair' }, // zawjun
+      { root: [['م', 'fatha-waw'], ['ع', 'kasra'], ['د', 'dammatain']], syll: ['maw', 'i', 'dun'], meaning: 'an appointed time' }, // maw'idun
+    ],
+    // docs/lesson-11/05 §2: the wow joined to the letter before it (word 1), standing apart after raa (word 2), and
+    // the long "oo" in the middle of a longer word (word 3). A wow is never a step of its own: it is part of its
+    // letter's tail, so qu-u is one step (quu), not qu then w. Candidates for the teacher's check.
+    'damma-waw': [
+      { root: [['ن', 'damma-waw'], ['ر', 'dammatain']], syll: ['nuu', 'run'], meaning: 'light' }, // nuurun
+      { root: [['ر', 'damma-waw'], ['ح', 'dammatain']], syll: ['ruu', 'hun'], meaning: 'a spirit' }, // ruuhun
+      { root: [['ي', 'fatha'], ['ق', 'damma-waw'], ['ل', 'damma']], syll: ['ya', 'quu', 'lu'], meaning: 'he says' }, // yaquulu
+    ],
+    // docs/lesson-12/05 §2: the yaa joined to the letter before it (word 1), standing apart after zaa (word 2), and
+    // "ai" in the middle of a longer word that ends in a zair (word 3). A yaa with a jazam is never a step of its own:
+    // it is part of its letter's tail, so bay is one step, not ba then y. No word ends in the yaa, so every yaa here
+    // is in its middle shape. Candidates for the teacher's check.
+    'fatha-yaa': [
+      { root: [['ب', 'fatha-yaa'], ['ت', 'dammatain']], syll: ['bay', 'tun'], meaning: 'a house' }, // baytun
+      { root: [['ز', 'fatha-yaa'], ['ت', 'dammatain']], syll: ['zay', 'tun'], meaning: 'oil' }, // zaytun
+      { root: [['ع', 'fatha'], ['ل', 'fatha-yaa'], ['ه', 'kasra']], syll: ['a', 'lay', 'hi'], meaning: 'on him' }, // 'alayhi
+    ],
+    // docs/lesson-13/03 §2: the yaa joined to the letter before it (word 1), standing apart after daal (word 2), and
+    // the long "ee" in the middle of a longer word (word 3). A yaa is never a step of its own: it is part of its
+    // letter's tail, so fii is one step, not fi then y. No word ends in the yaa, so "fii", "in", is left out as a
+    // word (docs/lesson-13/01 §4). Candidates for the teacher's check.
+    'kasra-yaa': [
+      { root: [['ف', 'kasra-yaa'], ['ل', 'dammatain']], syll: ['fii', 'lun'], meaning: 'an elephant' }, // fiilun
+      { root: [['د', 'kasra-yaa'], ['ن', 'dammatain']], syll: ['dii', 'nun'], meaning: 'a religion, a way' }, // diinun
+      { root: [['ك', 'fatha'], ['ب', 'kasra-yaa'], ['ر', 'dammatain']], syll: ['ka', 'bii', 'run'], meaning: 'big' }, // kabiirun
+    ],
+    // docs/lesson-14/05 §2: the jazam closing a word (word 1), in the middle with the word going on after it (word 2),
+    // and the closed syllable as the first of three (word 3). A jazam letter is its OWN step ("Laam with jazam: no
+    // vowel of its own"), the traditional spelling order, and its `syll` is just the consonant: the blend step after it
+    // joins it to the syllable before ("qal"). None has a first-letter jazam, a jazam after a jazam, or a jazam on alif
+    // (tools/qaida-words-check.js), and none has qalqalah or a noon that changes (docs/lesson-14/05 §1). Candidates for
+    // the teacher's check.
+    sukun: [
+      { root: [['ق', 'damma'], ['ل', 'sukun']], syll: ['qu', 'l'], meaning: 'say!' }, // qul
+      { root: [['ق', 'fatha'], ['ل', 'sukun'], ['ب', 'dammatain']], syll: ['qa', 'l', 'bun'], meaning: 'a heart' }, // qalbun
+      { root: [['م', 'fatha'], ['س', 'sukun'], ['ج', 'kasra'], ['د', 'dammatain']], syll: ['ma', 's', 'ji', 'dun'], meaning: 'a mosque' }, // masjidun
+    ],
+    // docs/lesson-15/05 §2: the shadda on the second of two letters (word 1), in the middle of a word with a letter
+    // after it (word 2), and on a meem, where it is held with a hum, in the word a student will most want to read
+    // (word 3). A letter with a shadda is ONE step and its `syll` is the doubled consonant with its vowel ("rra"): the
+    // blend step after it reads the whole ("marra"). A shadda is never on a word's first letter (that is the article's
+    // shadda, Lesson 18; tools/qaida-words-check.js). Candidates for the teacher's check.
+    shadda: [
+      { root: [['م', 'fatha'], ['ر', 'shadda-fatha']], syll: ['ma', 'rra'], meaning: 'he passed' }, // marra
+      { root: [['ع', 'fatha'], ['ل', 'shadda-fatha'], ['م', 'fatha']], syll: ['a', 'lla', 'ma'], meaning: 'he taught' }, // 'allama
+      { root: [['م', 'damma'], ['ح', 'fatha'], ['م', 'shadda-fatha'], ['د', 'dammatain']], syll: ['mu', 'ha', 'mma', 'dun'], meaning: 'Muhammad' }, // muhammadun
+    ],
+    // docs/lesson-9/05 §2: three words that show everything the board says — the standing mark beside Lesson 8's
+    // alif spelling of the same sound (word 1), khari zair where the Qur'an actually puts it, on haa (word 2), and a
+    // longer word carrying two of the three standing marks at once (word 3). These are the mushaf's OWN spellings,
+    // not ordinary Arabic ones (docs/lesson-9/05 §1) — checked against Tanzil's Uthmani text before they ship.
+    standing: [
+      { root: [['ه', 'standing-fatha'], ['ذ', 'fatha-alif']], syll: ['haa', 'dhaa'], meaning: 'this' }, // haadhaa
+      { root: [['ب', 'kasra'], ['ه', 'standing-kasra']], syll: ['bi', 'hii'], meaning: 'with it' }, // bihii
+      { root: [['ك', 'kasra'], ['ت', 'standing-fatha'], ['ب', 'fatha'], ['ه', 'inverted-damma']], syll: ['ki', 'taa', 'ba', 'huu'], meaning: 'his book' }, // kitaabahuu
+    ],
   };
 
-  const mark = marks.markOf(root.dataset.mark);
+  // Exposed so tools/qaida-words-check.js can check every word, on every lesson, without a browser (docs/lesson-8/06 §3).
+  // Before the section guard below: the data exists whether or not this particular page has a .spell block to draw it in.
+  window.qaidaSpellWords = WORDS;
+
+  const section = document.querySelector('.spell');
+  if (!section) return;
+
+  // A single mark (lessons 4-6, 8) or a SET (Lesson 9's "standing" — marks.markOf returns null for a set, docs/lesson-9/04 §6).
+  const mark = marks.markOf(root.dataset.mark) || marks.setOf(root.dataset.mark);
   const walkthrough = mark && WORDS[mark.id];
   if (!mark || !walkthrough) return;
 
@@ -80,11 +167,28 @@
     return new Map(shell.lettersOf().map(([glyph, name]) => [shell.keyOf(glyph), { glyph, name }]));
   }
 
-  function glyphFor(names, entry, upto) {
-    return entry.root.slice(0, upto).map(([key, id]) => {
+  // Every letter's own glyph, in reading order (root order), never sliced: the fix below (fixes/lesson 4 5/,
+  // "should be animated, and be shown in complete word and the word that is being read is highlighted") wants the
+  // whole word on screen from the first step, not built up piece by piece.
+  function unitsFor(names, entry) {
+    return entry.root.map(([key, id]) => {
       const found = names.get(key);
       return marks.glyphOf(found ? found.glyph : key, marks.markOf(id));
-    }).join('');
+    });
+  }
+
+  // Which state a letter (index i) is in for the step on screen: 'active' is the part being read right now, 'read'
+  // is a letter already covered by an earlier step, 'unread' is a letter the word hasn't reached yet. A 'letter'
+  // step lights one letter alone; a 'blend' step lights the whole run it just put together, as ONE piece (a
+  // highlighted "qaa" inside "qaala" must stay one unit, not a letter at a time) — except the FINAL blend, the
+  // whole word, which settles to plain 'read' rather than staying lit.
+  function stateFor(i, step) {
+    if (step.kind === 'letter') {
+      if (i === step.upto - 1) return 'active';
+      return i < step.upto - 1 ? 'read' : 'unread';
+    }
+    if (step.final) return 'read';
+    return i < step.upto ? 'active' : 'unread';
   }
 
   // One step per letter met, then one per blend: name it, then put it together with what came before. The last
@@ -135,13 +239,30 @@
     const entry = walkthrough[wordIndex];
     const names = lettersMap();
     const step = steps[at];
-    glyphBox.textContent = glyphFor(names, entry, step.upto);
+
+    // The whole word, every step: each letter its own span, so the part being read can be lit without touching the
+    // rest. No element sits BETWEEN two letters that are meant to join (a span boundary alone doesn't break Arabic
+    // shaping in a modern engine, only an inserted character would) — check on the browser checklist regardless
+    // (docs/lesson-8/05 §2), since a highlighted "qaa" must stay joined to the "la" after it.
+    glyphBox.textContent = '';
+    unitsFor(names, entry).forEach((text, i) => {
+      const unit = document.createElement('span');
+      unit.className = `unit ${stateFor(i, step)}`;
+      unit.textContent = text;
+      glyphBox.append(unit);
+    });
 
     if (step.kind === 'letter') {
       const [key, id] = entry.root[step.upto - 1];
       const found = names.get(key);
       const m = marks.markOf(id);
-      caption.textContent = fill(section.dataset.letterLine, {
+      // A letter with a jazam has no sound of its own to say (docs/lesson-14/03 §6): it gets its own line, which
+      // names the letter and the mark and says what the jazam does. The blend step after it reads the closed syllable.
+      // A letter with a shadda is said twice (docs/lesson-15/03 §5): its own line too, naming what it does.
+      let template = section.dataset.letterLine;
+      if (m.id === 'sukun' && section.dataset.jazamLine) template = section.dataset.jazamLine;
+      else if (m.id.startsWith('shadda') && section.dataset.shaddaLine) template = section.dataset.shaddaLine;
+      caption.textContent = fill(template, {
         name: found ? found.name : key, mark: marks.nameOf(m, shell), sound: entry.syll[step.upto - 1],
       });
     } else {

@@ -117,6 +117,19 @@
           </svg>
           <span data-words="Exercise: back to the lesson button">Back to Lesson 6</span>
         </a>
+        <!-- fixes/lesson 6/bugs.txt, 2026-09-27: "there is no next lesson button in paish lesson in the exercise!
+             while there is for others." Lesson 7 now exists, so this links to it; a <button>, not a plain <a>, since
+             exercise.js wires every exercise page's Next the same way mark-lesson.js's own Next button already works
+             (a real link once the next lesson is built, a "not built yet" note until then). -->
+        <button class="button primary next" type="button"
+                data-next-zabar="Next: Tanween" data-next-fatha="Next: Tanween"
+                data-soon="The next lesson isn’t built yet."
+                data-words-attr="data-next-zabar|Next lesson button (zabar names);data-next-fatha|Next lesson button (fatha names);data-soon|Next lesson button: not built yet note">
+          <span></span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
       </div>
     </footer>
   </main>

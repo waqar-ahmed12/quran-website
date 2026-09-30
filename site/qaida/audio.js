@@ -80,27 +80,63 @@
     const list = [{ kind: 'letters', say: (name) => name }];
     const marks = window.qaidaMarks;
     if (!marks) return list;
+    // A kind is listed once (docs/lesson-9/03 §8): khari zabar shares Lesson 8's 'fatha-alif' sound ("baa" again),
+    // so without this a built Lesson 9 would add the same recording group a second time.
+    const seen = new Set(['letters']);
     for (const mark of Object.values(marks.MARKS)) {
       if (!shell.LESSONS.some((lesson) => lesson.n === mark.lesson && lesson.built)) continue;
-      // Keyed by mark.audio and never by the student's chosen word for the mark: the recordings are global.
-      list.push({ kind: mark.audio, say: (name) => `The sound of ${name} with ${mark.names.fatha} — not its name` });
+      if (seen.has(mark.audio)) continue;
+      seen.add(mark.audio);
+      // When a kind is shared (Lessons 9 and 11 share 'damma-waw'), the built row whose id is the kind names it.
+      const built = (m) => shell.LESSONS.some((lesson) => lesson.n === m.lesson && lesson.built);
+      const owner = Object.values(marks.MARKS).find((m) => m.id === mark.audio && built(m)) || mark;
+      // Keyed by mark.audio and never by the student's chosen word for the mark: the recordings are global. A mark
+      // with a lead (Lesson 14's alif with fatha) needs the teacher told to say it: "ab" is the alif's "a" and the
+      // letter closed, never the letter alone (docs/lesson-14/03 §9).
+      // Lesson 15's shadda has a lead too, but its sound is not closed: it is the closed sound AND the opened one, "ab-ba"
+      // (docs/lesson-15/03 §8).
+      let say = (name) => `The sound of ${name} with ${owner.names.fatha} — not its name`;
+      if (marks.leadOf(owner, 'madani')) {
+        say = owner.id.startsWith('shadda')
+          ? (name) => `The doubled sound, as in "ab-ba": alif with fatha, then ${name} with ${owner.names.fatha}, said twice — not the letter's name`
+          : (name) => `The one closed sound: alif with fatha, then ${name} with ${owner.names.fatha} — not the letter's name`;
+      }
+      list.push({ kind: mark.audio, say });
     }
     return list;
   }
 
+  // The mark a group's sound belongs to, if any (docs/lesson-8/03 §8): `kind` is mark.audio, which is mark.id for
+  // every mark today. Used to honour `skip` (Lesson 8's alif and hamza are never written, so there is no "baa"
+  // sound to want) and to show the composed glyph rather than the bare key.
+  function markForKind(kind) {
+    const marks = window.qaidaMarks;
+    if (!marks) return null;
+    const all = Object.values(marks.MARKS);
+    // Lessons 9 and 11 share one recording group ('damma-waw'): the row whose id is the kind wins, so the teacher
+    // sees the plainer spelling and not Lesson 9's ulta paish (docs/lesson-11/03 §6).
+    return all.find((m) => m.id === kind) || all.find((m) => m.audio === kind) || null;
+  }
+
   function wanted() {
+    const marks = window.qaidaMarks;
     const rows = [];
     for (const { kind, say } of groups()) {
+      const mark = markForKind(kind);
+      const skip = (mark && mark.skip) || [];
       const seen = new Set();
       for (const script of ['madani', 'indopak']) {
         for (const [glyph, name] of shell.lettersOf(script)) {
           const key = shell.keyOf(glyph);
-          if (seen.has(key)) continue;
+          if (seen.has(key) || skip.includes(key)) continue;
           seen.add(key);
           rows.push({
             kind,
             key,
-            glyph: key,
+            glyph: key, // the manifest key (recordings.js writes groups[kind][glyph]) — always the bare letter
+            // What the teacher SEES beside the sound's description: the composed glyph for a mark's own group
+            // ("baa", not the bare letter, beside "Baa with fatha and alif"), the bare letter for the letters' own names.
+            display: mark ? marks.leadOf(mark, 'madani') + marks.glyphOf(key, mark) : key, // Lesson 14's shows its lead: what the teacher will say
             name,
             say: say(name),
             slug: SLUGS[key] || key,

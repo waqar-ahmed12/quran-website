@@ -49,6 +49,7 @@
   <script src="practice.js" defer></script>
   <script src="marks.js" defer></script>
   <script src="mark-lesson.js" defer></script>
+  <script src="spell.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
   <script src="qaida-options.js" defer></script>
@@ -337,6 +338,46 @@
 
     <!-- No "Spell a word" section: tanween only ever happens at the end of a word in real text, and this lesson
          teaches the letter and the mark, not words (docs/lesson-7/01 §3). -->
+
+    <!-- Real words, made only from letters and marks taught so far: the traditional spelling method, the same block
+         as every mark lesson's (spell.js). Added 2026-09-28 (fixes/lesson 7/fixes.txt: "there is no walkthrough
+         words for all tanween"). Two paish and two zair only: a word ending in two zabar is written with an alif
+         after it (docs/lesson-10/07 §7), and the alif is the next lesson. The words are candidates, to be checked. -->
+    <section class="spell" aria-labelledby="spell-title"
+             data-word-label="Word {n} of {total}" data-word-button="Word {n}"
+             data-letter-line="{name} with {mark}: {sound}." data-blend-line="Put together: {sound}."
+             data-whole-line="The whole word: {sound}." data-meaning-line="It means “{meaning}.”"
+             data-words-attr="data-word-label|Spell it: which word, of how many ({n} and {total} are filled in);data-word-button|Spell it: a word's own button, for a screen reader ({n} is filled in);data-letter-line|Spell it: naming a letter ({name}, {mark} and {sound} are filled in);data-blend-line|Spell it: a blend so far ({sound} is filled in);data-whole-line|Spell it: the finished word ({sound} is filled in);data-meaning-line|Spell it: what the word means ({meaning} is filled in)">
+      <div class="section-head">
+        <p class="eyebrow" data-words="Spell it: step label">Step 3</p>
+        <h2 class="section-title" id="spell-title" tabindex="-1" data-words="Spell it: heading">Spell a word</h2>
+        <p class="section-guide" data-words="Spell it: guide line">Put letters together, one at a time, to read a real word.</p>
+        <p class="section-guide" data-words="Spell it: two zabar note">Words ending in two zabar come after the next lesson, because they are written with an alif.</p>
+      </div>
+
+      <div class="spell-words" role="group" aria-label="Which word">
+        <p class="spell-words-label"></p>
+        <div class="spell-words-nav"></div>
+      </div>
+
+      <div class="spell-stage" role="group" aria-labelledby="spell-title">
+        <p class="spell-glyph" lang="ar" dir="rtl" aria-hidden="true"></p>
+        <p class="spell-caption" role="status" aria-live="polite"></p>
+        <p class="spell-meaning" hidden></p>
+      </div>
+      <div class="spell-controls">
+        <button class="button quiet spell-back" type="button" data-words="Spell it: back button">Back</button>
+        <button class="button primary spell-next" type="button" data-words="Spell it: next button">Next</button>
+        <button class="button primary spell-restart" type="button" hidden data-words="Spell it: start over button">Start over</button>
+        <button class="button primary spell-nextword" type="button" hidden data-words="Spell it: next word button">Next word</button>
+      </div>
+
+      <div class="spell-more">
+        <h3 class="spell-more-title" data-words="Spell it: more words heading">More words to read</h3>
+        <p class="spell-more-guide" data-words="Spell it: more words guide line">Twelve more, ending in two paish or two zair — no translations, just reading.</p>
+        <a class="button quiet" href="exercise-7.html" data-words="Spell it: more words link">Practice reading →</a>
+      </div>
+    </section>
 
     <footer class="lesson-end">
       <!-- The star and its rules draw into place once the lesson says you seem ready. -->

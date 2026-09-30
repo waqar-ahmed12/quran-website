@@ -39,7 +39,9 @@
       letter.className = 'glyph-cell';
       letter.lang = 'ar';
       letter.dir = 'rtl';
-      letter.textContent = row.glyph;
+      // The composed glyph where there is one (docs/lesson-8/03 §8): "baa" beside "Baa with fatha and alif", not the
+      // bare ب the manifest is actually keyed by (row.glyph, untouched below).
+      letter.textContent = row.display || row.glyph;
 
       tr.append(
         number,

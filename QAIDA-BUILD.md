@@ -10,9 +10,112 @@ Qaida with one line: the current step, its skills, and the next step.
 
 ## Where we are
 
+**Step P1, Lesson 15 (shadda / tashdeed), is built — the first lesson of the second pass** (2026-09-29, the user:
+"please build the next lesson", taken as the yes to the second pass and to building it before launch that
+`docs/pass-2/03` §1–2 waited on). `lesson-15.html` and `exercise-15.html`; the rows are `shadda-fatha`, `shadda-kasra` and
+`shadda-damma` in `marks.js` (a set, `shadda`), the first with **two marks on one letter as `cp`** (a list; vowel first,
+shadda last, so the halo rings the shadda). Lessons 4–14 are proved identical by a fifth hash fence (2160 lines, both
+scripts). **The spec's kasra premise did not survive measuring:** Scheherazade New and Noto Naskh both draw a kasra under a
+shadda **above** the letter, and only Amiri Quran draws it below (`docs/lesson-15/02` §3, filled in). So `sits` is above
+in both scripts and the per-script `sits` was not built; the board says printed Qaidas differ. **The home is now two
+parts and 29 lessons** (`shell.js` rows 15–29, `part: 2`; `home.js` headings; 16–29 say "Not built yet"). Lesson 14's Next
+is an ordinary Next to Lesson 15 (its `data-last` is gone). All 17 check scripts pass. **Still the user's:** the kasra with
+the shadda against a printed Qaida, the halo on the shadda, the hum line, the words, and see "Step P1 built — Lesson 15" in
+the step log. **Left undone, and a decision:** the first-pass pages still say "Lesson N of 14" with a 14-dash track.
+**Next: Lesson 16 (hamza)**, which needs its full folder first (`docs/lesson-16/` is one plan file) and is the first
+lesson on a new page type (`docs/pass-2/02` §1).
 **Steps 1–5 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing, Lesson 2 with the
 practice engine (`practice.js`) that lessons 4–14 reuse, and Lesson 3, letter shapes. Steps 4 and 5 have not been seen
 in a browser yet.
+
+**The second pass is planned: lessons 15–29, from shadda to reading the last surahs** (2026-09-28, the user: "okay,
+plan for shadda too, and the ones that are left for the quran"). `docs/pass-2/` is the map, and **Lesson 15 (shadda)
+is specified in full** in `docs/lesson-15/`. Lessons 16–29 have one plan file each. Every claim about how the two
+scripts print a rule was **checked against Quran.com's own text** (`docs/pass-2/01`). Nothing was written to `site/`.
+**Waiting on the user:** yes to the fifteen lessons, and whether to build them before launch (`docs/pass-2/03` §1–2,
+recommended). See **"Second pass planned — lessons 15 to 29"** in the step log.
+
+**Lessons 11, 12, 13 and 14 are each planned in a folder of their own** (2026-09-28, the user: "please plan out
+every lesson seperately"): `docs/lesson-11/` to `docs/lesson-14/`. Nothing was written to `site/`. Planning them one
+by one corrected the phase map in three places: **Lesson 11's two scripts disagree about a mark** (Indo-Pak puts a
+jazam on the long-vowel wow, Madani leaves it bare); **Lesson 13 puts the zair and the yaa's bowl below the line side
+by side**, which must be measured first; and **Lesson 14's item needs a lead** (اَبْ) that is drawn but never asked,
+so the ids and `masteredCount` stay as they are. **Build order: 11, 12, 13, then 14 after the user signs off on
+`docs/lesson-14/07` §1.** See **"Step 9 planned — lessons 11 to 14, one folder each"** in the step log.
+
+**Step 9, Lesson 14 (the jazam), is built — step 9 is now built in full** (2026-09-29, the user: "go ahead and build
+next lesson if it is planned, if not, just tell"). It was planned, but **waiting on the user's sign-off on `docs/lesson-14/07`
+§1** (one lead or three). "Build it" was taken as a yes to that section's recommendation, as lessons 4–13 took theirs:
+**(a), one lead, ا with zabar, drawn in front of every item, never asked, never in an id.** If the teacher wants option
+(b) (three leads, 81 recordings), (a) is a step towards it: the lead is already a field. `lesson-14.html` and
+`exercise-14.html`; the row is `sukun` in `marks.js`, with `lead: [U+0627, U+064E]` and a new `leadOf`. **The lead is
+the new code:** eight draw sites, a fourth fence (2000 lines of items, twins, board rows and samples of lessons 4–13,
+hashed before `leadOf` existed and unchanged after it), and the Madani jazam (U+06E1) on all 27 letters. Measured in the
+browser pane: nothing clips (tightest 13.9px at 1100px, 9.2px at 375px), no overflow, no uneven row, both scripts, default
+and Large. **Two things found:** in Madani, Scheherazade New re-draws laam when the jazam follows it, so the halo's
+before-and-after diff rang the whole letter (0.47 × 1.03em instead of 0.26 × 0.17em) — fixed in `markBox` for a tile with
+a lead only; and the halo on Madani laam is now 0.35 × 0.20em, a little large. **Yours to look at:** اَبْ against اَبَ
+at the tile's size, the halo on laam, the leads line, and every word. See **"Step 9 built — Lesson 14"** in the step log.
+**Next: nothing in this part.** The first pass is done; steps 10–13 (recordings, finish screen, polish, audit) or the
+second pass (`docs/pass-2/`, Lesson 15 shadda) come next, the user's choice.
+
+**Step 9, Lesson 13 (zair and yaa, the long "ee"), is built** (2026-09-29, the user: "continue building. i guess we
+are on lesson 13"). `lesson-13.html` and `exercise-13.html`; the row is `kasra-yaa` in `marks.js` — Lesson 11's shape
+(same-sound tile: Lesson 9's khari zair, never an answer; minimal pair against Lesson 12) with Lesson 12's letter
+(two `forms`, id `letter + U+0650 U+064A U+0652`, neither script's drawing). Lessons 4–12 are proved identical by a
+third hash fence (726 items). **The spec's warning came true, and is fixed in `qaida.css`:** the below-the-line row
+rule forced the tall ratio onto the wide tail tile, so it came out 1.5× taller than its neighbours (176px against
+117px), the "row drops" trap. One new rule fixes it — and **also repairs Lesson 9's Madani khari zair rows, all 7 of
+which were uneven** (the same bug, found by accident). Measured after the fix, in the browser pane: no uneven row,
+nothing clipped, no overflow, both scripts, default and Large, at 1280px and 375px; the zair and the yaa never touch.
+Tightest: 4px in the drill's prompt (Madani, عِي, Large, phone). **Yours to look at:** that tightest case, the
+words (all Claude's candidates), and the halo on the yaa. See **"Step 9 built — Lesson 13"** in the step log.
+**Next: Lesson 14 (jazam)** — it waits on your choice of one lead or three (`docs/lesson-14/07` §1).
+
+**Step 9, Lesson 12 (zabar and yaa, "ai"), is built** (2026-09-29, the user: "build the next lesson in like, i will
+check them out later for mistakes. if there is none, tell me"). `lesson-12.html` and `exercise-12.html`; the row is
+`fatha-yaa` in `marks.js`, **the first with two `forms` entries** — the yaa is a letter the scripts write differently
+(Madani ي, Indo-Pak ی, dotless at the end), so both scripts draw the tail from `forms` while the id stays one
+(`letter + U+064E U+064A U+0652`, neither script's drawing). Lessons 4–11 are proved identical by a second hash fence
+(672 items). Measured in the browser pane: nothing clips (tightest 11.9px clear, Madani, at default and Large), and
+laam + yaa is two letters, not a fused shape, in both faces. **Two things it cannot tell you, which are yours:** the
+words (all Claude's candidates) and whether the halo sits well on the yaa. See **"Step 9 built — Lesson 12"** in the
+step log. **Next: build Lesson 13 (zair and yaa)** from `docs/lesson-13/` (it needs Lesson 12's row and puts
+بِي against بَيْ), then Lesson 14 after the user signs off on `docs/lesson-14/07` §1.
+
+**Step 9, Lesson 11 (paish and wow, the long "oo"), is built** (2026-09-29, the user: "please build the next lesson
+in line"). `lesson-11.html` and `exercise-11.html`; the row is `damma-waw` in `marks.js` (a fourth `Object.assign`,
+since it borrows Lesson 9's `same` and damma's `first`). Three new things, all checked: the **same-sound tile**
+(ulta paish, Lesson 9's spelling of the same "oo") sits on part 1's feature row and is never an answer; the board's
+**jazam line has one wording per script** (Madani writes بُو with a bare wow, Indo-Pak بُوْ with a jazam), which
+lessons 12–14 reuse; and `audio.js` lets Lessons 9 and 11 share one recording group. Lessons 4–10 are proved
+identical by a hash fence in `qaida-check.js`. See **"Step 9 built — Lesson 11"** in the step log. **Next: build
+Lesson 12 (zabar and yaa)** from `docs/lesson-12/`, after the user's look at Lesson 11.
+
+**Step 9, Lesson 10 (zabar and wow), is built, and step 0's loose ends are landed** (2026-09-28, the user: "go
+ahead, and build the next step or lesso"). The home no longer locks anything; Lesson 7 has its words and
+`exercise-7.html`; Lesson 3's joined shapes are visibly joined (با، بد، بو; بـ ـبـ ـب) and group 1 has a next-group
+button. Lessons 8 and 9 are still **not committed** — the user's call. See **"Step 9 built — step 0 and Lesson 10"**
+in the step log.
+
+**Step 9 was planned: Lesson 10 (zabar and wow) was specified** (2026-09-28, the user: "jsut plan the next
+phase, ill check later on"). `docs/step-9/README.md` maps the whole phase (lessons 10–14) and lists **five loose ends
+to land first** — commit lessons 8 and 9, a look at lessons 7–9, Lesson 7's missing words, the home's locks (still
+there, against the user's own "nothing is locked"), and Lesson 3's notes. `docs/lesson-10/` is the full spec. See
+**"Step 9 planned — Lesson 10"** in the step log.
+
+**Step 8, Lesson 9 (standing harakaat), is built** (2026-09-28, the user: "start building the next lesson in line" —
+taken as a yes to `docs/lesson-9/07` §0's recommendation, built without waiting for a separate look at lessons 7 and
+8 first, since neither the browser checklist blocks the build). The one new idea, built as specified: **the two
+scripts write these marks with different characters** (Indo-Pak بٰ بٖ بٗ; Madani بَٰ بِۦ بُۥ) — `marks.js` gained
+`forms`, `formOf` and `drawnOf`, and every call site that draws a glyph (`mark-lesson.js`, `spell.js`, `exercise.js`)
+goes through them, while `suffixOf` (the id) stays the Indo-Pak code point alone, unread by any of it. See **"Step 8
+built — Lesson 9"** in the step log for where the build differs and what is still the user's own to check.
+
+**Step 8, Lesson 8 (zabar and alif), is built** (2026-09-27, the user: "there should be lesson 8 plan, start
+building" — the plan already existed; this session did the four pending fix notes first, `docs/lesson-8/06` §2's
+own step 0, then the ten build steps in order). See **"Step 8 built — Lesson 8"** in the step log below for what
+changed, where the build differs from the spec, and what is still the user's own to check in a browser.
 
 **Step 8, Lesson 7 (tanween), is built** (2026-09-27, the user, choosing to build it despite the standing "plain no":
 lessons 4–6's own tile-size question was still open at the time — see "Step 8 built — Lesson 7" in the step log for
@@ -109,12 +212,26 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 5 | **Lesson 3, letter shapes.** Easy shapes to hard ones, then start / middle / end | `minimalist-ui`, `ui-ux-pro-max` | **Built, awaiting sign-off** (2026-09-20). Six groups and a table; `docs/lesson-3/README.md` lists where the code differs. Checks: `node tools/qaida-check.js`, `node tools/qaida-lesson3-check.js`. **The joined shapes have not been seen rendering** — that is the first thing to look at |
 | 6 | **Lessons 4–6: zabar, zair, paish,** each with its exercise and mixed review | `ui-ux-pro-max`, `full-output-enforcement` | **Lesson 4 built 2026-09-20, awaiting the user's preview** (`docs/lesson-4/` is the spec; `README.md` there lists where the build differs). **Lesson 5 built 2026-09-20, awaiting the user's preview** (`docs/lesson-5/` — the differences only; it assumes `docs/lesson-4/`; `README.md` there lists where the build differs). **Lesson 6 built 2026-09-21, awaiting the user's preview** ("next lesson plan is up, build it up" — taken as a yes to `docs/lesson-6/06`'s recommendations, including §0: built before 4 and 5 were previewed; `docs/lesson-6/` is the spec, seven files). One page file, `mark-lesson.js`, serves all three lessons. Mixed review carries through every later lesson (2026-09-19). Lesson 6 has the Say it block from step 7, added at the merge (2026-09-27). Checks: `node tools/qaida-check.js`, `qaida-marks-check.js` (Lesson 4's page), `qaida-lesson5-check.js`, `qaida-lesson6-check.js`, `qaida-lesson3-check.js` |
 | 7 | **Say it and listen back:** the student records their own voice and plays it against the teacher's, **in every lesson** | `ui-ux-pro-max`, `minimalist-ui` | **Built 2026-09-24, awaiting the user's preview.** Specified in `docs/your-voice/`; the step log below lists where the build differs. *Was step 10;* moved here at the user's request — *"i want it in every lesson, because thats important"* — so lessons 6–14 are born with it instead of being retrofitted. Check: `node tools/qaida-voice-check.js` |
-| 8 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | Was step 7. **Lesson 7 specified 2026-09-21, not built** — `docs/lesson-7/`, seven files, the differences only. **Do not build before lessons 4–6 have been previewed** (`docs/lesson-7/06` §0). The scripts' difference is **font-only**: same three code points, drawn stacked in Indo-Pak and side by side in Madani, so it cannot show until the Indo-Pak font blocker is fixed at step 13 (`docs/lesson-7/02` §5) |
-| 9 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Was step 8. Answered 2026-09-20: **jazam stays last**, after leen |
+| 8 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | Was step 7. **Lesson 7 built 2026-09-27, awaiting the user's look** (`docs/lesson-7/`; see "Step 8 built — Lesson 7"). The scripts' tanween difference is **font-only**, so it cannot show until the Indo-Pak font blocker is fixed at step 13 (`docs/lesson-7/02` §5). **Lesson 8 built 2026-09-27, awaiting the user's look** — `docs/lesson-8/`, eight files; see "Step 8 built — Lesson 8" for where the build differs and the four pending fixes it was built after. Checks: `node tools/qaida-check.js`, `qaida-lesson8-check.js`, `qaida-words-check.js` (new). **Lesson 9 built 2026-09-28, awaiting the user's look** — `docs/lesson-9/`, eight files; see "Step 8 built — Lesson 9" for where the build differs. **Step 8 is now built in full** (lessons 7, 8 and 9). Checks: `node tools/qaida-check.js`, `qaida-lesson9-check.js` (new), `qaida-words-check.js` |
+| 9 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Was step 8. Answered 2026-09-20: **jazam stays last**, after leen. **Planned 2026-09-28:** `docs/step-9/README.md` (the phase, and a step 0 of five loose ends), `docs/lesson-10/` (Lesson 10's full spec). **Step 0 landed and Lesson 10 built 2026-09-28, awaiting the user's look** — see "Step 9 built — step 0 and Lesson 10". Checks: `node tools/qaida-lesson10-check.js` (new), and every other one. **Lesson 11 built 2026-09-29, awaiting the user's look** — see "Step 9 built — Lesson 11"; `node tools/qaida-lesson11-check.js` (new). **Lesson 12 built 2026-09-29, awaiting the user's look** — see "Step 9 built — Lesson 12"; `node tools/qaida-lesson12-check.js` (new). **Lesson 13 built 2026-09-29, awaiting the user's look** — see "Step 9 built — Lesson 13"; `node tools/qaida-lesson13-check.js` (new). **Lessons 11–14 planned 2026-09-28, one folder each** (`docs/lesson-11/` to `docs/lesson-14/`), see "Step 9 planned — lessons 11 to 14". **Lesson 14 built 2026-09-29, awaiting the user's look — step 9 is now built in full** (built on `07` §1's recommendation, one lead, without a separate sign-off: see "Step 9 built — Lesson 14"); `node tools/qaida-lesson14-check.js` (new) |
 | 10 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Was step 9. Each lesson adds its rows to the recording list as it's built |
 | 11 | **Finish screen:** a mark for each finished lesson, and a last screen pointing to one-to-one lessons | `minimalist-ui` | |
 | 12 | **Polish:** spacing, lettering, motion | `high-end-visual-design` | |
 | 13 | **Audit and connect:** keyboard, screen readers, phones, MASTER.md's checklist; options panels and `recordings.html` removed; a licensed Indo-Pak font in place of the Noto Naskh stand-in | `web-design-guidelines` | The landing page's three Free Qaida links were pointed at `qaida/` early, 2026-09-18 |
+
+**The second pass** (planned 2026-09-28, `docs/pass-2/README.md` §5) is **steps P1–P5**, lessons 15–29. **Proposed:**
+they run after step 9 and **before** steps 10–13, which finish the whole Qaida once (the recordings, the finish screen
+after Lesson 29, polish, the audit). The numbers 10–13 stay as they are, so every existing reference to them stays
+true. **The Indo-Pak Qur'an font moves from step 13 to P3** (Lesson 23, the first real verses). Not adopted until the
+user says so.
+
+| Step | Lessons | What is new | Skills |
+|---|---|---|---|
+| P1 | 15 shadda | two marks on one letter; a mark whose place differs by script; the home in two parts | `ui-ux-pro-max`, `full-output-enforcement` |
+| P2 | 16–22 | the rule page (`rule-lesson.js`, born in 16); the Qur'an's own words (18); "tap the letter" (21) | `ui-ux-pro-max`, `full-output-enforcement` |
+| P3 | 23 Al-Fatiha | the verse page; the Qur'an fonts | `ui-ux-pro-max`, `high-end-visual-design` |
+| P4 | 24–28 | tajweed on the rule page; recordings become the test | `ui-ux-pro-max`, `full-output-enforcement` |
+| P5 | 29 the last surahs | a surah picker; the last lesson | `minimalist-ui` |
 
 ## Skills on this PC
 
@@ -901,6 +1018,551 @@ exercise".*
 table (4 × 3, full rows), the panel and its sections, the chooser ticked, the three links on each exercise page,
 the walkthrough's buttons, a tapped tile's ring on lessons 5 and 6, zair under ا ب ت ث and the dotted circle in
 Scheherazade New. **Not yet seen by the user.**
+
+### Step 8 built — Lesson 8, zabar and alif
+
+*2026-09-27. The user: "there should be lesson 8 plan, start building" (the plan already existed, `docs/lesson-8/`
+below). Built in the order `docs/lesson-8/06` §2 sets out: the four pending fixes first (step 0), then the lesson
+itself, checking after each step.*
+
+**Step 0 — the four pending fixes, first.**
+
+1. **The walkthrough's reshape** (`fixes/lesson 4 5/`, "should be animated, and be shown in complete word and the
+   word that is being read is highlighted"). `spell.js`'s `paint()` used to slice the word down to the current
+   step (`glyphFor(names, entry, upto)`); it now draws the WHOLE word every step, as one span per letter
+   (`unitsFor`), and gives each a state — `active` (the part being read right now, lit and animated in),
+   `read` (already covered), `unread` (not reached yet, dimmed). A `letter` step lights one letter; a `blend`
+   step lights the whole run just put together, as one piece, so a highlighted syllable inside a longer word stays
+   visually joined to what comes after it; the FINAL blend settles every letter to plain `read` rather than
+   staying lit. `qaida.css` gained the three states and one `@keyframes` entrance (opacity only — no `transform`
+   and no `inline-block`, since either would risk breaking the Arabic shaping across the span boundary; kept
+   `prefers-reduced-motion`-aware). Verified live: `کَتَبَ` steps through all five states correctly (letter, letter,
+   blend-both-active, letter, blend-final-all-read) and the full word is visible from the first step.
+2. **The zair tile's height** (`fixes/lesson 6/`, "why is the zair box is weird", and `fixes/lesson 7/`, "two zair
+   brings the box down" / "two zair out of place" — all three the same fault). Diagnosed in `docs/lesson-8/06` §2:
+   Lesson 7 moved `[data-sits='below']` from `:root` to the tile itself, so a mixed row (Lesson 6's quartet, Lesson
+   7's last part) gave its one below-sitting tile a taller `aspect-ratio` alone — a flex row doesn't stretch
+   siblings to match, so the taller tile jutted past its neighbours and the row after it visibly dropped. Fixed by
+   reading the whole row: `.pair:has(.mark-tile[data-sits='below']) .mark-tile` applies the taller sizing to EVERY
+   tile in a row that holds a below-sitting mark, not just that one tile. Measured live on Lesson 6 and Lesson 7's
+   last part: every tile in a mixed row now reports the same `offsetHeight`.
+3. **Exercise 6's missing Next** (`fixes/lesson 6/bugs.txt`, "there is no next lesson button in paish lesson in
+   the excercise"). `exercise-6.html` had no Next element at all. `exercise.js` gained the same "real link once
+   built, a note until then" mechanism `mark-lesson.js`'s own Next button already has (reads `shell.LESSONS`, only
+   wired for a `<button>`, so exercise-4/5's already-working static `<a href>` links are untouched); exercise-6.html
+   gained the button, exercise-8.html was built with one from the start.
+4. **Lesson 7's mark names** (`fixes/lesson 7/fixes.txt`, "i don't want fathatain, like no tathnia, and no 'do
+   zabar' — two zabar or two fatha is good"). `marks.js`: fathatain/kasratain/dammatain's `names` became
+   `{fatha: 'two fatha', zabar: 'two zabar'}` etc (and `'two kasra'`/`'two zair'`, `'two damma'`/`'two paish'`);
+   `id`/`audio` kept the Arabic technical terms (folder and key names, never shown to a student).
+   `tools/qaida-lesson7-check.js`'s two literal-name assertions updated to match; both still pass.
+
+**Checked (step 0):** every `node --check`; `qaida-check.js`, `qaida-lesson7-check.js` and the whole existing suite,
+unchanged and passing. **Seen live in the browser pane:** the walkthrough's five states on Lesson 4, uniform tile
+heights on Lesson 6's quartet and Lesson 7's last part, exercise-6 and exercise-8's Next buttons both correctly
+linking or showing "not built yet", and the renamed tanween rail ("Meet two fatha" etc).
+
+**Steps 1–10 — Lesson 8 itself, in the order `docs/lesson-8/06` §2 sets out.** Matches the spec closely; where it
+differs:
+
+- **`marks.js`**: the `'fatha-alif'` row exactly as specified — `cp: 0x064E`, `tail: [0x0627]`, `skip: ['ا', 'ء']`,
+  `against: ['fatha']`, `first` is fatha's six with laam swapped for noon. `suffixOf`/`glyphOf`/`aloneOf` compose
+  the tail; every place an id is built (`itemFor`, `twinItems`, `reviewKeys`'s `earlier`) goes through `suffixOf`
+  now, so the no-tail case (lessons 4–7) is provably unchanged. `allItems` and `boardRows` both honour `skip`.
+  `NEVER_JOIN` (`['د', 'ذ', 'ر', 'ز', 'و']`) is exported for the joined-block example and the board's caption logic.
+- **`shell.js`**: `masteredCount` now tests a SUFFIX (the mark, plus its tail if it has one) rather than a bare code
+  point, matched by id LENGTH — Lesson 8 shares zabar's `cp` with Lesson 4, so without the length test its twins
+  (`بَ`, riding along as review) would count toward Lesson 8's own total. Lessons 4–7 (no `tail`) read exactly as
+  before. Lesson 8's row: `href`, `built: true`, `progress: 'drill'`, `cp: 0x064E`, `tail: [0x0627]`.
+- **`mark-lesson.js`**: `markTile` gained `data-tail` and routes its id/tint through `suffixOf`. The halo
+  (`markBox`/`positionHalos`) draws a tailed mark's two comparison strings from the RIGHT edge, not centred (a
+  tailed glyph is wider, so centring each draw independently would slide the shared letter sideways and the diff
+  would see the whole letter move); the "before" string is the letter with its mark and an invisible joiner
+  (U+200D, Lesson 3's start-shape trick), so the ring isolates the alif alone, not the mark, not the shape change.
+  The cache key gained the stroke's id. `renderBoard`'s joined block, for a tailed mark, shows the part's first
+  joining letter and first non-joining letter side by side (and, only where the tail is exactly an alif, a third
+  example — laam, once it is in the part — for the lam-alif ligature) instead of `joinedOf`'s "same letter twice"
+  (which would draw a made-up word for a tailed mark). Two new elements, `.lam-alif-note` and `.skip-note`
+  (`null` on lessons 4–7, which don't have them), shown once the part holds every letter — a bug found while
+  building: that part has `first: false` but never `every: true` in the one-mark case (only a multi-mark lesson's
+  own last part gets that flag), so the gate is `currentPart().every || !currentPart().first`, not `.every` alone.
+- **`qaida.css`**: `.mark-tile[data-tail]` is wider (`--tile * 1.5`), never taller, at the SAME `aspect-ratio`
+  formula scaled to match — verified live, a tailed tile and its bare/other row-mates report the same height.
+  `:root[data-tailfit='shrink']` is the panel's other choice: ordinary width, the glyph at 0.72 of its size.
+- **`lesson-8.html`**: `lesson-6.html` with `docs/lesson-8/04` applied — `data-board="trio"`, `data-arrows="all"`,
+  `data-titlemark="baa"`, `data-tailfit="wide"`, the board's new `data-lam-alif`/`data-skip-note` attributes and
+  the bar's `aria-valuemax="27"`. `lesson-7.html` needed no change: its Next button already reads `shell.LESSONS`
+  and picked up the new row the moment it said `built: true`.
+- **`audio.js`**: `wanted()` now skips a mark's `skip` letters and carries a `display` field — the COMPOSED glyph
+  (بَا), so the teacher sees it beside "Baa with fatha and alif" rather than the bare letter — kept separate from
+  `glyph`, which stays the bare letter because `recordings.js` also uses it as the manifest's own key
+  (`groups[kind][glyph] = file`); changing what `glyph` itself held would have silently changed the manifest's key
+  scheme for every mark group, not just this one. `recordings.js` reads `display` for its cell text only.
+  `audio/manifest.json` gained `"fatha-alif": {}`. Verified live: 27 rows, composed glyphs, no ا or ء, manifest
+  keys still bare.
+- **`spell.js`**: a `'fatha-alif'` entry in `WORDS` (قَالَ, زَارَ, كِتَابٌ — the three the spec names, docs
+  `05` §3) went through the walkthrough fix above rather than needing a change of its own. `exercise.js`: the
+  twelve-word `'fatha-alif'` entry from `05` §5, unchanged from the spec's own list. Both files now also expose
+  their `WORDS` table on `window` (`qaidaSpellWords` / `qaidaExerciseWords`, moved above their own DOM guards so
+  the data exists even off a page with no `.spell`/`.mashq`), for the new `tools/qaida-words-check.js`.
+- **`qaida-options.js`**: one new row, "Two-letter tiles" (Wider / Same width, smaller letters → `data-tailfit`),
+  shown only when `lesson.hasTail` — a new getter on `mark-lesson.js`'s `window.qaida`.
+- **`exercise-8.html`**: `exercise-6.html` with `docs/lesson-8/04` §8 applied — twelve words (verified live:
+  قَالَ كَانَ صَامَ خَافَ زَارَ سَافَرَ سَاعَدَ بَابٌ دَارٌ طَعَامٌ سَلَامٌ كِتَابٌ, all composed
+  correctly, no rendering errors), a Next button with `data-soon` since Lesson 9 doesn't exist yet.
+- **Not built, as the spec itself recommends leaving for later:** the by-ear question format (waits for
+  recordings, `07` §1); بًا as a second contrast (`07` §7); the teacher's own wording for how "long" is said out
+  loud and how the alif is named when spelling out loud (`07` §4) — all text fields, none of them code.
+
+**Checked, and passing:** every `node --check`; the full existing suite (`qaida-check.js` — including a new Lesson
+8 block: `suffixOf` with and without a tail, the row itself, 27 items none for ا or ء, every id three characters,
+`sizes()` `[6, 27]`, laam only in part 2, eight distinct ids for one letter across every lesson, **300 questions
+run through the real engine — every one about a Lesson 8 item offered its own twin (بَ) among the answers**,
+`masteredCount(8)` counting three known against a record that also holds a mastered twin, `masteredCount(4)`
+unchanged, Indo-Pak glyphs and id-folding, mastery surviving a script switch, `NEVER_JOIN`, no literal combining
+mark in `marks.js`, `lesson-8.html`, `spell.js`, `exercise.js` or `exercise-8.html`, and the home's row —
+`qaida-marks-check.js`, `qaida-lesson5-check.js`, `qaida-lesson6-check.js`, `qaida-lesson7-check.js` (all four
+unchanged), `qaida-lesson3-check.js`, `qaida-voice-check.js`, `qaida-page-check.js`, the new
+`tools/qaida-lesson8-check.js` (the real page in a hand-made DOM: the trio and its arrows, `data-tail` on only the
+marked tile, both new notes hidden in part 1 and shown with real text in part 2, the joined block's two examples
+in part 1 and three in part 2, 250 questions with the twin check again at the page level, right/wrong wording,
+finishing gated by part 2 alone at seven tenths of 27 — part 1 known never finishes it — the name set changing the
+title/board/choices, Indo-Pak, the Spell block stepping قَالَ correctly with Previous going to Lesson 7, the
+options row, and no "29" anywhere on the page), and the new `tools/qaida-words-check.js` (recommended by the spec:
+every word in `spell.js` and `exercise.js`, on every lesson including this one, uses only the 29 letters and only
+marks that lesson has already taught — all pass, three words a lesson in the walkthrough, twelve in the exercise).
+
+**Seen working in the browser pane** (not by the user): the trio and its wider tailed tile (same height as its
+row-mates, verified by measurement), the joined block's two-then-three examples, both new notes appearing only in
+part 2, the halo positioned without error, a live drill question always offering the twin, right and wrong verdicts
+in both name sets, the Indo-Pak kaaf with its tail, the walkthrough's five states, exercise-8's twelve words, the
+home page's card (title, lede, and the "Finish Lesson 7 first" advisory on a locked click), and lessons 4 and 7
+still answering questions with no console errors. **Not seen by the user.** The blocking browser checklist is
+`docs/lesson-8/06` §4 — in particular whether two letters fit a tile at every width, whether لَا reads as one
+shape in both faces and both themes, whether the halo really rings the alif and not the whole pair, and the
+Indo-Pak ہ-joining-to-alif font question `02` §5 already flagged.
+
+### Second pass planned — lessons 15 to 29
+
+*2026-09-28. The user: "okay, plan for shadda too, and the ones that are left for the quran."* **Specified, not built.
+Nothing was written to `site/`.**
+
+- **`docs/pass-2/`**: the map (four files). The test the pass is built to is *can the student read Al-Fatiha?*, and
+  the sequence is shadda → hamza → ة/ى → al- → the joining alif → the wavy line → silent letters → stopping →
+  **Al-Fatiha** → noon/tanween → meem → the bounce → heavy and light → the opening letters → **the last ten surahs**.
+- **`docs/lesson-15/`** (shadda), a full specification, eight files. It is Lesson 7's three-part shape with Lesson 14's
+  lead. The board reads **ب → اَبَ → اَبْ → اَبَّ**: the shadda as the jazam and the vowel together. New: `cp` as a
+  list; a mark whose **place** differs by script with the same code points (a kasra under a shadda: under the letter
+  in Indo-Pak, under the shadda in Madani), which must be measured first.
+- **`docs/lesson-16/` to `docs/lesson-29/`**, one plan file each, expanded into a full folder before each is built.
+- **Three page types** (`docs/pass-2/02`): the mark lesson (15), a new **rule lesson** (born in 16, the Qur'an's own
+  words from 18, a "tap the letter" question from 21, the one change `practice.js` needs), and a new **verse page**
+  (23, 29).
+- **Checked against Quran.com, not memory**: a scratch `node` script fetched 22 verses in both scripts and printed
+  their code points (`docs/pass-2/01`). What it settled:
+  - **Indo-Pak marks the letters that are read** (a long-vowel wow or yaa carries a jazam, and a bare one is not read).
+    **Madani marks the ones that are not** (a small circle). This confirms lessons 11 and 13, whose check is now
+    done (`docs/lesson-11/02` §2).
+  - **Madani prints the noon and meem rules in its marks; Indo-Pak mostly doesn't** (Lesson 24's whole shape).
+  - **Indo-Pak writes a word-start hamza as a bare alif with its vowel** (اَنْعَمْتَ), exactly Lesson 14's lead.
+  - **Both mushafs end a word with a dotless ى**, which answers `docs/lesson-12/07` §1 (Lesson 17 teaches it).
+  - **A correction to Lesson 10:** Quran.com writes the Uthmani sukun as U+0652 and the Indo-Pak as U+06E1, the
+    reverse of `docs/lesson-10/02` §3's assumption. Lesson 10's drawing choice stands (it was measured), and a note
+    is added there.
+  - **Quran.com's Indo-Pak text is tied to its own font** (private-use signs, Arabic-style letters), so **the Indo-Pak
+    Qur'an font is a blocker for Lesson 23**, not only for launch.
+- **Proposed steps P1–P5**, before steps 10–13 (see the note under the steps table). Waiting on the user.
+
+### Step 9 planned — lessons 11 to 14, one folder each
+
+*2026-09-28. The user: "please plan out every lesson seperately."* `docs/step-9/README.md` had planned only Lesson 10
+in full and said the thin lessons (11, 13) would be "planned and built together". Now **every lesson has its own
+folder**, in the shape `docs/lesson-10/` set. **Specified, not built. Nothing was written to `site/`.**
+
+| Folder | Files | The genuinely new thing | Recordings |
+|---|---|---|---|
+| `docs/lesson-11/` (paish and wow) | 8 | **The scripts disagree about a mark:** Indo-Pak writes بُوْ, Madani بُو. `forms` again, and the board's jazam line becomes **one per script** (a one-line change to `mark-lesson.js`, which lessons 12–14 reuse). In Indo-Pak the minimal pair against Lesson 10 is *only* zabar against paish, Lesson 6's hard contrast. Opens a **fourth `MARKS` statement** so lessons 11–14 can borrow from Lesson 9's rows | none |
+| `docs/lesson-12/` (zabar and yaa) | 8 | **The id is neither script's drawing**: the yaa folds to ي (a letter) and the jazam is U+0652 (a mark), so both scripts draw from `forms`, the first row with two. The Indo-Pak yaa is dotless at the end. The yaa's bowl is deeper than the wow's: measure the tile | 27 (`fatha-yaa`) |
+| `docs/lesson-13/` (zair and yaa) | 5 | Lesson 11's shape with Lesson 12's letter. **The zair and the yaa's bowl below the line side by side**, the first tile with two things there. It is the "zair box" family of bugs, so measure first | none |
+| `docs/lesson-14/` (jazam) | 8 | **A lead**: every item is drawn after اَ (a jazam cannot be said alone), and the lead is never asked and never part of an id. `leadOf` plus the lead at eight draw sites; the walkthrough's first letter with no sound of its own; three structural rules in the words check; the last lesson's Next goes back to the Qaida home | 27 (one lead) |
+
+**Three corrections to the phase map**, made in `docs/step-9/README.md`: Lesson 11 is not "nothing structural";
+Lesson 13 is not risk-free; Lesson 14's "pair" is answered by the lead, so the page never needs to know which letter
+it asks about.
+
+**Two small bugs found on the way**, both folded into Lesson 11's build (`docs/lesson-11/06` §2): Lesson 10's jazam
+line says "zabar" as a literal word, so the fatha set reads it too (it should be `{other}`); and `shell.js`'s Lesson 11
+fatha title is "Damma and wow" (it should be "waw", as Lesson 10's was corrected).
+
+**Build order:** 11 (opens the fourth statement and the per-script line), 12, 13 (needs 12's row), then 14. **Lesson
+14 needs the user's answer to `docs/lesson-14/07` §1 first** (one lead, recommended, or three), because it decides
+the ids and whether `masteredCount` changes. Every word in every folder is Claude's candidate, for the teacher's check.
+
+### Step 9 built — step 0 and Lesson 10
+
+*2026-09-28. The user: "go ahead, and build the next step or lesso."* Taken as a yes to `docs/lesson-10/07`'s
+recommendations, and to building without a separate look at lessons 7–9 first (§0 is "not a gate").
+
+**Step 0 (`docs/step-9/README.md` §0), items 3–5.** Items 1 (commit) and 2 (a look) are the user's.
+- **Nothing is locked** (`docs/lesson-2/09-going-in-order.md`, finally built). `shell.isOpen` is gone; `nextUp()` /
+  `inOrder(n)` say which lesson is next, and `state.skipped` remembers "Carry on anyway". The home's cards are
+  *Finished* / *Start here* / *Comes later*, every built lesson a link; the lock icon means only "not built yet".
+  A "later" card opens **the advice once** (`.order-advice` dialog on `index.html`: "This one comes later… Take me to
+  Lesson N · Carry on anyway"; Escape and a click outside count as carry on). **Differs from the spec:** the advice
+  is at the home's door, not on every lesson page — a lesson reached by its URL goes straight in. One dialog, not
+  fourteen copies. *Named `.order-advice` because lesson pages already use `.advice` for the drill's advice strip.*
+- **Lesson 7's words:** a Spell block on `lesson-7.html` (qalamun, rajulun, baladin) and `exercise-7.html`, twelve
+  nouns in two paish and two zair, with one line saying two-zabar words come after the next lesson (`07` §7's
+  recommendation). Candidates, for the teacher's check.
+- **Lesson 3's notes** (`fixes/aunn.txt` problem 1, `fixes/lesson 3/`), none of which had been fixed:
+  - joined shapes drew no join (an invisible joiner), so تـ looked like ـتـ and a joined alif like a lone one.
+    `shapes.FORM` now uses the connecting stroke (U+0640) — بـ ـبـ ـب — and a letter that never joins forward is
+    shown after a baa, as the user asked: با، بد، بذ، بر، بز، بو;
+  - "only 1 of the options show waaw": group 1 is handed each letter's lone shape as a **wrong answer only**
+    (`shapes.wrongOnly`, never asked, never counted), so every question offers "Waaw, joined" beside "Waaw, on its
+    own". No engine change;
+  - "if I know this group… move to the next": a **Go to the next group** button beside "You seem to know this group";
+  - the tick overlapping a two-line name: the name keeps clear of the corner.
+  - *Not changed:* "some words are repeated" ("…, end of a word" on every button) — the position wording is a text
+    field each, and shortening it is the user's call. "Too long for the easiest group" is answered by the button,
+    not by changing the target.
+
+**Lesson 10**, built as `docs/lesson-10/` specifies, with these differences:
+- **`against: ['fatha', 'fatha-alif']`**, taught order, not the spec's alif-first. The quartet then reads the road
+  ب بَ بَا بَوْ, and `{other}` is "zabar" so the board's wording works in both name sets. The drill is unaffected:
+  twins alternate per letter (`data-twins="alternate"`), and the check confirms every "au" question offers its twin.
+- **The jazam was measured** (`02` §3): Scheherazade New draws U+0652 as a small circle and U+06E1 as the Madani
+  mushaf's open head-of-khaa, so **Madani draws U+06E1** through `forms`; ids stay U+0652 (a script switch keeps the
+  credit — checked). Noto Naskh (Indo-Pak stand-in) draws a small circle; unchanged, as `02` §3.4 says.
+- **The tile was measured** (`03` §3): all 27 tiles, both scripts, default and Large — nothing clips; the closest is
+  7px clear. Recorded in `qaida.css`; no rule added.
+- **The lam-alif line** was gated on "has a tail", so it would have shown here: now on "the tail is an alif".
+- **The jazam line** says "in a later lesson" (`07` §6's recommendation), with `{jazam}` = jazam / sukoon.
+- Lesson 10's fatha-set title is "Fatha and waw" on the home too (was "Fatha and wow").
+
+**Still the user's** (`docs/lesson-10/06` §4): does the jazam read as a mark on the wow, and is it the shape your
+mushaf prints; does the halo sit on the wow (it behaves as Lesson 8's does, and at this size wraps most of the item);
+دَوْ standing apart; the walkthrough; the reading page. And the words — every one is Claude's candidate.
+
+### Step P1 built — Lesson 15 (shadda)
+
+*2026-09-29. The user: "please build the next lesson, also tell me where we are in the grand scheme of things".* Built in
+`docs/lesson-15/06` §2's order (page copied from `lesson-14.html`, the lead and all):
+- **The fence first** (`qaida-check.js` §9f6): sha256 of every item, twin, board row and sample of lessons 4–14, both
+  scripts (2160 lines, `68ab91f52e22…`), taken before any change and unchanged after every step; plus `masteredCount` for
+  lessons 4, 5, 6, 8 and 10–14.
+- **The kasra's place was measured before any code** (`02` §3, now filled in): Scheherazade New and Noto Naskh both put a
+  kasra with a shadda **above** the letter, under the shadda; Amiri Quran alone puts it below. SIL's `cv62` (0 / lowered /
+  raised) keeps it above at all three values in Google's copy. Decision: `sits: 'above'` on all three rows, no per-script
+  `sits`, one honest sentence on the board (`data-mark-sits-shadda-kasra`). **This contradicts the spec's assumption about
+  both mushafs; only the teacher's printed Qaida settles which is right.**
+- **`marks.js`:** `cpsOf` (a row's `cp` may be a list; `suffixOf` and `formOf` read it), the three rows and the `shadda`
+  set. The twin's own lead (`leadOf(other) || leadOf(mark)`) was already there from Lesson 14, so `03` §3 needed nothing.
+  Ids are three characters, the letter, the vowel and U+0651, the same in both scripts.
+- **`mark-lesson.js`:** per-mark captions (`data-pair-other-{id}` beats `data-pair-other`; `data-pair-marked-{id}`), a
+  `{c}` token (the featured letter's consonant, so the quartet reads a-ba / ab / ab-ba on baa and a-ti / at / at-ti on
+  taa), `{Set}`, `{jazam}` and `{lead}` tokens, and the hum line (parts with noon or meem only: 1, 3, 4).
+- **The board is a quartet in every part** (`data-board="auto"`, one arrow, before the last tile): the letter, once with a
+  vowel, once closed, twice. In part 4 the middle two are the other two shaddas, all captioned "Twice".
+- **`shell.js` / `home.js` / `index.html`:** `masteredCount` reads a list of lists; rows 15–29; the home in two parts with a
+  heading per part (each its own text field); the title and bar say 29. `.track li` may shrink so 29 dashes fit a phone.
+- **`spell.js` / `exercise.js`:** three walkthrough words (مَرَّ, عَلَّمَ, مُحَمَّدٌ, seven steps, the shadda its own line) and twelve
+  reading words, Claude's candidates as `05` says. `qaida-words-check.js` gained the two shadda rules and proof they fail.
+- **Audio:** three groups in `manifest.json`; `recordings.html` lists 81 more rows (446), each with the lead and told to
+  say the sound twice.
+- **Measured** in the browser pane (every tile of all four parts, prompts and choices, both scripts, 375px and desktop):
+  nothing clips or overflows. One CSS rule was needed: a lesson-only taller tile (`5 / 7.3`), because the phone's tightest
+  gap above a tile was **1.4px** (taa with shadda and paish, Madani) and is now 4.1px at worst. Row heights within a row are
+  even; part 2's rows differ by a wrapped caption on a phone, not by tiles.
+- **Lesson 14's page, exercise and check** were edited: Next is "Next: Shadda" / "Next: Tashdeed" and goes to Lesson 15.
+- **Checks:** `node tools/qaida-lesson15-check.js` (new, 101 checks), the Lesson 15 block and fence in `qaida-check.js`
+  (§9f6, §9l), the words check. All 17 scripts pass.
+
+**Still the user's** (`docs/lesson-15/06` §4): اَبَّ against اَبَ and اَبْ (does the quartet say "both at once"?); **the kasra
+with the shadda against your own printed Qaida**, in both scripts; the halo on the shadda; the hum line in the right parts;
+the home in two parts on a phone; the walkthrough and the reading page; and every word. **A decision left open:** the 14
+first-pass pages say "Lesson N of 14" and draw 14 dashes, which now disagrees with the home's 29.
+### Step 9 built — Lesson 14
+
+*2026-09-29. The user: "go ahead and build next lesson if it is planned, if not, just tell".* It was planned
+(`docs/lesson-14/`, eight files), but the spec said **"needs the user's sign-off on `07` §1 before anything is built"**.
+The instruction to build was taken as a yes to §1's recommendation, **(a) one lead, ا with zabar** — and this is the
+one decision in the build that was not the user's own, so it is recorded here. Built in `06` §2's order:
+- **A fourth fence first** (`qaida-check.js` §9f5): the sha256 of every glyph `allItems`, `twinItems`, `boardRows` and
+  `sampleOf` return for lessons 4–13, both scripts (2000 lines, `b32e84f6ba17…`), taken before `leadOf` existed and
+  unchanged after every later step; plus `masteredCount` for lessons 4, 5, 6, 8, 10–13.
+- **The row** (`marks.js`, fourth `Object.assign`): `sukun`, cp U+0652, `against: ['fatha','kasra','damma']`, `skip` alif
+  and hamza, `lead: [U+0627, U+064E]`, `forms.madani` drawing U+06E1 (Lesson 10's measurement). `id` and `audio` are the
+  Arabic term, never shown. Ids are the letter and U+0652, two characters, **with no lead in them**, so `masteredCount`
+  needed no change: its own ids end in U+0652 and the twins end in a vowel.
+- **`leadOf(mark, script)`** returns `''` for every row but this one, reading a form's own `lead` first (the Madani
+  hamza alternative, `07` §3). It is drawn at every place an item is drawn: `allItems`, `twinItems` (the twin's own lead,
+  else the lesson's), `boardRows`, `sampleOf`, `markTile`, `markBox`, the title glyph, and `audio.js`'s recordings list.
+  `glyphOf` itself did not change. **Two things the spec left out:** `exercise.js` needed the same last-lesson Next as
+  the lesson, and `qaida-words-check.js`'s rules are run through a function that can be shown to fail.
+- **The board** is a trio (بـ → اَبَ → اَبْ), the joined block off, and four new lines: `lead-line` (why the alif is
+  there), `leads-note` (the other two leads, composed in code from the alif and each vowel's own code point), `wy-note`
+  and `skip-note` (part 2 only), and a jazam line per script (Madani: it has only closed a syllable; Indo-Pak: it has also
+  sat on a long vowel; the rule is the same). Every one has its text field through `data-words-attr`.
+- **The walkthrough**: a letter with a jazam gets its own step ("Laam with sukoon: no vowel of its own — it closes the
+  sound before it."), then the blend reads the closed syllable. قَلْبٌ is five steps, as the spec says.
+- **The last Next**: `data-last="Back to the Qaida"` on the lesson and the reading page; it goes to `index.html`. Lesson
+  13's Next, which said "not built yet", now goes to Lesson 14.
+- **Measured** in the browser pane (`02` §4), all 27 letters, both scripts, default and Large, at 1100px and 375px:
+  nothing clips (tightest 13.9px, and 9.2px at 375px), no horizontal overflow, no uneven row, the trio fits a phone (24px
+  minimum gap), and the drill's prompt and choices fit at 375px with the lead. `qaida.css` gained only the new lines' own
+  rules — no tile rule was needed.
+- **A real finding, and its fix.** In Madani, Scheherazade New draws laam differently when the jazam follows it (the string
+  is 6.35px wider at 100px), so `markBox`'s "draw with, draw without, diff" ringed the whole letter: 0.47 × 1.03em, where
+  every other letter is 0.26 × 0.17em. Not a font-loading race (checked: one Arabic subset holds both characters). Fixed
+  for a tile with a lead only, by keeping the highest 0.2em of the new ink; laam is now 0.35 × 0.20em, on the mark and
+  slightly large. Lessons 4–13's halos are measured exactly as before (the branch is gated on `lead`).
+- **Words** (`spell.js`: قُلْ, قَلْبٌ, مَسْجِدٌ; `exercise.js`: twelve, ending in مَكْتُوبٌ, which in Indo-Pak shows two
+  jazams doing the two jobs) are Claude's candidates. None has qalqalah, a noon or meem a tajweed rule changes, a hamza, a
+  shadda or the article.
+- **Audio:** `manifest.json` gains `"sukun": {}`; `recordings.html` lists **27 new rows** (اَبْ, اَتْ…), 338 → 365, each
+  with a line telling the teacher to say the alif and then the closed letter.
+- **Checks:** `node tools/qaida-lesson14-check.js` (new, 91 checks), the Lesson 14 block in `qaida-check.js` (§9f5,
+  §9k), and three new rules in `qaida-words-check.js` (no jazam on a first letter, after another jazam, or on alif). All
+  sixteen scripts pass. No console errors on the lesson, the reading page, the home or the recordings list.
+
+**Still the user's** (`docs/lesson-14/06` §4): بَ against اَبْ and اَبَ at the tile's size (the jazam and zabar sit in the
+same place); the jazam's shape on all 27, both scripts, both themes (Indo-Pak is still Noto Naskh's circle, the known
+launch blocker for step 13); whether the lead reads naturally or crowds the page; the halo on laam in Madani; the leads
+line and the lines under the board; part 2's اَوْ and اَيْ; the walkthrough and the reading page; and every word.
+**Screenshots did not render in this session's browser pane** (the frame came back stale), so nothing above was looked at
+by eye, only measured.
+
+### Step 9 built — Lesson 13
+
+*2026-09-29. The user: "continue building. i guess we are on lesson 13. if there is no plan let me know?"* There was
+a plan (`docs/lesson-13/`, four files). Built in its `03` §4 order, page copied from `lesson-11.html` by script:
+- **A third fence first** (`qaida-check.js` §9f4): the sha256 of every item of lessons 4–12 in both scripts (726
+  lines), taken before the row existed, unchanged after it; plus `masteredCount` for lessons 4, 5, 6, 8, 10, 11, 12.
+- **The row** (`marks.js`, fourth `Object.assign`): `kasra-yaa`, cp U+0650, tail `[U+064A, U+0652]`, `sits: 'below'`,
+  `against: ['kasra', 'fatha-yaa']`, `same: 'standing-kasra'`, `first` khari zair's six (borrowed), `sample: 'ف'` (the
+  title shows فِي), two `forms`: Madani `[U+0650]` + `[U+064A]` (a bare yaa), Indo-Pak `[U+0650]` + `[U+06CC, U+0652]`.
+  Shares the `kasra-yaa` recordings with Lesson 9: **no new rows** (recordings stay at 338), no `audio.js` change.
+- **Measured first, as the spec said** (`02` §4), and it found a real bug. The rule that grows a row holding a
+  below-sitting tile (`.pair:has(.mark-tile[data-sits='below'])`, Lesson 5/7) sets `aspect-ratio: 5 / 7.4` on every
+  tile in the row, **including the wide `data-tail` tile**, which is 1.5× as wide: it came out 176px tall against 117px
+  for its neighbours, the row dropped, in both scripts. `qaida.css` gains one rule (`7.5 / 7.4` for a tail tile in a
+  below row, and the counterpart for the "shrink" option). **The same rule repairs Lesson 9's Madani khari zair part**
+  (checked: 7 of 7 rows uneven with the old ratio, 0 with the new). Nothing else in `qaida.css` changed.
+- **After the fix**, every tile of parts 1 and 2 in both scripts, default and Large, at 1280px and 375px: no uneven
+  row, nothing clipped, no horizontal overflow. Tightest ink-to-edge gap 13.2px (1280px) and 8.3px (375px); the drill's
+  prompt is tightest at **4px** (Madani, عِي, Large, 375px): fits, but close. Zair and yaa never touch (no returning
+  yaa in Scheherazade New or Noto Naskh). No `data-tail-below` rule and no `mark-lesson.js` change was needed.
+- **Words** (`spell.js`: فِيلٌ, دِينٌ, كَبِيرٌ; `exercise.js`: twelve, three with the yaa standing apart after ر) are
+  Claude's candidates, as the spec lists them. No word ends in the yaa, so فِي "in" is not a word here.
+- **Pages:** `lesson-13.html`, `exercise-13.html`; Previous goes to Lesson 12, Next reads "Jazam / Sukoon" and shows the
+  "not built yet" note until Lesson 14 exists. Lesson 12's stale "Lesson 13 is not built yet" comment is fixed.
+- **Checks:** `node tools/qaida-lesson13-check.js` (new, 70 checks) and the Lesson 13 blocks in `qaida-check.js` (§9f4,
+  §9j); all fifteen scripts pass. No console errors on the lesson or the exercise.
+
+**Still the user's** (`docs/lesson-13/03` §6): the halo on the yaa rather than the zair; that 4px prompt case; بَيْ
+against بِي at a glance (and Indo-Pak بَیْ against بِیْ); the same-sound tile wrapped alone on a phone; the
+walkthrough and the reading page; and every word (seven of the twelve are words the Qur'an uses of Allah,
+`docs/lesson-13/04` §2).
+
+### Step 9 built — Lesson 12
+
+*2026-09-29. The user: "build the next lesson in like, i will check them out later for mistakes. if there is none,
+tell me."* Built as `docs/lesson-12/` specifies, in its `06` §2 order (page copied from `lesson-11.html`):
+- **A second fence first** (`qaida-check.js` §9f3): the sha256 of every item of lessons 4–11 in both scripts (672
+  lines), taken before the row existed, unchanged after it; plus `masteredCount` for lessons 4, 6, 8, 10, 11.
+- **The row** (`marks.js`, in the fourth `Object.assign`): `fatha-yaa`, cp U+064E, tail `[U+064A, U+0652]`,
+  `against: ['fatha', 'fatha-waw']`, no `same`, `skip` alif and hamza, and **two** `forms`: Madani `[U+064E]` +
+  `[U+064A, U+06E1]`, Indo-Pak `[U+064E]` + `[U+06CC, U+0652]`. `suffixOf` never reads `forms`, so a switch of script
+  keeps every letter's credit in both directions (checked). `formOf` gained the one-line `cp` fallback
+  (`docs/lesson-12/03` §1); the fence proves it moves nothing.
+- **The board's jazam line** reuses Lesson 11's two attributes: the Madani line, and the same line plus "At the end of
+  a word, the Indo-Pak yaa has no dots: ی." for Indo-Pak. The ی is a letter, so it sits in the attribute.
+- **Measured** (`03` §3), in the browser pane, all 27 letters, both scripts, default and Large: nothing clips or
+  overflows. Tightest clearance below the ink is 11.9px (Madani, baa) and 29.9px (Indo-Pak); no `data-tail-below`
+  rule was needed, so `qaida.css` was **not touched**. **Laam + yaa** (`02` §4) is two letters in Scheherazade New
+  and Noto Naskh, so `first` stays and `07` §7's swap did not arise.
+- **Words** (`spell.js`: بَيْتٌ, زَيْتٌ, عَلَيْهِ; `exercise.js`: twelve, three with the yaa standing apart) are Claude's
+  candidates. No word ends in the yaa.
+- **Audio:** `manifest.json` gains `"fatha-yaa": {}`; `recordings.html` lists **27 new rows**, 311 → 338.
+- **Checks:** `node tools/qaida-lesson12-check.js` (new, 60 checks) and the Lesson 12 block in `qaida-check.js`
+  (§9i); all fourteen scripts pass. No console errors on the lesson, the exercise, the home or the recordings list.
+- **Also fixed:** Lesson 11's two "Lesson 12 is not built yet" comments.
+
+**Still the user's** (`docs/lesson-12/06` §4): بَيْ against بَوْ at a glance; the halo on the yaa; the Indo-Pak
+dotless end and the line under the board; the walkthrough and the reading page; and every word.
+
+### Step 9 built — Lesson 11
+
+*2026-09-29. The user: "please build the next lesson in line."* Built as `docs/lesson-11/` specifies (page copied from
+`lesson-10.html`), with these differences and additions:
+- **The row** (`marks.js`, a fourth `Object.assign` after Lesson 9's): `damma-waw`, cp U+064F, tail wow + jazam,
+  `against: ['damma', 'fatha-waw']` (taught order, so `{other}` is damma/paish in both name sets), `same:
+  'inverted-damma'`, `forms.madani` drawing the wow bare. Ids are letter + U+064F U+0648 U+0652 in both scripts.
+- **A fence first** (`qaida-check.js` §9f2): a sha256 of every item of lessons 4–10 in both scripts (618 lines),
+  taken before the row existed and unchanged after it; plus `masteredCount` for lessons 4, 6, 8, 10.
+- **The jazam line is one per script** (`mark-lesson.js`): `data-template-indopak` / `data-template-madani`, falling
+  back to `data-template`. Madani: "Here the wow has no mark on it…"; Indo-Pak: "The wow carries a {jazam} here too…".
+  Lessons 12–14 will use the same two attributes.
+- **The same-sound tile** ("The same sound: Baa with ulta paish", `data-same`) is on part 1's feature row, after an
+  equals sign, with no halo, and never among the answers (checked over 800 questions). Five tiles in the row.
+- **Two small bugs folded in:** Lesson 10's jazam line said "zabar" as a literal word (now `{other}`); Lesson 11's
+  fatha-set title is "Damma and waw" on the home and on the page.
+- **`audio.js`:** Lessons 9 and 11 share the `damma-waw` recording group (27 rows, no new ones). `markForKind` prefers
+  the row whose id is the kind, so the teacher sees بُو and "damma and waw", not Lesson 9's ulta paish.
+- **Words** (`spell.js`: نُورٌ, رُوحٌ, يَقُولُ; `exercise.js`: twelve, including three with the wow standing apart)
+  are Claude's candidates. Words with a silent alif after the wow (كَفَرُوا) are left out on purpose.
+- **In the browser pane** (375px and 1280px, default and Large, both scripts): nothing overflows; at phone width the
+  feature row wraps 2 / 2 / 1, the same-sound tile alone on the last line. `qaida.css` was not touched. No console
+  errors on the lesson, the exercise or the recordings list.
+- **Checks:** `node tools/qaida-lesson11-check.js` (new) and the Lesson 11 block in `qaida-check.js` (§9h); all
+  thirteen scripts pass.
+
+**Still the user's** (`docs/lesson-11/06` §4): can paish and zabar be told apart at the tile's size in Indo-Pak; the
+same-sound tile and its wrapped position on a phone; the jazam line per script; the halo; the words; the walkthrough.
+
+### Step 9 planned — Lesson 10, and the phase
+
+*2026-09-28. The user: "im a bit busy, jsut plan the next phase, ill check later on."*
+
+**Specified, not built.** Nothing was written to `site/`. Two things:
+
+1. **`docs/step-9/README.md`** — the phase map. Lessons 10–13 are four near-identical lessons on Lesson 8's `tail`
+   and Lesson 9's `forms` and same-sound tile, so each should be a short build; **Lesson 14 (jazam) is the one with
+   real new code** — its item is a *pair* (اَبْ) and the letter asked about is the second one — and gets a full plan
+   of its own. Lessons 11 and 13 need **no new recordings** (they are the same sounds as Lesson 9's ulta paish and
+   khari zair), so the phase costs the teacher 54. **Step 0, before Lesson 10:** commit lessons 8–9; a look at
+   lessons 7–9; Lesson 7's missing words (`fixes/lesson 7/fixes.txt`); the home's locks, still built despite the
+   2026-09-19 decision and `fixes/aunn.txt` problem 3 (and very likely `fixes/qaida interface/`); and Lesson 3's notes
+   in `fixes/aunn.txt` and `fixes/lesson 3/`, which the step log never records as fixed.
+2. **`docs/lesson-10/`** — seven files and a README, thin like `docs/lesson-8/` and `docs/lesson-9/`. One row
+   (`'fatha-waw'`: zabar, `tail: [wow, jazam]`, 27 letters, `against: ['fatha-alif', 'fatha']`, a quartet board).
+   **The one genuinely new thing: the jazam appears four lessons before it is taught**, carried inside the tail as
+   part of the pattern and named in one line on the board — which also means the words check needs no new rule. Two
+   things to **measure before building**: whether the Madani face draws the mushaf's sukun (U+06E1) differently from
+   U+0652 (if so, Lesson 9's `forms` carries it and the id does not change), and whether the wow's descender clips in
+   Lesson 8's wide tile.
+
+**Eight questions for the teacher**, none blocking: `docs/lesson-10/07-open-questions.md`. The words (three walked
+through, twelve for `exercise-10.html`) are Claude's candidates.
+
+### Step 8 built — Lesson 9, standing harakaat
+
+*2026-09-28. The user: "start building the next lesson in line."* `docs/lesson-9/07` §0 recommended a short look at
+lessons 7 and 8 in the browser first (neither had been seen by the user); nothing in the plan depended on that
+answer, only the browser checklist, so the build went ahead. Followed `docs/lesson-9/06` §2's order exactly,
+checking after every step: the fence first, then `formOf`/`drawnOf`, then the three rows, then `shell.js`,
+`mark-lesson.js`, `lesson-9.html`, audio, the words, the options panel, `qaida.css`.
+
+**The one genuinely new idea, built as specified: a mark the two scripts write with different characters.**
+`marks.js` gained `forms` (only on the three new rows — every earlier mark has none), and `formOf`/`drawnOf`
+generalise `suffixOf`/`glyphOf`/`aloneOf`: `suffixOf` (the id) never reads `forms` and stays exactly the Indo-Pak
+code point, so a switch of script keeps every letter's credit with no change to `shell.masteredCount`. **The fence
+written first, before any of the three rows existed** (`tools/qaida-check.js`), proves `drawnOf(mark, script) ===
+suffixOf(mark)` for all seven marks of lessons 4–8, in both scripts, and that every one of their glyphs is
+byte-for-byte what it was before `formOf` existed — it still passes, unchanged, after everything else below.
+
+**Where the build differs from `docs/lesson-9/`:**
+
+1. **The "where you will meet it" line's example word is a small local table in `mark-lesson.js`** (`MET_WORDS`),
+   not a reach into `spell.js`'s own word list by key as `04` §4 suggested. Three short `[key, markId]` pairs — the
+   same words the walkthrough and the exercise page already use — composed through `marks.glyphOf` exactly as
+   `spell.js` does its own. Simpler than resolving a specific word out of another file's array by position, and
+   there was nothing to keep in sync: if a word changes, the three lines here can be revisited independently.
+2. **`data-mark-sits` gained a per-mark override** (`data-mark-sits-{mark-id}`, read with a fallback to the shared
+   line) that `docs/lesson-9/04` §4 asked for but didn't say how to wire — ulta paish needed its own line ("turned
+   over", not "standing up"), so `mark-lesson.js`'s `aloneSits` line now looks for
+   `words[`markSits${pascalOf(mark.id)}`]` before falling back to `words.markSits`.
+3. **The same-sound tile's caption** uses `{sameMark}`, filled from the `same` row's own name (`marks.nameOf`), as
+   `04` §4 revised it to — not the literal "zabar and alif" text `03` §7's first draft showed.
+4. **The optional options-panel row** (`04` §9's "The same sound: Show / Hide") **was not built.** It is a nice-to-have
+   comparison toggle, not load-bearing, and every other row `04` §9 asks for needed no change at all — `hasTail`
+   already reads `own`/`formOf` per script, once its getter was generalised (see below).
+5. **`mark-lesson.js`'s `hasTail` getter now asks "does ANY of this page's marks have a tail in the CURRENT
+   script"**, not "does the open part's mark have a tail" — the old getter would have flickered the options panel's
+   "Two-letter tiles" row on and off as the student moved between parts on this lesson, instead of once, on a
+   change of script (`04` §9). Lessons 4–8 keep exactly the same answer as before, since `own.length` is 1 there.
+6. **`markBox`'s cache key gained the script**, and its `head`/`tailed` logic was generalised from Lesson 8's own
+   special case to read a form's `cp`/`tail` generally (`03` §5) — the halo now rings whatever a form's *last* mark
+   adds: the whole standing mark in Indo-Pak, the small alif alone in Madani's khari zabar (not the zabar under it,
+   which the student already has from Lesson 4), the small yaa/waw in Madani's khari zair and ulta paish.
+7. **`audio.js`'s `groups()` now skips a `kind` already listed**, so khari zabar sharing Lesson 8's `'fatha-alif'`
+   recording group does not appear twice in the recording list — the fix `03` §8 asked for.
+
+**Checked, and passing:** every `node --check`; the full existing suite — `qaida-check.js` (a new Lesson 9 block:
+the three rows, `forms`, `suffixOf` unchanged by any of it, `drawnOf` differing correctly per script, the four parts
+`[6,6,6,27]`, the last part's spread `8/10/9` exactly as `02` §3 predicted, eleven distinct ids for one letter across
+every lesson built so far, mastery surviving a script switch, `masteredCount(9)`/`(4)`/`(8)` each counting only their
+own, 600 questions through the real engine — no Lesson 9 question ever offers a Lesson 8 item, every warm-up offers
+its short twin, every last-part question offers another standing mark — `audio.js`'s recording counts, and no
+literal combining mark or small letter anywhere the lesson touches), `qaida-marks-check.js`, `qaida-lesson5-check.js`,
+`qaida-lesson6-check.js`, `qaida-lesson7-check.js`, `qaida-lesson8-check.js` (all five unchanged), `qaida-lesson3-check.js`,
+`qaida-voice-check.js`, `qaida-page-check.js`, `qaida-words-check.js` (now resolving a page's `data-mark` through
+`setOf` as well as `markOf`, so Lesson 9's own three walkthrough and twelve exercise words are checked the same way
+every earlier lesson's are), and the new `tools/qaida-lesson9-check.js` (Lesson 7's suite, pointed at `lesson-9.html`
+and with `spell.js` added: four rail buttons naming their own mark, a trio in each warm-up and a quartet in the last
+part, the same-sound tile on part 1's feature row only and nowhere else, no halo on it, the joined block hidden
+throughout with the met-note and Madani-note taking its place, the Madani note disappearing in Indo-Pak while the
+met-note does not, switching script redrawing every tile without moving the bar, finishing gated by part 4 alone at
+seven tenths of 27, the Spell block stepping هٰذَا correctly with Previous going to Lesson 8, and `hasTail` true in
+Madani and false in Indo-Pak).
+
+**Seen working in the browser pane** (not by the user): the same-sound tile (بَا, an `=` sign, no halo, never an
+answer), the halo correctly ringing the small alif on khari zabar's Madani form and the bare standing mark in
+Indo-Pak, the met-note and Madani-note appearing and disappearing correctly across parts and scripts, the Indo-Pak
+haa correctly drawn with khari zair (ہٖ) and the exercise page's twelve words all composing without error. **Measured
+rather than assumed** (`03` §4's own instruction): with the page's full 27-letter table open, no row's glyph overlaps
+the row above or below it, in either script, at the default tile size and font — including laam's row, the tallest
+letter under the tallest stack the Qaida draws (Madani's khari zabar) — so the `above-tall` mirror rule `docs/lesson-9/03`
+§4 flagged as a possibility was **not added**; `qaida.css` records the measurement in place of the rule. **Not seen
+by the user.** The blocking browser checklist is `docs/lesson-9/06` §4, in particular whether khari zabar against
+zabar, and ulta paish against paish, can really be told apart at the tile's size, and the teacher's check of every
+word's spelling against the mushaf (`05` §1, §4).
+
+**Step 8 is now built in full**, all three of lessons 7, 8 and 9, and none of the three has been previewed by the
+user yet.
+
+### Step 8 planned (Lesson 8) — zabar and alif, and an item of two letters
+
+*2026-09-27. The user: "go ahead and plan the next milestone if it is not planned."*
+
+**Specified, not built.** `docs/lesson-8/` is **eight files**, thin like `docs/lesson-5/` to `docs/lesson-7/`: it
+assumes all four earlier folders and holds only what is new. Nothing was written to `site/`.
+
+**Lesson 8 is one sentence: an alif after zabar makes the sound long** — بَ "ba", بَا "baa". The zabar is Lesson 4's,
+in the same place; what is new is a **letter** after it.
+
+**The one thing genuinely new, and the only part with real code in it: an item is two letters.** Every item so far
+was a letter and a mark — two-character ids, `masteredCount`'s `id.length === 2`, a portrait tile, a halo found by
+drawing the letter with and without its mark. `docs/lesson-8/03` gives a `MARKS` row a **`tail`** (code points,
+composed, never pasted), one `suffixOf(mark)` that every id and glyph goes through, and `masteredCount` a suffix
+test — **Lesson 8 shares zabar's code point with Lesson 4**, and its twins (بَ) are Lesson 4's ids, so without the
+length rule the home card would count the twins and not the lesson. Lessons 10–13 (wow and yaa) are the same shape.
+
+**Findings, each written where it happens:**
+- **27 letters, not 29** (`02` §2): اَا is never written (a long aa there is آ, a different sign), and ءَا is how the
+  Madani mushaf writes it but not an Indo-Pak one. Recommended: leave both out, in both scripts, with a line on the
+  board saying why.
+- **لَا arrives uninvited** (`02` §4): the user's 2026-09-18 "no lam-alif as a letter" stands, but every font draws
+  ل + ا as one shape and drawing them apart would be a misspelling. Laam stays, out of part 1, with one line.
+- **The alif joins or stands apart** as Lesson 3 taught — 22 letters in their *start* shape, the first mark lesson
+  where letters are not drawn alone; د ذ ر ز و leave it standing. The tile gets **wider, never taller** (the rule the
+  pending "zair box is weird" fix settles).
+- **The halo should ring the alif**, measured against the letter + zabar + an invisible joiner (Lesson 3's trick).
+- **The drill is the easy half** (`01` §2, `07` §1): an alif is a whole letter, so "name it" tests little; the
+  lesson is a *sound*. The by-ear format matters here more than anywhere, so `07` §6 asks the teacher to record this
+  lesson's 27 "baa" sounds, with Lesson 4's "ba", before the 87 tanween ones.
+- **Words open up** (`05`): three walked through (قَالَ, زَارَ, كِتَابٌ) and twelve for `exercise-8.html`, all
+  Claude's candidates. **The mushaf spells many long-aa nouns with Lesson 9's standing mark instead of an alif**
+  (كِتَٰبٌ), so these are never labelled Qur'anic — and that is the case for Lesson 9 coming straight after.
+
+**Build after the four fix notes of 2026-09-27 evening** (`06` §2, step 0): the walkthrough's reshape (`fixes/lesson
+4 5/`, on the path — the words go through it), the zair tile's height (`fixes/lesson 6/`, on the path — diagnosed as
+Lesson 7's move of `[data-sits]` to the tile, which makes a zair tile in a mixed row taller alone), exercise 6's
+missing Next, and Lesson 7's names ("two zabar", not "do zabar" or "fathatain").
+
+**Eight questions for the teacher**, none blocking: `07-open-questions.md`. `design-system/quran-landing/pages/qaida.md`
+is untouched: it is written after the code exists and the user has seen it.
 
 ### Step 6 planned (Lesson 5) — the mark below
 
