@@ -8,7 +8,11 @@ This folder is that pass: **lessons 15 to 29**, from shadda to reading whole sur
 
 - **`docs/lesson-15/`** (shadda, the next lesson) is a **full build specification**, in the shape of
   `docs/lesson-14/`.
-- **`docs/lesson-16/` to `docs/lesson-29/`** each hold **one file**, a lesson plan: what it teaches, what is drilled,
+- **Lessons 15 to 19 are built** (15 on 2026-09-29, 16, 17 and 18 on 2026-09-30, 19 on 2026-10-05: [[docs/lesson-16/08-build-record|Lesson 16's build record]], the first
+  rule page, [[docs/lesson-16/README|Lesson 16]]; [[docs/lesson-17/02-build-record|Lesson 17's]], the second, [[docs/lesson-17/README|Lesson 17]];
+  [[docs/lesson-18/02-build-record|Lesson 18's]], the first copied words; [[docs/lesson-19/02-build-record|Lesson 19's]], the first pairs).
+  **`docs/lesson-16/` is a full folder** (README, `01`–`08`) and **`docs/lesson-17/`**, **`18/`** and **`19/`** hold their README, `01-design` and `02-build-record`; the rest of
+  this line is about **`docs/lesson-20/` to `docs/lesson-29/`**, which each hold **one file**, a lesson plan: what it teaches, what is drilled,
   what the two scripts print, what is new in the code, the examples, the recordings and the open questions. Each one
   becomes a full folder before it is built, as lessons 10–14 did. They are planned this far ahead so the user can see
   the whole road and change it. Specifying every attribute of Lesson 27 before Lesson 18's new page exists would

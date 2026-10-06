@@ -1,7 +1,23 @@
+---
+tags: [lesson-22, stopping, stop-signs, rule-page, built]
+---
 # Lesson 22 — Stopping: lesson plan
 
-*One-file plan, written 2026-09-28. It becomes a full folder before it is built. Read `docs/pass-2/` first. The stop
-signs are `docs/pass-2/01` §7, checked against Quran.com.*
+*One-file plan, written 2026-09-28; **built 2026-10-06** (the user: "start the next lesson build"). The plan below is kept as it was written, with the
+build's own notes in [[docs/lesson-22/01-design|01 Design]] and [[docs/lesson-22/02-build-record|02 Build record]]. Read [[docs/pass-2/README|Pass 2]]
+first. The stop signs are [[docs/pass-2/01-what-the-two-scripts-print|pass-2/01]] §7, checked against Quran.com, and now measured over the whole Qur'an
+([[docs/lesson-22/01-design|01]] §2).*
+
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · before it [[docs/lesson-21/README|Lesson 21, letters that are not read]] · after it [[docs/lesson-23/README|Lesson 23, Al-Fatiha]]
+
+## Status — built (2026-10-06)
+
+Built on the README's recommendations (a composed stopped form beside the printed word, labelled; the everyday signs, the rest on a line), with **two
+things the plan did not know**: **the two mushafs put different signs in the same place** (Madani's small jeem is Indo-Pak's small taa in 1,591 words), so
+the sign questions use only the **four meanings both print**, each drawn the student's own script's way; and **the Madani face draws the copied jazam as a
+circle like Lesson 21's "not read"**, so the stopped form's jazam is the open head the lessons taught. **Twenty-seven items** (15 "how do you stop on this
+word?", 12 "what does the lit sign say?"), parts of **15, 12 and 27**, no engine change. Where it differs and what is still the user's:
+[[docs/lesson-22/02-build-record|02 Build record]] §2 and §4.
 
 | | |
 |---|---|

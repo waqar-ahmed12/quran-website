@@ -1,13 +1,32 @@
-# Lesson 17 — The round taa and the end yaa: lesson plan
+---
+tags: [lesson-17, round-taa, end-yaa, rule-page, built]
+---
+# Lesson 17 — The round taa and the end yaa
 
-*One-file plan, written 2026-09-28. It becomes a full folder before it is built. Read `docs/pass-2/` first. The
-script facts are `docs/pass-2/01` §8, checked against Quran.com.*
+*One-file plan written 2026-09-28; **built 2026-09-30** (the user: "build the next lesson in line"). The plan below is kept as it was
+written, with the build's own notes in [[docs/lesson-17/01-design|01 Design]] and [[docs/lesson-17/02-build-record|02 Build record]].
+Read [[docs/pass-2/README|Pass 2]] first. The script facts are [[docs/pass-2/01-what-the-two-scripts-print|pass-2/01]] §8, checked
+against Quran.com.*
+
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · before it [[docs/lesson-16/README|Lesson 16, hamza]] · after it [[docs/lesson-18/README|Lesson 18, Al-]]
+
+## Status — built (2026-09-30)
+
+Built on Lesson 16's rule page with a second **kit** (`ends.js`); what changed from the plan below is listed in
+[[docs/lesson-17/02-build-record|02 Build record]] §2. The short version: **part 2 has four letters, not six** (eight forms, so the drill
+is not longer than it has to be), **no new recording** (the lesson plays what Lessons 4–13 recorded), and **هُدًى is not in the reading
+list** (the plan listed it under the small-alif yaa; it is a two-zabar word and a stop changes it, so it is Lesson 22's).
+
+| Note | What it settles |
+|---|---|
+| [[docs/lesson-17/01-design\|01 Design]] | what it teaches, the fourteen forms, what each script prints, the words and the recordings |
+| [[docs/lesson-17/02-build-record\|02 Build record]] | what was built, where it differs from this plan, what was measured and checked, what is still the user's |
 
 | | |
 |---|---|
 | **Page** | the rule lesson (Lesson 16's) |
 | **Depends on** | Lesson 16 built |
-| **Recordings** | a handful: the round taa with each mark ("-ta, -ti, -tu, -tan…"), and ى read both ways |
+| **Recordings** | none new: a round taa plays what a taa with that mark says, and an end yaa what its letter says with the long vowel |
 
 ## What it teaches
 
@@ -72,7 +91,7 @@ stop (هُدًى at a stop is "hudaa"), also Lesson 22.
 ## Open questions
 
 1. **The titles**: "The round taa and the end yaa", or *taa marbuta* and *alif maqsura*, the class's words?
-   **Recommended: plain, with the class's word once on the board.**
+   **Recommended: plain, with the class's word once on the board.** *(Taken: the seat note under the two shapes says it once.)*
 2. **"A yaa that is not read"** after zabar: say it here, or leave it for Lesson 21 (letters that are not read)?
-   **Recommended: say it here, in one line**, since the student meets it on the first page.
+   **Recommended: say it here, in one line**, since the student meets it on the first page. *(Taken: every "aa" row says "the yaa is not read".)*
 3. **Words**: candidates, for the teacher.

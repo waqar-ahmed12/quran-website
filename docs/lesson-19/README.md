@@ -1,7 +1,23 @@
+---
+tags: [lesson-19, wasl, joining-alif, rule-page, built]
+---
 # Lesson 19 — The joining alif: lesson plan
 
-*One-file plan, written 2026-09-28. It becomes a full folder before it is built. Read `docs/pass-2/` first. The script
-facts are `docs/pass-2/01` §2 and §4, checked against Quran.com.*
+*One-file plan, written 2026-09-28; **built 2026-10-05** (the user: "there should be a new lesson plan, please start building"). The plan below
+is kept as it was written, with the build's own notes in [[docs/lesson-19/01-design|01 Design]] and [[docs/lesson-19/02-build-record|02 Build record]].
+Read [[docs/pass-2/README|Pass 2]] first. The script facts are [[docs/pass-2/01-what-the-two-scripts-print|pass-2/01]] §2 and §4, checked
+against Quran.com.*
+
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · before it [[docs/lesson-18/README|Lesson 18, Al-]] · after it [[docs/lesson-20/README|Lesson 20, the wavy line]]
+
+## Status — built (2026-10-05)
+
+Built on the README's recommendations: the plain name with the class's word once, the starting vowel as one line and one example each, and
+**Madani and Indo-Pak both**, with Lesson 18's honest line about the stand-in font. **Eight places differ from this plan**, each with its reason
+in [[docs/lesson-19/02-build-record|02 Build record]] §2; the ones that matter most: **the starting vowels are answered in the student's own words**
+(zabar, zair, paish) and not as "a / i / u"; **one additive engine tag (`askGroup`)** was needed because part 4 mixes three questions; **the basmala is
+out** (Quran.com's Indo-Pak text for it is unmarked); and **the plan's claim that the Indo-Pak jazam is always gone was nearly, not quite, right**
+(15 of 896 pairs keep it), while **Madani does mark the shortened vowel** (the end yaa drops its small alif).
 
 | | |
 |---|---|

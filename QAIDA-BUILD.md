@@ -22,8 +22,121 @@ parts and 29 lessons** (`shell.js` rows 15–29, `part: 2`; `home.js` headings; 
 is an ordinary Next to Lesson 15 (its `data-last` is gone). All 17 check scripts pass. **Still the user's:** the kasra with
 the shadda against a printed Qaida, the halo on the shadda, the hum line, the words, and see "Step P1 built — Lesson 15" in
 the step log. **Left undone, and a decision:** the first-pass pages still say "Lesson N of 14" with a 14-dash track.
-**Next: Lesson 16 (hamza)**, which needs its full folder first (`docs/lesson-16/` is one plan file) and is the first
-lesson on a new page type (`docs/pass-2/02` §1).
+**Step P2, Lesson 22 (stopping), is built — the seventh and last rule lesson of P2, so step P2 is done** (2026-10-06, the user: "start the next lesson build, also tell how much is
+left", taken as the yes to the README's recommendations). `docs/lesson-22/` was written (`01-design`, `02-build-record`). **Twenty-seven items by reference**: 15 asked "how do you stop
+on this word?" (three each: a vowel, two zair or two paish, two zabar, a round taa, a long vowel at the end) and 12 "what does the lit sign say?" (three each of four signs); parts of
+**15, 12 and 27**; two name questions kept apart by `askGroup`, so **no engine change**. **How a word is said at a stop is composed** (`saidOf`) and shown beside the
+printed word, labelled "Said at a stop:", never in its place; the answers are names ("Ends with a jazam"), so no wrong spelling of a Qur'an word is ever on the page. **Measured over the
+whole Qur'an, which corrected the plan:** the two mushafs mostly put **different signs in the same place** (Madani's small jeem is Indo-Pak's small taa in 1,591 words), so the drill uses
+the **four meanings both print**, each drawn the student's own script's way ("better to stop" is Madani's "qalaa" and Indo-Pak's small taa); "salaa" and the three dots are a Madani line;
+verse ends are in for the first time (an Indo-Pak verse end carries an invisible U+200F). **Found in the browser pane:** the site's Madani face draws Quran.com's jazam (U+0652) as a
+small circle all but identical to **Lesson 21's "not read" circle**, so the stopped form uses the open-head jazam the lessons taught (the copied words keep theirs: a font matter, Lesson
+23's). Also fixed from screenshots: the title glyph (now the verse-end sign around a one), the large signs, a lit sign's tint, the question's word colour, nested quotes, the stopped
+forms' heights and a 3+1 wrap on a phone. Measured at 375px, both scripts, all 27 words: no overflow, the word never nearer than 83.6px to the prompt's sides. No new recording (447
+rows). **Ships in both scripts**, with Lesson 18's line about the stand-in font. All 24 check scripts pass (`node tools/qaida-lesson22-check.js` is new, 179 checks). **Documented in the
+Obsidian graph** (`MAP.md`, `docs/lesson-22/`). See **"Step P2 built — Lesson 22"** in the step log. **Still the user's:** `docs/lesson-22/02` §4 — the four meanings against the list at
+the end of the teacher's mushaf, **the Madani circle (the Qur'an font decision)**, a laam-alif on a verse end, the look, the words and their sounds, and one recording per word.
+**Next: Lesson 23 (Al-Fatiha), step P3** — the verse page, a new page type; it waits on **the Qur'an fonts** (Madani: measure Amiri Quran; Indo-Pak: a licensed font that draws Quran.com's
+private-use verse signs) and **whose voice reads the verses** (`docs/pass-2/03` §3, §5). Or, the user's choice, the first-pass loose ends (the "of 14" pages), or steps 10–13. Skills:
+`ui-ux-pro-max`, `high-end-visual-design` (step P3).
+**Step P2, Lesson 21 (letters that are not read), is built — the sixth rule lesson, and the first whose question is to TAP a letter** (2026-10-06, the user: "go ahead and make
+the next lesson, tell me what lesson number that is", taken as the yes to the README's recommendations and to the one change to the engine `docs/pass-2/02` §2 left for this
+lesson). `docs/lesson-21/` was written (`01-design`, `02-build-record`). **Thirty items by reference**: 18 words (6 with the alif after a plural wow, 4 with the wow after the
+hamza, 4 with a wow that only carries a long "aa", 4 where every letter is read) and 12 questions about one letter ("is the lit letter read?"); parts of **14, 12 and 30**: tap the
+letter that is not read, read or not read, and all together, where **"none" is an answer**. **The two scripts show it in opposite ways and the page teaches both**: Madani marks the
+letter (a small circle; a wow with only a small alif), Indo-Pak leaves it bare (a wow or yaa with no mark, an alif with no zabar before it); `silent.js` finds the letter by each script's
+rule, and the check proves both find the same one for every word. **Measured over the whole Qur'an** (77,429 words): Madani writes the circle in 3,970, and the Indo-Pak rule
+finds the same number in 87% of them; it also finds a bare letter in 3,903 words with no circle (the joining alif, the alif after a tanween), so the line is true of these words and a rule
+of thumb elsewhere, **and the teacher confirms it**. **The one change to the engine** (`practice.js`, additive): a format may bring its own answers (`choicesFor`, `correctFor`), which
+here are the word's own letters in reading order; the page draws each letter a span with `role="button"` (a `<button>` would break the joining), nothing lit before the answer, the
+right letter gold with a line under it after. **Found by scanning the whole Qur'an, which corrected the plan:** the word for "those" is out (an Indo-Pak sign not yet met), the word for
+prayer with its article is out (a sun letter and a joining alif: three letters not read), a wow with a vowel and the small alif IS read, and **the alif of "I" is out** (Madani's small
+rectangle: read only at a stop, a third answer, Lesson 22's). Fixed from screenshots: the right letter's tall stripe (the band now), a lowercase "the" after "Not that one.", and
+tap targets too small on a phone (the word now grows with the screen; **at 375px the narrowest target is 39.4px**, under the site's 44px: the user's to look at on a real phone). Measured
+at 375px: no overflow, the word never nearer than 54.6px to the prompt's sides. No new recording (447 rows). **Ships in both scripts**, with Lesson 18's one line about the stand-in
+font. All 23 check scripts pass (`node tools/qaida-lesson21-check.js` is new, 225 checks). **Documented in the Obsidian graph** (`MAP.md`, `docs/lesson-21/`). See **"Step P2 built —
+Lesson 21"** in the step log. **Still the user's:** `docs/lesson-21/02` §4 — the Indo-Pak rule in words, the tap targets on a real phone, the look, the words and their sounds, and one
+recording per word when ready.
+*(Its Next was Lesson 22, which is now built: see above.)* Skills: `ui-ux-pro-max`, `full-output-enforcement` (step P2).
+**Step P2, Lesson 20 (the wavy line, madd), is built — the fifth rule lesson, and the first whose question is heard** (2026-10-05, the user: "please make
+the next lesson in line", taken as the yes to the README's recommendations). `docs/lesson-20/` was written (`01-design`, `02-build-record`). **Twenty-four
+items by reference**, nine of them pairs, in **five kinds**: a long vowel with no line (5 words, 4 pairs), a line before a hamza in the word (5), a line before
+the next word's hamza (5 pairs), a line before a shadda (5); parts of **10, 9, 10 and 24**, **one question** all through ("How long is the long vowel held
+here?"), whose answers are the lengths (*held normally, longer, longest*), with **no number on the page**. **No engine change**; `rule-lesson.js` gained
+two small additive edits, one of them **`byEar`**: a kit that says so starts the page in the mixed way, so a word the teacher has recorded is asked by ear
+from its first question and one with no recording is asked by its picture (nothing waits on a recording; the check proves both halves). **Found by scanning
+the whole Qur'an, which corrected the plan:** "shadda or jazam" is a shadda (the only line before a jazam is the opening letters, Lesson 28's); **الضَّآلِّينَ
+is out** (it ends its verse, with a private-use sign in Indo-Pak; ٱلضَّآلُّونَ stands in, and it is Lesson 23's); **Indo-Pak uses U+06E4 in more than half
+of its wavy lines** (2,718 words against 2,380 for U+0653), so every word chosen is one both scripts write with U+0653. Fixed from a screenshot: the three
+tiles on their own were different heights on a phone (one rule). Measured at 375px: no overflow, tightest 18.8px (Madani) and 19.2px (Indo-Pak). No new
+recording (447 rows). **Ships in both scripts**, with Lesson 18's one line about the stand-in font. All 22 check scripts pass (`node
+tools/qaida-lesson20-check.js` is new, 201 checks). **Documented in the Obsidian graph** (`MAP.md`, `docs/lesson-20/`). See **"Step P2 built — Lesson 20"**
+in the step log. **Still the user's:** `docs/lesson-20/02` §4 — the look of the lit places and the Indo-Pak stand-in, **which wavy line your printed Indo-Pak
+Qaida draws**, the words and their sounds, and one recording per word when ready (the length is the lesson).
+*(Its Next was Lesson 21, which is now built: see above.)* Skills: `ui-ux-pro-max`, `full-output-enforcement` (step P2).
+**Step P2, Lesson 19 (the joining alif), is built — the fourth rule lesson and the first with PAIRS of the Qur'an's words** (2026-10-05, the user: "okay,
+there should be a new lesson plan, please start building", taken as the yes to the README's recommendations). `docs/lesson-19/` was written
+(`01-design`, `02-build-record`). **Twenty-four items by reference**, 14 of them pairs: six words to start on (two for each vowel, each the first word
+of its verse, so Quran.com's own Indo-Pak text proves the vowel), four read on their own, six joined (the alif skipped), four with a long vowel read
+short and four read long; parts of **6, 10, 8 and 24**, one **question** each ("How do you start this word?", "Is the alif read here?", "Is the long
+vowel read long here?", then all three). **The starting vowels are answered in the student's own words** (zabar, zair, paish). **`fetch-qaida-words.js`
+takes a range** (`2:142:3-4`, saved as the two words and one space), and the words were chosen from a scan of the whole Qur'an. **The one change to the
+engine:** an item's `askGroup` keeps its wrong answers to its own question (part 4 mixes three); additive, and Lessons 4–18 are untouched. **Two plan
+claims corrected by measuring:** Madani does mark a shortened vowel (the end yaa drops its small alif), and the Indo-Pak jazam is gone in all but 15 of
+896 pairs. **The basmala is out** (Quran.com's Indo-Pak text for it is unmarked). Fixed from screenshots: three words wrapping two and one on a phone, a
+pair tile one to a row, a clipped prefixed word, a small question. Measured at 375px: no overflow, tightest 24.3px. No new recording (447 rows). **Ships
+in both scripts**, with Lesson 18's one line about the stand-in font. All 21 check scripts pass (`node tools/qaida-lesson19-check.js` is new, 200
+checks). **Documented in the Obsidian graph** (`MAP.md`, `docs/lesson-19/`). See **"Step P2 built — Lesson 19"** in the step log. **Still the user's:**
+`docs/lesson-19/02` §4 — the look of the lit places and the Indo-Pak stand-in, the words and their sounds, whether the Madani student should be taught the
+starting vowel at all, and one recording per word when ready.
+*(Its Next was Lesson 20, which is now built: see above.)* Skills: `ui-ux-pro-max`, `full-output-enforcement` (step P2).
+
+**Step P2, Lesson 18 (Al-, the moon and sun letters), is built — the third rule lesson and the first with the Qur'an's own words** (2026-09-30, the
+user: "make the lesson 18 if it is next, be sure to do the obsidian graph, also do the thing that you self evaluate by taking screenshots for overall
+feel"). `docs/lesson-18/` was written (`01-design`, `02-build-record`) and it was built on the README's recommendations. **The words are copied, never
+typed:** `tools/fetch-qaida-words.js` reads every reference (`"1:2:1"`) out of `al.js` and saves Quran.com's text, both scripts, unmodified, into
+`rule-words.js` (JS, not JSON: read synchronously). **Twelve words** (five moon, five sun, Allah twice), chosen from 212 scanned so that each holds only
+marks the student has met, in both scripts, and stands mid-verse; parts of **5, 5 and 12**. The laam of Al- and the letter after it are **lit inside the
+word**; the check proves the lit units, joined, are the copied word exactly. **Found by looking at the page, not by reading the plan:** parts 1 and 2
+showed "Something is missing here", because a part of one kind of word is one answer and the engine never offers one name twice; **the other kind now
+rides along, not required** (`ridersOf`), and the check proves it. Also fixed from screenshots: a tall lit stripe, a silent laam invisible on paper, a
+raw `{jazam}` token, a 4+1 wrap, and titles that named the answer ("Trace this word" now). **Ships in both scripts**, with one honest line for Indo-Pak
+about the stand-in font. No new recording (447 rows). **Five differences from the plan** (`docs/lesson-18/02` §2). Measured at 375px: no overflow,
+tightest 18.9px. All 20 check scripts pass (`node tools/qaida-lesson18-check.js` is new, 206 checks). **Documented in the Obsidian graph** (`MAP.md`,
+`docs/lesson-18/`). See **"Step P2 built — Lesson 18"** in the step log. **Still the user's:** `docs/lesson-18/02` §4 — the Indo-Pak stand-in, the words
+and their sounds, and one recording per word when ready.
+*(Its Next was Lesson 19, which is now built: see above.)* Skills: `ui-ux-pro-max`, `full-output-enforcement` (step P2).
+
+**Step P2, Lesson 17 (the round taa and the end yaa), is built — the second rule lesson, on Lesson 16's page** (2026-09-30, the user:
+"build the next lesson in line"). The plan was one file, so `docs/lesson-17/` was written first (`01-design`, then `02-build-record`) and it was
+built on the README's recommendations. **The page now reads a rule's *kit*** (`KITS` in `rules.js`; `ends.js` is this lesson's), so a rule
+brings its own forms, names, sounds, board and echo; Lesson 16 is unchanged and its 163 checks pass. **Fourteen forms:** ة with six marks
+(always after a zabar, so drawn after a baa with zabar), and ى read "ee" or "aa" after baa, faa, laam and meem; parts of **6, 8 and 14**. **The one
+design question, answered:** the long "aa" marks the *letter before*: Madani a small alif on the yaa, Indo-Pak a khari zabar on the letter and a
+bare yaa (`rules.js wordUnits`). **Four differences from the plan** (`docs/lesson-17/02` §2): part 2 is four letters, not six; **no new
+recording** (447 rows still); the round taa's board is two rows of three; **هُدًى and عِيسَى are not in the reading list**. Measured in the
+browser pane, every form, both scripts: nothing clips (tightest 13.4px at 375px), no overflow. All 19 check scripts pass (`node
+tools/qaida-lesson17-check.js` is new, 168 checks). **Documented in the Obsidian graph** (`MAP.md`, `docs/lesson-17/`). See **"Step P2 built —
+Lesson 17"** in the step log. **Still the user's:** `docs/lesson-17/02` §4, the look of the "aa" in each script, and the words.
+*(Its Next was Lesson 18, which is now built: see above.)* Skills: `ui-ux-pro-max`, `full-output-enforcement` (step P2).
+
+**Step P2, Lesson 16 (hamza), is built — the first RULE lesson, on a page type of its own** (2026-09-30, the user: "please
+build the lesson 16 if that is in line. be sure to document in graph thingy obsidian", taken as the yes to
+`docs/lesson-16/07` §1 that the plan waited on). `lesson-16.html` and `exercise-16.html`; the new files are `rules.js` (the
+data: four seats, **fifteen forms**, ids, the drawing per script, the grid) and `rule-lesson.js` (the page: the drill half
+of `mark-lesson.js` **copied**, not shared, plus the grid board). `marks.js`, `mark-lesson.js`, `practice.js` and every
+earlier lesson are untouched: a **sixth hash fence** (2604 lines, lessons 4–15, both scripts) proves it. The board is a
+grid — a row per mark, a column per seat — so reading a row across says the lesson: **the same sound on four seats, and only
+the hamza is read**. No halo. The choices are the *marks*, one each, because the engine never offers one name twice.
+**Ten places differ from the plan, each with its reason in `docs/lesson-16/08-build-record.md`**; the two the user should
+know: **reading word 10 is مُؤْلِمٌ, not لُؤْلُؤٌ** (the last hamza of لؤلؤ is a wow with two paish, not one of the fifteen
+forms), and the verdicts say the form's own name ("Yes — Hamza with paish."). Measured in the browser pane, every form, both
+scripts, ink against the box: the board's tightest gap at 375px is 7.1px, and the prompt was **1.8px** from clipping until it
+was made taller on this page (now 12.7px). All 18 check scripts pass (`node tools/qaida-rules-check.js` is new, 163 checks).
+**Documented in the Obsidian graph:** `MAP.md` (Lesson 16 built, the rule page, "how to keep this graph true") and
+`docs/lesson-16/` (tags, a `Part of` line of `[[links]]` on every note, and the new `08-build-record`). See **"Step P2 built
+— Lesson 16"** in the step log. **Still the user's:** `docs/lesson-16/06` §4, with the new word and the verdict wording.
+*(Its Next was Lesson 17, which is now built: see above.)* Skills: `ui-ux-pro-max`, `full-output-enforcement` (step P2).
 **Steps 1–5 of 13 built, awaiting sign-off** — the Qaida home, Lesson 1, sound and tracing, Lesson 2 with the
 practice engine (`practice.js`) that lessons 4–14 reuse, and Lesson 3, letter shapes. Steps 4 and 5 have not been seen
 in a browser yet.
@@ -228,7 +341,7 @@ user says so.
 | Step | Lessons | What is new | Skills |
 |---|---|---|---|
 | P1 | 15 shadda | two marks on one letter; a mark whose place differs by script; the home in two parts | `ui-ux-pro-max`, `full-output-enforcement` |
-| P2 | 16–22 | the rule page (`rule-lesson.js`, born in 16); the Qur'an's own words (18); "tap the letter" (21) | `ui-ux-pro-max`, `full-output-enforcement` |
+| P2 | 16–22 | the rule page (`rule-lesson.js`, born in 16); the Qur'an's own words (18); "tap the letter" (21) | `ui-ux-pro-max`, `full-output-enforcement` — **Built in full, 2026-09-30 to 2026-10-06, awaiting the user's look**: Lesson 16 (`docs/lesson-16/`, `08-build-record`), 17 (`ends.js`), 18 (`al.js`, the first copied words), 19 (`wasl.js`, pairs), 20 (`madd.js`, heard), 21 (`silent.js`, tap the letter), 22 (`stop.js`, the stop signs); each folder has a build record |
 | P3 | 23 Al-Fatiha | the verse page; the Qur'an fonts | `ui-ux-pro-max`, `high-end-visual-design` |
 | P4 | 24–28 | tajweed on the rule page; recordings become the test | `ui-ux-pro-max`, `full-output-enforcement` |
 | P5 | 29 the last surahs | a surah picker; the last lesson | `minimalist-ui` |
@@ -1223,9 +1336,9 @@ recommendations, and to building without a separate look at lessons 7–9 first 
     own". No engine change;
   - "if I know this group… move to the next": a **Go to the next group** button beside "You seem to know this group";
   - the tick overlapping a two-line name: the name keeps clear of the corner.
-  - *Not changed:* "some words are repeated" ("…, end of a word" on every button) — the position wording is a text
-    field each, and shortening it is the user's call. "Too long for the easiest group" is answered by the button,
-    not by changing the target.
+  - "some words are repeated": **changed 2026-10-05** — the position names are now "{name}, start / middle / end"
+    (`shapes.js` TEMPLATES, `lesson-3.html`'s `data-name-*`); the board's column headings keep "…of a word".
+  - *Not changed:* "too long for the easiest group" is answered by the button, not by changing the target.
 
 **Lesson 10**, built as `docs/lesson-10/` specifies, with these differences:
 - **`against: ['fatha', 'fatha-alif']`**, taught order, not the spec's alif-first. The quartet then reads the road
@@ -1244,6 +1357,191 @@ recommendations, and to building without a separate look at lessons 7–9 first 
 mushaf prints; does the halo sit on the wow (it behaves as Lesson 8's does, and at this size wraps most of the item);
 دَوْ standing apart; the walkthrough; the reading page. And the words — every one is Claude's candidate.
 
+### Step P2 built — Lesson 22 (stopping)
+
+*2026-10-06. The user: "start the next lesson build, also tell how much is left".* Full record in `docs/lesson-22/02-build-record.md`; the reasons in `01-design.md`. In short:
+- **The seventh kit**, `stop.js`, on Lesson 21's page: 27 items by reference (15 stop words in five kinds, 12 sign words in four), parts of 15, 12 and 27, the rule of how a word ends
+  (`stopKindOf`) and which sign it carries (`signKindOf`) for each script, the stopped form (`saidOf`), the lit places (the end, or the sign), a wrong answer that shows the printed word,
+  "said" and the stopped form, a three-word walkthrough and a twelve-word reading page. `rule-words.js` holds 177 entries (135 unchanged, plus 42).
+- **No engine change.** `rule-lesson.js`, additive: `ownLine` (one wording a script), headings through `say`, a sign's list draws its sign, the samples strip and the echo draw the stopped form.
+- **Chosen from the whole Qur'an**, scanned: only marks the student has met, a stop sign, and the spaces and invisible marks Quran.com puts with them; the same end and the same sign
+  meaning in both scripts. **Plan claims corrected:** the mushafs put different signs in the same place (Madani's jeem is Indo-Pak's taa in 1,591 words), so four signs are drilled, one of
+  them a different glyph in each script; the plan's wrong stopped spellings as answers became names, so no Qur'an word is ever misspelt on the page.
+- **Found by screenshot and fixed:** the Madani jazam drawn as a circle like Lesson 21's "not read" (the stopped form uses the open head); the title glyph; the large signs; a lit sign's
+  tint; the question word's colour; nested quotes; the stopped forms' heights; a 3+1 wrap. **Measured at 375px:** no overflow, the word never nearer than 83.6px to the prompt's sides.
+- **Checks:** `node tools/qaida-lesson22-check.js` (new, 179 checks); `qaida-check.js` (lessons 1–22 built), `qaida-lesson18-check.js` to `qaida-lesson21-check.js` (the fifth kit file;
+  Lesson 21's Next is a link) updated. **All 24 scripts pass.**
+- **Obsidian:** `MAP.md` (Lesson 22 built, the kit), `docs/lesson-22/` (`tags:`, a `Part of` line on every note, `01-design`, `02-build-record`).
+
+**Still the user's** (`docs/lesson-22/02` §4): the four meanings against the teacher's mushaf; **the Madani circle in every copied word (the Qur'an font, before Lesson 23)**; a laam-alif
+on a verse end; the look; the words and their sounds; one recording per word, read stopped.
+
+### Step P2 built — Lesson 21 (letters that are not read)
+
+*2026-10-06. The user: "go ahead and make the next lesson, tell me what lesson number that is".* Full record in `docs/lesson-21/02-build-record.md`; the reasons in `01-design.md`. In short:
+- **The sixth kit**, `silent.js`, on Lesson 20's page and machinery: 30 items by reference (18 words in four kinds, 12 questions about one letter), parts of 14, 12 and 30, the
+  rule for each script (`notReadAt`), the lit places, a wrong answer that shows the word again with its letter lit and a line for the kind and the script, a three-item walkthrough
+  and a twelve-word reading page. `rule-words.js` holds 135 entries (102 unchanged, plus 33).
+- **The first question to tap a letter.** `practice.js` (additive): a format may bring its own answers (`choicesFor`, `correctFor`); a question carries `correct`; every other
+  format is dealt as before. `rule-lesson.js`: the word's letters as buttons (`tapWord`, spans with `role="button"`), the "none" button (part 3 only), the two formats (`tapFormat`), seven
+  verdict lines, the marks on the letters after an answer, Enter and Space, `boardId`. `marks.js`, `mark-lesson.js`, `rules.js` and every earlier lesson are untouched.
+- **Chosen from the whole Qur'an**, scanned: only marks the student has met (and, in Madani, the circle), no word the last of its verse, exactly one letter not read in both scripts (or
+  none). **Plan claims corrected:** the word for "those" and the word for prayer with its article are out; a wow with a vowel and the small alif is read; the alif of "I" is Lesson 22's; the
+  Indo-Pak rule agrees with Madani's circle in 87% of the Qur'an's 3,970 circled words and finds bare letters in 3,903 uncircled ones.
+- **Found by screenshot and fixed:** the right letter's tall stripe (a band now), "Not that one. the alif…", and tap targets too small on a phone (the word grows with the screen: 56px
+  to 74px at 375px, the narrowest target 29.8px to 39.4px). **Measured at 375px:** no overflow, the word never nearer than 54.6px to the prompt's sides, the prompt a steady 145px.
+- **Checks:** `node tools/qaida-lesson21-check.js` (new, 225 checks); `qaida-check.js` (lessons 1–21 built), `qaida-lesson18-check.js`, `qaida-lesson19-check.js` and `qaida-lesson20-check.js`
+  (the "nothing else" checks read the fourth kit file; Lesson 20's Next is a link) updated. **All 23 scripts pass.**
+- **Obsidian:** `MAP.md` (Lesson 21 built, the kit), `docs/lesson-21/` (`tags:`, a `Part of` line of wikilinks on every note, `01-design`, `02-build-record`).
+
+**Still the user's** (`docs/lesson-21/02` §4): the Indo-Pak rule in words; the tap targets on a real phone (39px at the narrowest, the site's minimum is 44px); the look of the lit
+places and of the Indo-Pak words in the stand-in face; the words and their sounds; one recording per word when ready; and whether the alif of "I" should be taught.
+
+### Step P2 built — Lesson 20 (the wavy line, madd)
+
+*2026-10-05. The user: "please make the next lesson in line".* Full record in `docs/lesson-20/02-build-record.md`; the reasons in `01-design.md`. In short:
+- **The fifth kit**, `madd.js`, on Lesson 19's page and machinery: 24 forms by reference in five kinds (5 plain, 5 with a line before a hamza in the word,
+  4 plain pairs, 5 with a line before the next word's hamza, 5 with a line before a shadda), parts of 10, 9, 10 and 24, one question ("How long is the long
+  vowel held here?") with three answers (*held normally / longer / longest*), the lit places per kind (`long`, `carry`; the long vowel with no line is found by
+  rule, not by position), a wrong answer that shows the word again lit, a three-item walkthrough and a twelve-word reading page. `rule-words.js` holds 102
+  entries (63 unchanged, plus 39). No number of beats anywhere on the page, and the check proves it.
+- **Chosen from the whole Qur'an**, scanned: only marks the student has met, in both scripts, the wavy line U+0653 in both, no word the last of its verse.
+  **Plan claims corrected:** a shadda, not "shadda or jazam"; الضَّآلِّينَ out (verse-end sign), ٱلضَّآلُّونَ in; بِمَآ أُنزِلَ out (an unmarked noon); Indo-Pak uses
+  U+06E4 in 2,718 words and U+0653 in 2,380 (the plan said "also").
+- **`byEar`**: a kit that says so starts the page in the mixed way; a recorded word is asked by ear from its first question ("How long is the long vowel held in
+  this one?"), an unrecorded one by its picture. With no recording nothing changes. `practice.js`, `marks.js` and `mark-lesson.js` are untouched.
+- **Found by screenshot and fixed:** the three tiles on their own were different heights on a phone (81, 81 and 73.5px): one rule for this page. Lesson 19's strip
+  has the same quirk and was left alone. **Measured at 375px:** no overflow, tightest 18.8px (Madani), 19.2px (Indo-Pak), the question never nearer than 56.7px.
+- **Checks:** `node tools/qaida-lesson20-check.js` (new, 201 checks); `qaida-check.js` (lessons 1–20 built), `qaida-lesson18-check.js` and `qaida-lesson19-check.js`
+  (the "nothing else" checks read the third kit file; Lesson 19's Next is a link) updated. **All 22 scripts pass.**
+- **Obsidian:** `MAP.md` (Lesson 20 built, the kit), `docs/lesson-20/` (`tags:`, a `Part of` line of wikilinks on every note, `01-design`, `02-build-record`).
+
+**Still the user's** (`docs/lesson-20/02` §4): the look of the lit places and of the Indo-Pak words in the stand-in face; which wavy line the printed Indo-Pak Qaida
+draws; the words and their sounds; one recording per word (the length is the lesson, and hearing practice opens by itself for the words that have one).
+
+### Step P2 built — Lesson 19 (the joining alif)
+
+*2026-10-05. The user: "okay, there should be a new lesson plan, please start building".* Full record in `docs/lesson-19/02-build-record.md`; the
+reasons in `01-design.md`. In short:
+- **Pairs, copied.** `tools/fetch-qaida-words.js` now reads `wasl.js` too and accepts a range (`2:142:3-4`), saving a pair as its two words with one space.
+  `rule-words.js` holds 63 entries (Lesson 18's 24 unchanged, plus 39). The words were chosen from the whole Qur'an, downloaded once and scanned: only
+  marks the student has met, in both scripts, neither word the last of its verse; the start words are verse-initial, where Quran.com's Indo-Pak text
+  prints the vowel, so the declared vowel is proved by the text itself.
+- **The fourth kit**, `wasl.js`: 24 forms (6 start, 4 read, 6 joined, 4 short, 4 keep), four parts by question, names "Start with zabar" (the
+  student's own word) / "The alif is (not) read" / "The long vowel is read short / long", the lit places per kind (`read`, `carry`, `short`, `long`,
+  `silent`), a wrong answer that shows the word again lit, a three-item walkthrough and a twelve-pair reading page.
+- **`practice.js`, one additive line:** `askGroup`, so a drill that mixes questions never offers an answer to another. Lessons 4–18 carry none and are
+  dealt exactly as before; the check proves part 4 does mix them without it.
+- **Plan claims corrected by measuring:** Madani drops the small alif of a shortened end yaa; the Indo-Pak jazam is gone in all but 15 of 896 pairs;
+  the plan's 2:27:16-17 has a stop sign in the printed word (2:29:6-7 instead); the basmala is out (unmarked in Indo-Pak).
+- **Found by screenshot and fixed:** the three words wrapping 2+1 on a phone, a pair tile one to a row, a clipped prefixed word, a small question.
+  **Measured at 375px:** no overflow, tightest 24.3px (53px for the question).
+- **Checks:** `node tools/qaida-lesson19-check.js` (new, 200 checks); `qaida-check.js` (lessons 1–19 built) and `qaida-lesson18-check.js` (its Next is a
+  link; its copy checks read only its own words) updated. **All 21 scripts pass.**
+- **Obsidian:** `MAP.md` (Lesson 19 built, the kit), `docs/lesson-19/` (`tags:`, a `Part of` line of wikilinks on every note, `01-design`, `02-build-record`).
+
+**Still the user's** (`docs/lesson-19/02` §4): the look of the lit places and of the Indo-Pak pairs in the stand-in face; the words and their sounds;
+whether the Madani student is taught the starting vowel at all; one recording per word.
+
+### Step P2 built — Lesson 18 (Al-, the moon and sun letters)
+
+*2026-09-30. The user: "make the lesson 18 if it is next, be sure to do the obsidian graph, also do the thing that you self evaluate by taking
+screenshots for overall feel".* Full record in `docs/lesson-18/02-build-record.md`; the reasons in `01-design.md`. In short:
+- **The first copied words.** `tools/fetch-qaida-words.js` (new) reads the references out of `al.js` and writes `rule-words.js` from Quran.com, both
+  scripts, unmodified, ASCII with `\u` escapes. Twelve words in the drill (moon: 1:2:1, 98:1:7, 95:3:2, 94:5:3, 100:8:3; sun: 1:1:3, 75:9:2, 99:6:3,
+  92:3:3, 54:1:2; Allah: 112:1:3, 112:2:1) and twelve others on the reading page, chosen from a scan of 212 article words.
+- **The third kit**, `al.js`, on the rule page: a `words` board (a moon and a sun word on their own, then a list per kind, the laam and the letter after
+  it lit inside each word, the fourteen sun letters once), names "The laam is read" / "The laam is not read", a wrong answer that shows the word again
+  lit. `rule-lesson.js`, `spell.js`, `exercise.js` and (one optional argument) `voice.js` were edited; `marks.js`, `practice.js`, `rules.js` were not.
+- **The plan's parts could not ask a question:** one kind of word is one answer. **The other kind rides along, not required** (`ridersOf`).
+- **Found by screenshot and fixed:** parts 1 and 2 broken; a tall lit stripe; a silent laam invisible on paper; a raw `{jazam}`; a 4+1 wrap; titles that
+  named the answer. **Measured at 375px:** no overflow, tightest 18.9px.
+- **Checks:** `node tools/qaida-lesson18-check.js` (new, 206 checks); `qaida-check.js` (lessons 1–18 built) and `qaida-lesson17-check.js` (its Next is a
+  link) updated. **All 20 scripts pass.**
+- **Obsidian:** `MAP.md` (Lesson 18 built, the kit), `docs/lesson-18/` (`tags:`, a `Part of` line of wikilinks on every note, `02-build-record`).
+
+**Still the user's** (`docs/lesson-18/02` §4): the look of the lit band and of the Indo-Pak words in the stand-in face; ship Indo-Pak now or wait for the
+Qur'an font; the words and their sounds; one recording per word.
+
+### Step P2 built — Lesson 17 (the round taa and the end yaa)
+
+*2026-09-30. The user: "build the next lesson in line".* Lesson 17 had only a one-file plan, which says it "becomes a full folder before it
+is built"; so the folder was written first (`docs/lesson-17/01-design.md`, the reasons the code comments point at) and the build recorded
+after (`docs/lesson-17/02-build-record.md`), and it was built on the README's three recommendations, as lessons 4–16 were. In short:
+- **The second rule kit.** `rule-lesson.js` now reads `KITS[data-rule]` (rules.js holds the hamza's, as the functions it already had) and
+  never a rule's own functions; `ends.js` registers this lesson's. **Fourteen forms:** a round taa (ة) with six marks, in a baa-with-zabar
+  lead (a round taa always follows a zabar), and an end yaa (ى) read "ee" or "aa" after baa, faa, laam and meem. Parts of **6, 8 and 14**.
+  Lesson 16's page and its 163 checks are unchanged in behaviour; the fence (lessons 4–15) passes.
+- **The one design question, answered:** the long "aa" puts a mark on the **letter before**. Madani: zabar on the letter, a **small alif on the
+  yaa**. Indo-Pak: the letter's zabar becomes a **khari zabar** and the yaa is bare. Built as two drawings of one form (`ends.js glyphOf`), and, in
+  a word, as a change to the unit before it (`rules.js wordUnits`). The "ee" yaa takes a jazam in Indo-Pak only (Lesson 13's rule). Both scripts
+  write ى (U+0649), as Quran.com prints it; one constant if the teacher's Qaida says otherwise.
+- **The questions:** every answer is a name ("Round taa with two paish", "End yaa, read “aa”"), so part 2 offers **two** choices, "which way is it
+  read?", and a wrong answer shows the same letters read both ways. The reverse question is not built (two pictures, one name).
+- **Where it differs from the plan** (each with its reason in `02` §2): part 2 is **four letters, not six** (the drill is 12 right answers, not 18);
+  **no new recording** (the sounds of Lessons 4–13 are reused, so the recordings page is still 447 rows); the round taa's board is **two rows of
+  three**, not six rows; **هُدًى and عِيسَى are not in the reading list**, two "ee" words are (رَبِّى, نَفْسِى).
+- **Words:** رَحْمَةٌ, عَلَى, فِى, and twelve reading words. `rules.js` gained `endOf`, `hasEnd`, `wordUnits`, and `spell.js` and `exercise.js` use them
+  only for a word with an end shape, so no earlier word can change. The words check proves a round taa is only the last letter after a zabar, an
+  end yaa only the last letter ("ee" after a zair, "aa" after a zabar), and that both rules fail on a bad word.
+- **Measured** in the browser pane, every form, both scripts, all three parts: at 1100px the ink was never nearer than 27.8px (top), 35px
+  (bottom) and 20.9px (sides) to its tile; at 375px 17.1px, 13.4px, and the prompt over 70 questions 56px and 36px. No overflow on either page.
+- **Checks:** `node tools/qaida-lesson17-check.js` (new, 168 checks); `qaida-words-check.js`, `qaida-rules-check.js` (Lesson 16's Next is a link now)
+  and `qaida-check.js` (lessons 1–17 built) updated. **All 19 scripts pass.**
+- **Obsidian:** `MAP.md` (Lesson 17 built, the kit), `docs/lesson-17/` (`tags:`, a `Part of` line of wikilinks on every note, and
+  `02-build-record`).
+
+**Still the user's** (`docs/lesson-17/02` §4): the look of the small alif on the yaa (Madani) and the khari zabar on the letter before (Indo-Pak)
+against your Qaida; the words (all Claude's candidates); the wording of the three lead lines; and whether the Indo-Pak end yaa should be ی.
+
+### Step P2 built — Lesson 16 (hamza)
+
+*2026-09-30. The user: "please build the lesson 16 if that is in line. be sure to document in graph thingy obsidian."* Built in
+`docs/lesson-16/06` §2's order; the full record, with every place it differs and why, is
+[`docs/lesson-16/08-build-record.md`](docs/lesson-16/08-build-record.md). In short:
+- **The fence first** (`qaida-check.js` §9f7): sha256 of every item, twin, board row and sample of lessons 4–15, both scripts
+  (2604 lines, `5496ff23143f…`), taken before anything changed and unchanged after every step; plus `masteredCount` for
+  lessons 4, 5, 6, 8 and 10–15.
+- **`rules.js`:** four seats (alif, line, wow, yaa), fifteen forms, each a seat and a `MARKS` id (so names, sounds and the jazam's
+  per-script drawing come from `marks.js`). Ids are two characters, the **Madani seat** and the mark's `suffixOf`, the same in both
+  scripts. Madani draws a hamza on an alif (a separate glyph below the alif for zair); Indo-Pak draws a **bare alif carrying the
+  vowel**, and a jazam on it is a hamza (`docs/lesson-16/02` §2). The four jazam forms are drawn after a **baa with zabar**, never
+  asked and never in an id. `seatOf` is the one function another file calls: `spell.js` and `exercise.js` draw a seat key
+  (أ إ ؤ ئ) for the script in use and get `null` for every other key, so no earlier word can move.
+- **`rule-lesson.js`:** the drill half copied from `mark-lesson.js` (the comment at its top says why and when it is extracted:
+  **once Lesson 18 shows what is shared**, behind the same fence). New: the seat strip, the **grid** (five rows by four seats, five
+  dashes, the whole map from part 1 with later parts dimmed, never hidden), the same-sound line for the row last tapped or missed,
+  one line per script, the lead line in parts 3 and 4, and a **seat line under a wrong answer** (the same sound on every seat).
+  `window.qaida` carries every member the options panel reads; a check diffs the panel's list against it.
+- **The engine is unchanged, and it is why the drill works:** `distractorsFor` never offers one name twice, so where five forms
+  are all "hamza with zabar" the choices come out as the *marks*, one each. The reverse question (a name, pick the picture) is
+  **not built**: two pictures honestly have one name. Part 1 offers three choices (three names), parts 2–4 four.
+- **The names:** "Hamza with zabar", never with the seat. The verdicts say the form's own name ("Yes — Hamza with paish.").
+- **Words:** three walkthrough words (سَأَلَ, مُؤْمِنٌ, سَمَاءٌ: the hamza its own step, "Hamza with fatha: 'a.") and twelve reading words.
+  **Word 10 is مُؤْلِمٌ, not the plan's لُؤْلُؤٌ:** that word's last hamza is a wow with two paish, not one of the fifteen forms, and the
+  words check now proves every seat key in every word is. Indo-Pak draws no Madani alif seat in any word (checked).
+- **Audio:** one new recording, `hamza-jazam` ("a'"), one row on the recordings page (447 rows in all); the other forms reuse
+  Lessons 4–7's sounds on alif.
+- **Measured** in the browser pane, every form, both scripts, ink (canvas `measureText`) against the box: the board at 375px, 19
+  tiles, tightest 7.1px (Madani, alif seat with zabar, at the top); the drill's prompt was **1.8px** from clipping (a hamza on an
+  alif with paish, Madani, 375px) because `shell.centerInk` centres the line box and not the ink — a taller prompt on this page
+  only (2.3 times the glyph, not 1.9) makes it 12.7px. The board at 1280px, default and Large, both scripts: 13.9px at worst. No
+  overflow, rows even, the jazam cell with its lead fits; the light theme was looked at and reads well. **Not measured:** the page
+  on a real phone, and how the forms *feel* at the tile's size.
+- **Checks:** `node tools/qaida-rules-check.js` (new, 163 checks: the data, 400 questions, the recordings, the page in a DOM);
+  `qaida-check.js` gained the fence and the built count 16; `qaida-words-check.js` the hamza rules and proof they fail; Lesson 15's
+  check now expects its Next to go to Lesson 16. **All 18 scripts pass.**
+- **The options panel** gained one `lesson.rule` branch: the rows about letters from before, another mark, the halo and two-letter
+  tiles are not offered on a rule page, and Question offers Form → name, Mix, Hear it → name.
+- **Obsidian:** `MAP.md` (Lesson 16 built, the rule page, "how to keep this graph true") and `docs/lesson-16/` (frontmatter
+  `tags:`, a `Part of` line of wikilinks on every note, the README as a hub, and `08-build-record`, which links out to the lessons it
+  stands on). Every wikilink was checked to resolve.
+
+**Still the user's** (`docs/lesson-16/06` §4): the grid read across (does "the same sound on four seats" come over? is the dim of the
+other parts clear without hiding them?); the Indo-Pak line and the Madani line; **your own Qaida beside the screen** (is the yaa seat
+ئ how your book draws it, or the dotless seat with a hamza below? is the alif's hamza with zair where your book puts it?); the four
+jazam forms after their baa; the three walkthrough words and the twelve reading words in both scripts (**every word is Claude's
+candidate, and word 10 changed**); "The seat is not read." under a wrong answer — too much, too little, or right.
 ### Step P1 built — Lesson 15 (shadda)
 
 *2026-09-29. The user: "please build the next lesson, also tell me where we are in the grand scheme of things".* Built in

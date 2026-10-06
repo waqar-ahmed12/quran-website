@@ -103,6 +103,19 @@
       }
       list.push({ kind: mark.audio, say });
     }
+    // Lesson 16 (docs/lesson-16/03 §7): a rule lesson's one new recording. The seat of a hamza is never read, so every
+    // hamza with a jazam is one sound, "a'", said on hamza alone: one row, and not one per seat. Its zabar, zair, paish and
+    // two-zabar forms reuse the sounds Lessons 4-7 recorded, so they add no group.
+    const rules = window.qaidaRules;
+    if (rules && shell.LESSONS.some((lesson) => lesson.n === 16 && lesson.built)) {
+      const form = rules.formsOf().find((f) => f.seat === 'line' && f.mark === 'sukun');
+      list.push({
+        kind: 'hamza-jazam',
+        only: ['ء'],
+        say: () => 'The sound "a\'": baa with zabar, then a hamza with a jazam — not the letter\'s name',
+        display: () => rules.drawnOf(form, 'madani'),
+      });
+    }
     return list;
   }
 
@@ -121,7 +134,7 @@
   function wanted() {
     const marks = window.qaidaMarks;
     const rows = [];
-    for (const { kind, say } of groups()) {
+    for (const { kind, say, only, display } of groups()) {
       const mark = markForKind(kind);
       const skip = (mark && mark.skip) || [];
       const seen = new Set();
@@ -129,6 +142,7 @@
         for (const [glyph, name] of shell.lettersOf(script)) {
           const key = shell.keyOf(glyph);
           if (seen.has(key) || skip.includes(key)) continue;
+          if (only && !only.includes(key)) continue; // a rule lesson's recording is of one thing, not of every letter
           seen.add(key);
           rows.push({
             kind,
@@ -136,7 +150,7 @@
             glyph: key, // the manifest key (recordings.js writes groups[kind][glyph]) — always the bare letter
             // What the teacher SEES beside the sound's description: the composed glyph for a mark's own group
             // ("baa", not the bare letter, beside "Baa with fatha and alif"), the bare letter for the letters' own names.
-            display: mark ? marks.leadOf(mark, 'madani') + marks.glyphOf(key, mark) : key, // Lesson 14's shows its lead: what the teacher will say
+            display: display ? display(key) : mark ? marks.leadOf(mark, 'madani') + marks.glyphOf(key, mark) : key, // Lesson 14's shows its lead: what the teacher will say
             name,
             say: say(name),
             slug: SLUGS[key] || key,

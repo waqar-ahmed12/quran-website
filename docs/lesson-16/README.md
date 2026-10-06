@@ -1,93 +1,91 @@
-# Lesson 16 — Hamza: lesson plan
+---
+tags: [lesson-16, hamza, rule-page, built]
+---
+# Lesson 16 — Hamza: the full plan
 
-*One-file plan, written 2026-09-28 (the user: "plan for shadda too, and the ones that are left for the quran"). It
-becomes a full folder, like `docs/lesson-15/`, before it is built. Read `docs/pass-2/` first. The facts about the two
-scripts below are from `docs/pass-2/01` §3, checked against Quran.com.*
+*Written 2026-09-30 (the user: "please build the next lesson in line"). `docs/lesson-16/` was one plan file; it is now a
+folder in the shape of `docs/lesson-15/`, because **Lesson 16 is the first lesson on a new kind of page** (the rule
+lesson, `docs/pass-2/02` §1) and `QAIDA-BUILD.md` says it needs its full folder before it is built. Read
+`docs/pass-2/` first. Nothing was written to `site/` until the user said yes: **"please build the lesson 16 if that is in
+line. be sure to document in graph thingy obsidian"** (2026-09-30), taken as the yes to `07` §1 and to every recommendation in
+this folder.*
 
-| | |
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · [[docs/pass-2/README|Pass 2]] · before it [[docs/lesson-15/README|Lesson 15, shadda]] · after it
+[[docs/lesson-17/README|Lesson 17, round taa and end yaa]] · what was built: [[docs/lesson-16/08-build-record|the build record]]
+
+## Status — built (2026-09-30)
+
+Built in `06` §2's order, and recorded in [[docs/lesson-16/08-build-record|08 Build record]] and in `QAIDA-BUILD.md` ("Step P2 built
+— Lesson 16"). Everything this folder decides was built as written **except these ten places** (the reason for each is in `08`):
+
+1. The verdicts say `{name}`: "Yes — Hamza with paish." and "That one is Hamza with zair. This is Hamza with paish. The seat is
+   not read.", not the lower-case "hamza with {mark}" of `04` §4, so a choice reads the same in the answer as on its button, and
+   the jazam needs no wording of its own.
+2. **Reading word 10 is مُؤْلِمٌ, not لُؤْلُؤٌ** (`05` §2): the last hamza of لؤلؤ sits on a wow with *two paish*, which is not one of
+   the fifteen forms. The words check now proves every seat key is one of the fifteen.
+3. **The grid's jazam cells carry the lead** (a baa with zabar): `03` §1 listed "the lead on the board" as not needed, and `03` §4's
+   own picture shows it; a jazam has nothing to be read after.
+4. **The options panel gained one branch** (`lesson.rule`): the rows about letters from before, another mark riding along, the halo
+   and two-letter tiles are not offered, and the Question row offers Form → name, Mix, and Hear it → name. `03` §6 said getters would
+   hide them; they do not.
+5. **The prompt is taller on this page** (2.3 times the glyph, not 1.9): the tallest Madani stack was 1.8px from the top edge.
+6. **The seat line under a wrong answer is built** as the same sound on every seat, drawn small (`.seat-echo`).
+7. **The data half and the page half of the check are one file**, `tools/qaida-rules-check.js` (163 checks), and the fence for lessons
+   4–15 is `tools/qaida-check.js` §9f7 (2604 lines, `5496ff23143f…`).
+8. `spell.js` and `exercise.js` read `data-rule` beside `data-mark`, and the words check knows the hamza rules.
+9. The home's row 16 is built and has no `cp`.
+10. `audio.js` lists **one** new row, `hamza-jazam`, shown as baa with zabar then a hamza with a jazam: the recordings page has 447 rows.
+
+## The notes in this folder
+
+| Note | What it settles |
 |---|---|
-| **Page** | **the rule lesson, born here** (`rule-lesson.js`, `rules.js`, `docs/pass-2/02` §1). Its full plan is the biggest part of this lesson's full folder, as Lesson 4's was for `mark-lesson.js` |
-| **Depends on** | Lesson 15 built |
-| **Recordings** | **few new.** A hamza with a vowel is the sound Lessons 4–6 recorded on alif ("a, i, u"). New: a hamza with jazam, after a vowel ("a'", as in يَأْ), about 3 |
+| [[docs/lesson-16/01-what-it-teaches\|01 What it teaches]] | the one idea, the 15 forms, the four parts, what is out |
+| [[docs/lesson-16/02-hamza-and-the-scripts\|02 Hamza and the scripts]] | what each mushaf prints (checked), what the faces draw (measured) |
+| [[docs/lesson-16/03-the-rule-page\|03 The rule page]] | `rules.js`, `rule-lesson.js`, and what a rule page copies and why |
+| [[docs/lesson-16/04-page-and-wording\|04 Page and wording]] | every section of `lesson-16.html` and every line as a text field |
+| [[docs/lesson-16/05-words\|05 Words]] | the walkthrough words, the twelve reading words |
+| [[docs/lesson-16/06-files-and-steps\|06 Files and steps]] | every file, the build order, the checks, the user's checklist |
+| [[docs/lesson-16/07-open-questions\|07 Open questions]] | what the user and the teacher decide |
+| [[docs/lesson-16/08-build-record\|08 Build record]] | **what was built, measured and checked, and where it differs** |
 
-## What it teaches
+**What was checked first (2026-09-30), and what it changed:**
 
-**Hamza (ء) is a letter, the 29th: a short catch in the throat, read with whatever vowel it carries.** It is written on
-the line (ء) or on a **seat**: an alif (أ إ), a wow (ؤ), or a yaa with no dots (ئ). **The seat is never read.** It only
-holds the hamza up. أَ ءَ ؤَ ئَ are all "a".
+1. **How the Indo-Pak mushaf writes a hamza in the middle of a word** (the open check in the one-file plan), copied
+   from Quran.com's own text, code point by code point: **a bare alif that carries the vowel or the jazam** (سَاَلَ,
+   يَاۡكُلُوۡنَ). `02` §2.
+2. **`docs/pass-2/01` §2 was wrong on one line:** "the alif never carries a jazam". The *long-vowel* alif never does.
+   An Indo-Pak alif with a jazam **is a hamza with a jazam** (يَاۡكُلُوۡنَ, U+0627 U+06E1). `02` §2 corrects it, and so
+   does `pass-2/01`.
+3. **The site's faces draw every hamza form** (Scheherazade New, Noto Naskh Arabic, Amiri Quran), in the browser pane.
+   `02` §3.
+4. **The alif seat is the same at the start of a word and in the middle** (Madani أ, إ; Indo-Pak a bare ا, both
+   places), so the lesson's parts are by *seat*, not by position. `01` §2.
 
-A student who knows it can read a hamza on any seat with any mark, and does not read the seat as a letter: سَأَلَ is
-"sa-'a-la", not "saa-la".
+| File | What it settles |
+|---|---|
+| `01-what-it-teaches.md` | the one idea, the 15 forms, the four parts, what is out |
+| `02-hamza-and-the-scripts.md` | what each mushaf prints (checked), what the site's faces draw (measured), the jazam and its lead |
+| `03-the-rule-page.md` | **the new page type**: `rules.js` (data), `rule-lesson.js` (page), how the engine is used, what is copied from `mark-lesson.js` and why |
+| `04-page-and-wording.md` | every section of `lesson-16.html`, and every line of wording as a text field |
+| `05-words.md` | the walkthrough words, the twelve reading words, the words check |
+| `06-files-and-steps.md` | every file, the build order, the checks, the user's browser checklist |
+| `07-open-questions.md` | what the user and the teacher decide |
 
-## The two scripts
+## The decisions this plan takes (the recommendations, as lessons 4–15 took theirs)
 
-**This is where they differ most so far.**
-
-| | Madani | Indo-Pak |
+| | Decision | Where |
 |---|---|---|
-| at the start of a word | أَ أُ إِ, the hamza sign on the alif | **a bare alif with the vowel**: اَ اُ اِ |
-| on the line | ءَ | ءَ |
-| on a wow | ؤ | ؤ |
-| on a yaa | ئ | a dotless seat with a hamza under it (Quran.com's Indo-Pak text: U+066E U+0655) |
-| a hamza then a long "aa" | ءَا (hamza, zabar, alif) | اٰ (an alif with khari zabar) |
+| 1 | The names are the short ones: "Hamza with zabar", never "Hamza on an alif, with zabar". The seat is what the student must learn to ignore | `04` §5 |
+| 2 | The Indo-Pak board says it: "An alif with a vowel on it is a hamza. You have been reading it since the start" | `04` §3 |
+| 3 | Madani ءَا and Indo-Pak اٰ are **not** compared across scripts. A student reads one mushaf | `01` §5 |
+| 4 | **No halo on this page.** The halo rings a mark on a letter; here the lesson is which part is *not* read, and a ring on the vowel would say the wrong thing | `03` §5 |
+| 5 | The jazam forms are drawn after a **lead** (baa with zabar), as Lesson 14's were after an alif, never asked and never in an id | `02` §4 |
+| 6 | The rule page **copies** the drill glue from `mark-lesson.js` and does not refactor it, so lessons 4–15 stay byte-identical (the fence) | `03` §1 |
+| 7 | Indo-Pak's yaa seat is drawn ئ (U+0626), not Quran.com's U+066E U+0655, until the teacher's Qaida says otherwise | `02` §5, `07` §3 |
 
-**The Indo-Pak student has been reading hamza since Lesson 4.** Every alif with a vowel on it is one: اِ in zair's
-first six, the lead اَ in lessons 14 and 15. The board says so in Indo-Pak ("An alif with a vowel on it is a hamza.
-You have been reading it since the start"). **The Madani student meets a new sign on a familiar letter.**
+## Build order, in one line
 
-**To check before the full plan:** how the Indo-Pak mushaf writes a hamza *in the middle* of a word, on an alif, with
-a vowel or a jazam (يَأْكُلُ, سَأَلَ). The likely answer is an alif carrying the mark with no hamza sign. Check it in the
-fetched text, as `docs/pass-2/01` was.
-
-**Same sound, two spellings**, as Lesson 9's same-sound tile: Madani ءَا and Indo-Pak اٰ are both "'aa". The tile
-shows the other script's spelling beside it only if the teacher wants the two scripts compared (`docs/pass-2/03`, by
-analogy with Lesson 9, where the tile compared spellings within one script). **Recommended: not across scripts.** A
-student reads one mushaf.
-
-## What is drilled
-
-A **fixed set of about 15 forms**, not "a mark on each of 27 letters". That is why this lesson needs the rule page:
-
-| Part | Forms |
-|---|---|
-| 1 | on an alif, at a word's start: أَ أُ إِ (Indo-Pak اَ اُ اِ) |
-| 2 | on the line: ءَ ءِ ءُ, and with two zabar (ءً) |
-| 3 | on a wow and a yaa: ؤَ ؤُ ؤْ ئَ ئِ ئْ |
-| 4 | all of them, with a jazam on each seat (أْ ؤْ ئْ) |
-
-**The question is "name it"**: a form, then pick "Hamza with zabar / zair / paish / jazam". Many forms share a name
-(أَ and ءَ are both "hamza with zabar"), and the engine never shows the same answer twice (`docs/pass-2/02` §2), so the
-choices come out as the **marks**. So the question really asks "read the mark, ignore the seat", which is the lesson.
-
-**The reverse question (a name, pick the picture) is switched off here.** Two pictures honestly have the same name,
-and the engine would mark a right one wrong. This is the first lesson where that is true.
-
-## What is new in the code
-
-- **`rule-lesson.js` and `rules.js`** (the second page type, `docs/pass-2/02` §1): a board of forms and examples, the
-  parts rail, the drill, the Spell block, "Write it", "Say it", the options panel. The full plan specifies them the
-  way `docs/lesson-4/` specified `mark-lesson.js`.
-- **Items composed per script**: a hamza form's drawing differs by script (the start-of-word alif), so each form
-  carries a `forms` entry, Lesson 9's idea on a new page. Its **id is one fixed string** (the Madani code points), so a
-  script switch keeps the credit.
-- **The key `ء`** finally gets items. Every lesson since 8 skipped it.
-
-## Examples (ordinary spellings, candidates)
-
-Walkthrough: سَأَلَ (he asked), مُؤْمِنٌ (a believer), سَمَاءٌ (a sky: the hamza on the line after a long "aa").
-Reading page, twelve: أَكَلَ, أَخَذَ, قَرَأَ, بَدَأَ, يَأْكُلُ, سُئِلَ, بِئْرٌ, ذِئْبٌ, لُؤْلُؤٌ, شَيْءٌ, جَزَاءٌ, أَبٌ. Each needs
-the teacher's check, and each has an Indo-Pak spelling (اَكَلَ…) drawn by the forms.
-
-## What is out
-
-The rules for *which seat* a hamza takes (spelling, not reading); the hamza "made easy" (tas-heel) in one word of the
-Qur'an (`docs/pass-2/README.md` §7); the joining alif, which *looks* like a hamza-less alif and is Lesson 19.
-
-## Open questions
-
-1. **The names**: "Hamza on an alif, with zabar", or just "Hamza with zabar"? **Recommended: the short one.** The seat
-   is what the student must learn to ignore.
-2. **The Indo-Pak line** ("you have been reading it since the start"): say it (**recommended**), or leave the
-   Indo-Pak student to notice?
-3. **ءَا against اٰ** across scripts: not shown (**recommended**).
-4. **Words**: the fifteen are candidates.
+`rules.js` and its check → `lesson-16.html` and `rule-lesson.js` → wording and CSS → words (`spell.js`,
+`exercise.js`, `exercise-16.html`) → the recordings page → every check → the browser pane, both scripts, both themes,
+375px and wide → the user. Full order: `06` §2.

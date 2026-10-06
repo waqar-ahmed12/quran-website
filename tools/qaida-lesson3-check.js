@@ -316,7 +316,7 @@ async function main() {
   check($('.progress-text').textContent === 'Just starting' && shell.drillOf(3).total === 68, 'the lesson line and the home total stay whole-lesson');
   check(all('.shapes-table tbody tr').length === 7 && $('.shapes-table').querySelectorAll('thead th').length === 6, 'the board shows seven letters, four shapes each, and the example');
   check(all('.shapes-table button.letter').length === 28, 'four shapes each for seven letters', String(all('.shapes-table button.letter').length));
-  check(all('.shapes-table tbody tr')[0].querySelectorAll('button.letter').map((t) => t.attrs['aria-label']).join('|') === 'Baa, on its own|Baa, start of a word|Baa, middle of a word|Baa, end of a word', 'tiles run isolated, start, middle, end', all('.shapes-table tbody tr')[0].querySelectorAll('button.letter').map((t) => t.attrs['aria-label']).join('|'));
+  check(all('.shapes-table tbody tr')[0].querySelectorAll('button.letter').map((t) => t.attrs['aria-label']).join('|') === 'Baa, on its own|Baa, start|Baa, middle|Baa, end', 'tiles run isolated, start, middle, end', all('.shapes-table tbody tr')[0].querySelectorAll('button.letter').map((t) => t.attrs['aria-label']).join('|'));
   click(railButton(4), 1);
   check($('.band-advice').hidden, 'the advice is not repeated');
   click(railButton(2), 1);

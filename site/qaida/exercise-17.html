@@ -1,0 +1,221 @@
+<!doctype html>
+<!-- The free Qaida, Lesson 17's reading exercise (QAIDA-BUILD.md step P2): twelve real words ending in a round taa or an end
+     yaa, arranged for silent reading practice — no walkthrough, no meanings, no audio, modelled on a printed Qaida's own
+     "mashq" (exercise) page, the same shape exercise-4 to 16.html already are. One page file for every lesson:
+     this file differs from them only in data-rule (a rule, rules.js, where they have data-mark) and its wording; the data
+     layer is exercise.js, which draws a round taa or an end yaa for the script in use through rules.js (`wordUnits`); ends.js
+     is loaded because it is what registers the rule (`RULES.ends`) that exercise.js reads its lesson number from. The
+     specification is docs/lesson-17/01 §6. Ordinary spellings, not quotations: a word is still a
+     word, not a Qur'an verse.
+
+     Deliberately thinner than a lesson page: no drill, so no practice.js; no audio anywhere on this page, so no
+     audio.js, voice-store.js, voice.js or echo dialog. Board and Settings still work (trace.js, shell.js), since
+     script, names and theme still matter here. exercise.js publishes a small window.qaida of kind "exercise", and
+     qaida-options.js gives it the rows that mean something on this page. -->
+<html lang="en" data-rule="ends" data-bg="light" data-madani-font="scheherazade" data-indopak-font="noto"
+      data-mashq-cols="auto" data-mashq-lines="grid" data-mashq-numbers="hide">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17 exercise: The round taa and the end yaa · Free Qaida</title>
+  <meta name="theme-color" content="#1F1A18">
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      document.documentElement.dataset.theme = 'dark';
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&family=Scheherazade+New&display=swap">
+  <link rel="stylesheet" href="qaida.css">
+  <script src="shell.js" defer></script>
+  <script src="trace.js" defer></script>
+  <script src="marks.js" defer></script>
+  <script src="rules.js" defer></script>
+  <script src="ends.js" defer></script>
+  <script src="exercise.js" defer></script>
+  <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
+       qaida-options.js once the look is chosen. -->
+  <script src="qaida-options.js" defer></script>
+</head>
+<body>
+  <div class="top-sentinel" aria-hidden="true"></div>
+  <a class="skip" href="#lesson" data-words="Skip link (keyboard only)">Skip to the exercise</a>
+
+  <header class="topbar">
+    <div class="where">
+      <a class="brand" href="../">
+        <svg class="mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
+          <rect x="-8" y="-8" width="16" height="16" />
+          <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+          <circle r="2" />
+        </svg>
+        <span class="name" translate="no" data-words="Top bar: site name">Alif to Ayah</span>
+      </a>
+      <a class="crumb" href="./" data-words="Top bar: where you are">Free Qaida</a>
+    </div>
+    <div class="tools">
+      <button class="tool open-board" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
+          <path d="M14.5 6.5l3 3" />
+        </svg>
+        <span class="word" data-words="Top bar: writing board button">Board</span>
+      </button>
+      <button class="tool open-settings" type="button" aria-haspopup="dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 8h8.5M17.5 8H20M4 16h2.5M11.5 16H20" />
+          <circle cx="15" cy="8" r="2.5" />
+          <circle cx="9" cy="16" r="2.5" />
+        </svg>
+        <span class="word" data-words="Top bar: settings button">Settings</span>
+      </button>
+      <button class="tool theme" type="button" aria-label="Switch to light mode">
+        <svg class="half" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="lesson" id="lesson" tabindex="-1">
+    <header class="exercise-head">
+      <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
+        <line class="rule left" x1="-100" y1="0" x2="-24" y2="0" />
+        <line class="rule right" x1="24" y1="0" x2="100" y2="0" />
+        <g class="star">
+          <rect x="-8" y="-8" width="16" height="16" />
+          <rect x="-8" y="-8" width="16" height="16" transform="rotate(45)" />
+          <circle r="2" />
+        </g>
+      </svg>
+      <p class="eyebrow" data-words="Exercise: step label">Reading practice</p>
+      <h1 data-words="Exercise: heading">More words</h1>
+      <p class="exercise-lede" data-template="Twelve words ending in a round taa or an end yaa — read them yourself, no translations."
+         data-words-attr="data-template|Exercise: line under the heading"></p>
+      <a class="link back-to-lesson" href="lesson-17.html" data-words="Exercise: back to the lesson link">← Back to Lesson 17</a>
+    </header>
+
+    <div class="mashq" role="list" data-word-label="Word {n}"
+         aria-label="Twelve words to read"
+         data-words-attr="aria-label|Exercise: word grid label;data-word-label|Exercise: a word's own label, for a screen reader ({n} is filled in)"></div>
+
+    <!-- The ways out, the same row a lesson ends with: the list, back to this exercise's lesson, and on to the next lesson (Lesson 18, not built yet: the same note rule-lesson.js's own Next button shows). The next label follows the student's choice of names, so exercise.js writes it. -->
+    <footer class="lesson-end exercise-end">
+      <div class="onward">
+        <a class="button back" href="./">
+          <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+          <span data-words="Back to the lessons button">The lessons</span>
+        </a>
+        <a class="button quiet prev" href="lesson-17.html">
+          <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+          <span data-words="Exercise: back to the lesson button">Back to Lesson 17</span>
+        </a>
+        <button class="button primary next" type="button"
+                data-next-zabar="Next: Al-" data-next-fatha="Next: Al-"
+                data-soon="The next lesson isn’t built yet."
+                data-words-attr="data-next-zabar|Next lesson button (zabar names);data-next-fatha|Next lesson button (fatha names);data-soon|Next lesson button: not built yet note">
+          <span></span>
+          <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <p class="note" role="status"></p>
+
+  <dialog class="tracer" aria-labelledby="tracer-title">
+    <div class="tracer-head">
+      <h2 class="tracer-title" id="tracer-title" data-template="Trace {name}" data-free="Writing board"
+          data-words-attr="data-template|Tracing board: title ({name} is filled in);data-free|Writing board: title"></h2>
+      <button class="tool close-trace" type="button" aria-label="Close the board">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+    <div class="board">
+      <canvas class="board-guide" aria-hidden="true"></canvas>
+      <canvas class="board-ink"></canvas>
+    </div>
+    <div class="board-tools">
+      <button class="link undo" type="button" data-words="Tracing board: undo">Undo</button>
+      <button class="link clear" type="button" data-words="Tracing board: clear">Clear</button>
+      <button class="link toggle-guide" type="button" aria-pressed="false"
+              data-hide="Hide the letter" data-show="Show the letter"
+              data-words-attr="data-hide|Tracing board: hide the letter;data-show|Tracing board: show the letter">Hide the letter</button>
+    </div>
+    <p class="board-hint"
+       data-trace="Write over the letter with your finger, a mouse or a pen. Hide it and try again from memory. This needs something to draw with — a keyboard won’t do it."
+       data-free="Write whatever you need — a letter, a word, a mark. Nothing is saved or marked. This needs something to draw with — a keyboard won’t do it."
+       data-words-attr="data-trace|Tracing board: line at the bottom;data-free|Writing board: line at the bottom"></p>
+  </dialog>
+
+  <dialog class="chooser" aria-labelledby="chooser-title">
+    <form method="dialog">
+      <p class="eyebrow" data-words="Choice: small heading">Before you start</p>
+      <h2 id="chooser-title" data-words="Choice: title">Choose how your letters look</h2>
+      <p class="intro" data-words="Choice: line under the title">Pick what matches the Qur’an you read from. You can change this any time.</p>
+      <fieldset>
+        <legend data-words="Choice: script heading">Script</legend>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="script" value="madani">
+            <span class="sample madani" lang="ar" dir="rtl" aria-hidden="true">ك ه ي</span>
+            <span class="option-name" data-words="Choice: Madani">Madani</span>
+            <span class="option-note" data-words="Choice: Madani note">Finer, flowing letters</span>
+          </label>
+          <label class="option">
+            <input type="radio" name="script" value="indopak">
+            <span class="sample indopak" lang="ar" dir="rtl" aria-hidden="true">ک ہ ی</span>
+            <span class="option-name" data-words="Choice: Indo-Pak">Indo-Pak</span>
+            <span class="option-note" data-words="Choice: Indo-Pak note">Bolder letters, and the Qaida order</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend data-words="Choice: names heading">Names for the marks</legend>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="names" value="fatha">
+            <span class="option-name" data-words="Choice: fatha names">Fatha, kasra, damma</span>
+            <span class="option-note" data-words="Choice: fatha names note">Arabic names for the marks and the letters</span>
+          </label>
+          <label class="option">
+            <input type="radio" name="names" value="zabar">
+            <span class="option-name" data-words="Choice: zabar names">Zabar, zair, paish</span>
+            <span class="option-note" data-words="Choice: zabar names note">South Asian names for the marks and the letters</span>
+          </label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend data-words="Choice: grouping heading">Letter grouping</legend>
+        <div class="options">
+          <label class="option">
+            <input type="radio" name="grouping" value="families">
+            <span class="option-name" data-words="Choice: grouping families">Shape families</span>
+            <span class="option-note" data-words="Choice: grouping families note">Look-alike letters sit together (ب ت ث)</span>
+          </label>
+          <label class="option">
+            <input type="radio" name="grouping" value="grid">
+            <span class="option-name" data-words="Choice: grouping grid">Even grid</span>
+            <span class="option-note" data-words="Choice: grouping grid note">Uniform spacing across every letter</span>
+          </label>
+        </div>
+      </fieldset>
+      <button class="button primary done" value="done"
+              data-first="Start" data-later="Done"
+              data-words-attr="data-first|Choice: button, first visit;data-later|Choice: button, later visits"></button>
+    </form>
+  </dialog>
+</body>
+</html>

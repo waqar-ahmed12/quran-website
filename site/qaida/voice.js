@@ -83,6 +83,7 @@
   let currentKind = '';
   let currentGlyph = '';
   let currentName = '';
+  let currentShown = ''; // what the panel draws when it is not the glyph itself (a Qur'an word, Lesson 18)
   let currentId = '';
   let hasTeacher = false;
 
@@ -129,7 +130,7 @@
       return;
     }
     title.textContent = fill(title.dataset.template || 'Say {name}', { name: currentName });
-    glyphEl.textContent = currentGlyph;
+    glyphEl.textContent = currentShown || currentGlyph;
     nameEl.textContent = currentName;
     asksEl.hidden = false;
     asksEl.textContent = currentKind === 'letters' ? asksEl.dataset.name : asksEl.dataset.sound;
@@ -176,13 +177,16 @@
 
   // Opening and closing -------------------------------------------------------------------------
 
-  async function open(kind, glyph, name) {
+  // `shown` is optional (Lesson 18): a Qur'an word is kept under its reference, and what the panel draws is the word itself, in the
+  // student's script, so a switch of script keeps the student's own recording of it.
+  async function open(kind, glyph, name, shown) {
     const token = ++openToken;
     opener = document.activeElement;
     stopBoth();
     currentKind = kind || '';
     currentGlyph = glyph || '';
     currentName = name || '';
+    currentShown = shown || '';
     currentId = currentGlyph ? itemId(currentKind, currentGlyph) : '';
     paintItem();
 
@@ -284,7 +288,7 @@
   for (const button of document.querySelectorAll('.open-echo')) {
     button.addEventListener('click', () => {
       const item = window.qaida && window.qaida.lastItem;
-      if (item) open(item[0], item[1], item[2]);
+      if (item) open(item[0], item[1], item[2], item[3]);
       else open();
     });
   }

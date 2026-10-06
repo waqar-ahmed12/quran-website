@@ -459,6 +459,9 @@
       showCosts();
       lesson.onCosts = showCosts;
 
+      // A rule page (Lesson 16, docs/lesson-16/03 §6) has no letters from before, no other mark riding along, no halo and no
+      // two-letter tiles: every row below is about one of those, so it would be a control that does nothing. Not offered.
+      if (!lesson.rule) {
       // The mixed review (docs/lesson-4/03 §3). It is also where every "does this one carry the mark?" wrong answer comes from,
       // so the row that asks for it is greyed out at nothing rather than allowed to make a drill with no contrast in it.
       let pairButton = null;
@@ -533,6 +536,7 @@
         group.lastElementChild.title = 'Wider: the tile widens to fit both letters at their usual size. Same width, smaller letters: '
           + 'the tile stays its usual width and the tailed glyph shrinks to fit.';
       }
+      }
     }
 
     if (shapes) {
@@ -569,12 +573,15 @@
     option('Question',
       shapes
         ? { 'Shape → name': 'form', 'Name → shape': 'name', 'Mix both': 'mix', 'Hear it → shape': 'sound' }
-        : marked
-          ? { 'Marked letter → name': 'mark', 'Name → marked letter': 'name', 'Mix both': 'mix', 'Hear it → marked letter': 'sound' }
-          : { 'Letter → name': 'glyph', 'Name → letter': 'name', 'Mix both': 'mix', 'Hear it → letter': 'sound' },
+        : lesson.rule
+          // Name → picture is not offered on a rule page: two pictures honestly have one name (docs/lesson-16/03 §3).
+          ? { 'Form → name': 'mark', 'Mix both': 'mix', 'Hear it → name': 'sound' }
+          : marked
+            ? { 'Marked letter → name': 'mark', 'Name → marked letter': 'name', 'Mix both': 'mix', 'Hear it → marked letter': 'sound' }
+            : { 'Letter → name': 'glyph', 'Name → letter': 'name', 'Mix both': 'mix', 'Hear it → letter': 'sound' },
       'ask', (v) => lesson.setFormat(v));
     // Hearing needs a real recording of a letter, and none exist until the teacher's arrive. Off until then.
-    const soundChoice = group.lastElementChild.querySelectorAll('button')[3];
+    const soundChoice = group.lastElementChild.querySelectorAll('button')[lesson.rule ? 2 : 3];
     if (window.qaidaAudio) {
       window.qaidaAudio.ready.then(() => {
         soundChoice.disabled = lesson.sound === 0;

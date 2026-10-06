@@ -59,6 +59,11 @@ loses its jazam. Madani leaves that to the reader.
 | on a yaa | أُو۟لَـٰٓئِكَ (0626) | اُولٰٓىِٕكَ: a dotless seat with a hamza below it (066E 0655) | 2:5 |
 | two hamzas | ءَأَنذَرْتَهُمْ | ءَاَنْذَرْتَهُمْ | 2:6 |
 
+**Checked again 2026-09-30 for Lesson 16** (Quran.com, `text_indopak`; `docs/lesson-16/02`): the Indo-Pak alif seat is a bare
+alif **in the middle of a word too** (سَاَلَ 0627 064E; يَاۡكُلُوۡنَ 0627 06E1). **This corrects the box at the top of this file:
+an Indo-Pak alif can carry a jazam, and then it is a hamza with a jazam.** "The alif never carries a jazam" is true of the
+*long-vowel* alif only (a bare alif after a zabar is "aa"), and Lesson 21's silent plural alif is unaffected.
+
 So **an Indo-Pak student has read hamza since Lesson 4**. Every alif with a vowel on it (اَ اِ اُ) is one. Lesson 14's
 bare lead اَ is exactly the Indo-Pak mushaf's spelling.
 

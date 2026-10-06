@@ -125,6 +125,27 @@
       { root: [['ع', 'fatha'], ['ل', 'shadda-fatha'], ['م', 'fatha']], syll: ['a', 'lla', 'ma'], meaning: 'he taught' }, // 'allama
       { root: [['م', 'damma'], ['ح', 'fatha'], ['م', 'shadda-fatha'], ['د', 'dammatain']], syll: ['mu', 'ha', 'mma', 'dun'], meaning: 'Muhammad' }, // muhammadun
     ],
+    // docs/lesson-16/05 §1: a hamza on an alif seat in the middle of a word (word 1: the seat is not read, so it is
+    // "sa-'a-la" and never "saa-la"), on a wow seat with a jazam (word 2: "mu'-mi-nun", and the wow is not "oo"), and on
+    // the line after a long "aa" with two paish (word 3). A seat is written as its Madani letter and drawn by
+    // rules.js for the script in use (docs/lesson-16/03 §8), so word 1 is an alif seat in Madani and a bare alif in
+    // Indo-Pak. A hamza with a jazam is its own step, as Lesson 14's jazam letters are, and its `syll` is just the
+    // catch: the blend step after it joins it to the syllable before ("mu'"). Candidates for the teacher's check.
+    hamza: [
+      { root: [['س', 'fatha'], ['أ', 'fatha'], ['ل', 'fatha']], syll: ['sa', "'a", 'la'], meaning: 'he asked' }, // sa'ala
+      { root: [['م', 'damma'], ['ؤ', 'sukun'], ['م', 'kasra'], ['ن', 'dammatain']], syll: ['mu', "'", 'mi', 'nun'], meaning: 'a believer' }, // mu'minun
+      { root: [['س', 'fatha'], ['م', 'fatha-alif'], ['ء', 'dammatain']], syll: ['sa', 'maa', "'un"], meaning: 'a sky' }, // samaa'un
+    ],
+    // docs/lesson-17/01 §6: a round taa with two paish after a letter with zabar (word 1: "rah-ma-tun", and the jazam on haa is its
+    // own step, as Lesson 14's), an end yaa read as a long "aa" (word 2: "a-la-a"), and one read as a long "ee" (word 3: "fi-i").
+    // A round taa is the key ة and an end yaa the key ى with 'aa' or 'ee' in place of a mark: rules.js draws both for the script
+    // in use (`wordUnits`), and in Indo-Pak the "aa" turns the zabar before it into a khari zabar. Each is a step of its own, and
+    // its `syll` is what it says: "tun", "a", "i". Candidates for the teacher's check.
+    ends: [
+      { root: [['ر', 'fatha'], ['ح', 'sukun'], ['م', 'fatha'], ['ة', 'dammatain']], syll: ['ra', 'h', 'ma', 'tun'], meaning: 'mercy' }, // rahmatun
+      { root: [['ع', 'fatha'], ['ل', 'fatha'], ['ى', 'aa']], syll: ['a', 'la', 'a'], meaning: 'on' }, // 'alaa
+      { root: [['ف', 'kasra'], ['ى', 'ee']], syll: ['fi', 'i'], meaning: 'in' }, // fii
+    ],
     // docs/lesson-9/05 §2: three words that show everything the board says — the standing mark beside Lesson 8's
     // alif spelling of the same sound (word 1), khari zair where the Qur'an actually puts it, on haa (word 2), and a
     // longer word carrying two of the three standing marks at once (word 3). These are the mushaf's OWN spellings,
@@ -136,6 +157,24 @@
     ],
   };
 
+  // Lesson 18 (docs/lesson-18/01 §6): the Qur'an's own words, COPIED and named by reference (docs/pass-2/02 §3), so an entry is not a
+  // list of [key, mark] pairs but { ref, kind, sounds, whole, meaning }, and al.js holds it (`WALK`) beside the words it names. Each
+  // takes three steps: the article, the rest, the whole. No word above can change: a copied entry has a `ref`, and no other has.
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.al) WORDS.al = window.qaidaRules.KITS.al.WALK;
+  // Lesson 19 (docs/lesson-19/01 §8): the same, for a PAIR of words or a word to start on. A pair's three steps are its first word, its second
+  // and the whole, so its units say which piece they are (`step`); Lesson 18's say nothing and are cut after the article, as before.
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.wasl) WORDS.wasl = window.qaidaRules.KITS.wasl.WALK;
+  // Lesson 20 (docs/lesson-20/01 §6): a word or a pair with a long vowel, in three steps: the long vowel with its line (or the first word), the
+  // rest (or the second word), and the whole. Its units say which piece they are (`step`), as Lesson 19's do.
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.madd) WORDS.madd = window.qaidaRules.KITS.madd.WALK;
+  // Lesson 21 (docs/lesson-21/01 §7): a word of each kind of letter that is not read, in three steps: the letters before it, it and what follows,
+  // and the whole. Its units say which piece they are (`step`), as Lessons 19 and 20's do.
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.silent) WORDS.silent = window.qaidaRules.KITS.silent.WALK;
+  // Lesson 22 (docs/lesson-22/01 §7): a word for each of the three ends that change most at a stop, in three steps: the word up to its end, the end as
+  // it is said at a stop, and the whole. Its units say which piece they are (`step`), as Lessons 19 to 21's do.
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.stop) WORDS.stop = window.qaidaRules.KITS.stop.WALK;
+  const copied = (entry) => Boolean(entry) && typeof entry.ref === 'string';
+
   // Exposed so tools/qaida-words-check.js can check every word, on every lesson, without a browser (docs/lesson-8/06 §3).
   // Before the section guard below: the data exists whether or not this particular page has a .spell block to draw it in.
   window.qaidaSpellWords = WORDS;
@@ -143,8 +182,11 @@
   const section = document.querySelector('.spell');
   if (!section) return;
 
-  // A single mark (lessons 4-6, 8) or a SET (Lesson 9's "standing" — marks.markOf returns null for a set, docs/lesson-9/04 §6).
-  const mark = marks.markOf(root.dataset.mark) || marks.setOf(root.dataset.mark);
+  // A single mark (lessons 4-6, 8), a SET (Lesson 9's "standing" — marks.markOf returns null for a set, docs/lesson-9/04 §6),
+  // or, from Lesson 16, a RULE (`data-rule`, rules.js): its `id` and `lesson` are all this file reads.
+  const rules = window.qaidaRules;
+  const rule = rules && rules.RULES[root.dataset.rule];
+  const mark = marks.markOf(root.dataset.mark) || marks.setOf(root.dataset.mark) || rule;
   const walkthrough = mark && WORDS[mark.id];
   if (!mark || !walkthrough) return;
 
@@ -171,7 +213,15 @@
   // "should be animated, and be shown in complete word and the word that is being read is highlighted") wants the
   // whole word on screen from the first step, not built up piece by piece.
   function unitsFor(names, entry) {
+    // A round taa or an end yaa (Lesson 17, docs/lesson-17/01 §5): rules.js draws the whole word, since the long "aa" touches the
+    // letter before it in Indo-Pak. No other word has one, so every earlier word goes the way it always did.
+    if (rules && rules.hasEnd && rules.hasEnd(entry.root)) {
+      return rules.wordUnits(entry.root, (key) => (names.get(key) ? names.get(key).glyph : key));
+    }
     return entry.root.map(([key, id]) => {
+      // A hamza seat (docs/lesson-16/03 §8): rules.js draws it for the script in use, null for every other key.
+      const seat = rules && rules.seatOf(key);
+      if (seat) return seat + marks.drawnOf(marks.markOf(id));
       const found = names.get(key);
       return marks.glyphOf(found ? found.glyph : key, marks.markOf(id));
     });
@@ -194,6 +244,8 @@
   // One step per letter met, then one per blend: name it, then put it together with what came before. The last
   // blend is the whole word. For a three-letter word this is exactly the user's own five steps.
   function stepsFor(entry) {
+    // A copied word (Lesson 18) is read in three steps: the article (alif and laam), the rest, then the whole word.
+    if (copied(entry)) return [{ kind: 'article' }, { kind: 'rest' }, { kind: 'whole', final: true }];
     const steps = [];
     entry.root.forEach((_, i) => {
       steps.push({ kind: 'letter', upto: i + 1 });
@@ -245,26 +297,54 @@
     // shaping in a modern engine, only an inserted character would) — check on the browser checklist regardless
     // (docs/lesson-8/05 §2), since a highlighted "qaa" must stay joined to the "la" after it.
     glyphBox.textContent = '';
-    unitsFor(names, entry).forEach((text, i) => {
+    // A copied word is split into its letters with their marks (al.js); the article is the first two, the rest is everything after.
+    const found = copied(entry) ? rules.copiedUnits(entry.ref, shell.state.script, entry.kind) : null;
+    const units = found ? found.map((u) => u.text) : unitsFor(names, entry);
+    const pieceOf = (i) => (found[i].step != null ? found[i].step : i < 2 ? 0 : 1);
+    const stateOfCopied = (i) => (step.kind === 'whole' ? 'read' : step.kind === 'article' ? (pieceOf(i) === 0 ? 'active' : 'unread') : pieceOf(i) === 0 ? 'read' : 'active');
+    units.forEach((text, i) => {
       const unit = document.createElement('span');
-      unit.className = `unit ${stateFor(i, step)}`;
+      unit.className = `unit ${copied(entry) ? stateOfCopied(i) : stateFor(i, step)}`;
       unit.textContent = text;
       glyphBox.append(unit);
     });
 
-    if (step.kind === 'letter') {
+    if (copied(entry)) {
+      const d = section.dataset;
+      const moon = entry.kind === 'moon';
+      // A kind with its own lines (Lesson 19's `data-first-joined`, `data-second-joined`, ...) says them; Lesson 18's two have the article's.
+      const own = (key) => d[`${key}${entry.kind[0].toUpperCase()}${entry.kind.slice(1)}`];
+      if (step.kind === 'article') caption.textContent = fill(own('first') || (moon ? d.articleMoon : d.articleSun), { sound: entry.sounds[0] });
+      else if (step.kind === 'rest') caption.textContent = fill(own('second') || (moon ? d.restMoon : d.restSun), { sound: entry.sounds[1] });
+      else caption.textContent = fill(d.wholeLine, { sound: entry.whole });
+    } else if (step.kind === 'letter') {
       const [key, id] = entry.root[step.upto - 1];
       const found = names.get(key);
       const m = marks.markOf(id);
+      const end = rules && rules.endOf ? rules.endOf(key, id) : null;
       // A letter with a jazam has no sound of its own to say (docs/lesson-14/03 §6): it gets its own line, which
       // names the letter and the mark and says what the jazam does. The blend step after it reads the closed syllable.
       // A letter with a shadda is said twice (docs/lesson-15/03 §5): its own line too, naming what it does.
+      // A hamza, on a seat or on the line, is named "Hamza" and has a line of its own (Lesson 16, docs/lesson-16/05 §1).
+      const hamza = Boolean(rules && (rules.seatOf(key) || key === 'ء') && section.dataset.hamzaLine);
       let template = section.dataset.letterLine;
-      if (m.id === 'sukun' && section.dataset.jazamLine) template = section.dataset.jazamLine;
-      else if (m.id.startsWith('shadda') && section.dataset.shaddaLine) template = section.dataset.shaddaLine;
-      caption.textContent = fill(template, {
-        name: found ? found.name : key, mark: marks.nameOf(m, shell), sound: entry.syll[step.upto - 1],
-      });
+      if (end) {
+        // A round taa is named for itself and says the mark it carries; an end yaa says how it is read, in place of a mark.
+        template = end.kind === 'yaa' ? section.dataset.yaaLine : section.dataset.letterLine;
+        const d = section.dataset;
+        caption.textContent = fill(template, {
+          name: end.kind === 'yaa' ? d.yaaName : d.taaName,
+          mark: end.kind === 'yaa' ? d[end.read === 'aa' ? 'readAa' : 'readEe'] : marks.nameOf(m, shell),
+          sound: entry.syll[step.upto - 1],
+        });
+      } else {
+        if (hamza) template = section.dataset.hamzaLine;
+        else if (m.id === 'sukun' && section.dataset.jazamLine) template = section.dataset.jazamLine;
+        else if (m.id.startsWith('shadda') && section.dataset.shaddaLine) template = section.dataset.shaddaLine;
+        caption.textContent = fill(template, {
+          name: hamza ? 'Hamza' : found ? found.name : key, mark: marks.nameOf(m, shell), sound: entry.syll[step.upto - 1],
+        });
+      }
     } else {
       const sound = entry.syll.slice(0, step.upto).join('');
       caption.textContent = fill(step.final ? section.dataset.wholeLine : section.dataset.blendLine, { sound });

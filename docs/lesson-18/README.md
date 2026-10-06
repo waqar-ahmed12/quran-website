@@ -1,7 +1,21 @@
+---
+tags: [lesson-18, al, moon-sun, rule-page, built]
+---
 # Lesson 18 — Al-: the moon letters and the sun letters: lesson plan
 
-*One-file plan, written 2026-09-28. It becomes a full folder before it is built. Read `docs/pass-2/` first. The script
-facts are `docs/pass-2/01` §4, checked against Quran.com.*
+*One-file plan, written 2026-09-28; **built 2026-09-30** (the user: "make the lesson 18 if it is next"). The plan below is kept as it was
+written, with the build's own notes in [[docs/lesson-18/01-design|01 Design]] and [[docs/lesson-18/02-build-record|02 Build record]].
+Read [[docs/pass-2/README|Pass 2]] first. The script facts are [[docs/pass-2/01-what-the-two-scripts-print|pass-2/01]] §4, checked
+against Quran.com.*
+
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · before it [[docs/lesson-17/README|Lesson 17, the round taa and the end yaa]] · after it [[docs/lesson-19/README|Lesson 19, the joining alif]]
+
+## Status — built (2026-09-30)
+
+Built on the README's recommendations: the marks only (the fourteen sun letters shown once), "moon" and "sun" kept, and **Madani and Indo-Pak
+both**, with an honest line for the Indo-Pak student about the stand-in font. **Five places differ from this plan**, each with its reason in
+[[docs/lesson-18/02-build-record|02 Build record]] §2; the one that matters most: **parts 1 and 2 could not ask a question as planned** (one kind
+of word is one answer), so the other kind rides along, not required.
 
 | | |
 |---|---|

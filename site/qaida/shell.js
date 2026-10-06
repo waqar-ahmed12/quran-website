@@ -140,21 +140,44 @@
     // The second pass (docs/pass-2/): lessons 15-29, from shadda to the last surahs. `part: 2` puts a lesson under the
     // home's second heading; a row with no `part` is in the first. Lesson 15's marks are a vowel and a shadda on one
     // letter, so its `cp` is a list of lists, one suffix per mark (docs/lesson-15/03 §1). Titles and ledes are from
-    // docs/pass-2/README.md §2; none of 16-29 is built, so each says so when tapped and nothing is locked.
+    // docs/pass-2/README.md §2; none of 18-29 is built, so each says so when tapped and nothing is locked.
     { n: 15, part: 2, title: { fatha: 'Shadda', zabar: 'Tashdeed' }, href: 'lesson-15.html', built: true,
       progress: 'drill', cp: [[0x064E, 0x0651], [0x0650, 0x0651], [0x064F, 0x0651]],
       lede: 'A letter said twice: once to close the sound before it, once with its own vowel.' },
-    { n: 16, part: 2, title: { fatha: 'Hamza', zabar: 'Hamza' }, lede: 'One sound written on four seats.' },
+    // Lesson 16 is the first RULE lesson (docs/lesson-16/): fifteen forms, each a seat and a mark, on a page of its own
+    // (rule-lesson.js). It has no `cp`: every id in its record is one of the fifteen forms (the page has no review items),
+    // so masteredCount counts every recorded id, as it always did for a lesson with no `cp` (docs/lesson-16/03 §8).
+    { n: 16, part: 2, title: { fatha: 'Hamza', zabar: 'Hamza' }, href: 'lesson-16.html', built: true, progress: 'drill',
+      lede: 'One sound written on four seats.' },
+    // Lesson 17 is the second RULE lesson (docs/lesson-17/): fourteen forms, a round taa with each of six marks and an end yaa
+    // read two ways after four letters, on the rule page with a kit of its own (ends.js). No `cp`, as Lesson 16: every id in its
+    // record is one of its fourteen forms, so masteredCount counts every recorded id.
     { n: 17, part: 2, title: { fatha: 'The round taa and the end yaa', zabar: 'The round taa and the end yaa' },
+      href: 'lesson-17.html', built: true, progress: 'drill',
       lede: 'Two end shapes that are not among the 29 letters.' },
-    { n: 18, part: 2, title: { fatha: 'Al-', zabar: 'Al-' },
+    // Lesson 18 is the third RULE lesson and the first with the Qur'an's own words (docs/lesson-18/): twelve words, copied and named by
+    // reference, on the rule page with a kit of its own (al.js). No `cp`, as Lessons 16 and 17: every id in its record is one of its
+    // twelve words, so masteredCount counts every recorded id.
+    { n: 18, part: 2, title: { fatha: 'Al-', zabar: 'Al-' }, href: 'lesson-18.html', built: true, progress: 'drill',
       lede: 'The laam that is read before some letters and not before others, and the name Allah.' },
-    { n: 19, part: 2, title: { fatha: 'The joining alif', zabar: 'The joining alif' },
-      lede: 'An alif that is read at the start of a word and skipped in the middle.' },
-    { n: 20, part: 2, title: { fatha: 'The wavy line', zabar: 'The wavy line' }, lede: 'Hold a long vowel a little longer.' },
-    { n: 21, part: 2, title: { fatha: 'Letters that are not read', zabar: 'Letters that are not read' },
-      lede: 'Written on the page, and left out when it is read.' },
-    { n: 22, part: 2, title: { fatha: 'Stopping', zabar: 'Stopping' }, lede: 'How a word changes when you stop on it.' },
+    // Lesson 19 is the fourth RULE lesson and the first with PAIRS of the Qur'an's own words (docs/lesson-19/): twenty-four words and
+    // pairs, copied and named by reference, on the rule page with a kit of its own (wasl.js). No `cp`, as 16-18: every id in its record
+    // is one of its twenty-four, so masteredCount counts every recorded id.
+    { n: 19, part: 2, title: { fatha: 'The joining alif', zabar: 'The joining alif' }, href: 'lesson-19.html', built: true,
+      progress: 'drill', lede: 'An alif that is read at the start of a word and skipped in the middle.' },
+    // Lesson 20 is the fifth RULE lesson (docs/lesson-20/): twenty-four words and pairs, five kinds, copied and named by reference, on the
+    // rule page with a kit of its own (madd.js). No `cp`, as 16-19: every id in its record is one of its twenty-four.
+    { n: 20, part: 2, title: { fatha: 'The wavy line', zabar: 'The wavy line' }, href: 'lesson-20.html', built: true,
+      progress: 'drill', lede: 'Hold a long vowel a little longer.' },
+    // Lesson 21 is the sixth RULE lesson and the first whose question is to TAP a letter (docs/lesson-21/): thirty items by reference, eighteen
+    // words (eighteen tapped, twelve asked as "is the lit letter read?"), on the rule page with a kit of its own (silent.js). No `cp`, as 16-20:
+    // every id in its record is one of its thirty.
+    { n: 21, part: 2, title: { fatha: 'Letters that are not read', zabar: 'Letters that are not read' }, href: 'lesson-21.html', built: true,
+      progress: 'drill', lede: 'Written on the page, and left out when it is read.' },
+    // Lesson 22 is the seventh RULE lesson (docs/lesson-22/): twenty-seven words by reference, fifteen asked "how do you stop on this word?" and
+    // twelve "what does the lit sign say?", on the rule page with a kit of its own (stop.js). No `cp`, as 16-21: every id in its record is one of them.
+    { n: 22, part: 2, title: { fatha: 'Stopping', zabar: 'Stopping' }, href: 'lesson-22.html', built: true,
+      progress: 'drill', lede: 'How a word changes when you stop on it.' },
     { n: 23, part: 2, title: { fatha: 'Al-Fatiha', zabar: 'Al-Fatiha' }, lede: 'The first surah, read whole.' },
     { n: 24, part: 2, title: { fatha: 'Noon and tanween', zabar: 'Noon and tanween' },
       lede: 'Four ways to read them: clear, merged, turned into meem, hidden.' },

@@ -2107,7 +2107,8 @@ a.crumb:hover {
 /* A mark lesson's question can carry zair, which hangs below even a letter that already has a tail (وِ): it came to
    rest a few pixels above the answers (fixes/lesson 4 5/zair touching the buttons.png). A clear gap under the question
    on these pages; Lesson 2's bare letters keep theirs. */
-:root[data-mark] .prompt {
+:root[data-mark] .prompt,
+:root[data-rule] .prompt {
   margin-bottom: 1.25rem;
 }
 
@@ -2888,7 +2889,8 @@ a.crumb:hover {
 }
 
 /* A marked letter is taller than a bare one, and seven letters hang below the line: the prompt needs room at both ends. */
-:root[data-mark] .prompt {
+:root[data-mark] .prompt,
+:root[data-rule] .prompt {
   padding-block-start: 0.5rem;
 }
 
@@ -3549,6 +3551,532 @@ a.crumb:hover {
 
 :root[data-mark='shadda'][data-tailfit='shrink'] .mark-tile[data-tail] {
   aspect-ratio: 5 / 7.3;
+}
+
+/* Lesson 16 - hamza, the first rule page (docs/lesson-16/03 §4). The board is not a list of letters but a GRID: a row per
+   mark and a column per seat, so that reading a row across says the lesson - the same sound on four seats, and only the
+   hamza is read. Right to left, like the script: the alif seat is on the right, and each row's name and sound are at the
+   left end. A cell is Lesson 4's tile (.letter.mark-tile) made fluid, so the tile look, the peek and the gold edge of a form
+   just missed are the ones every lesson has. The whole map is on the board from part 1: a form whose part is not open yet is
+   dimmed, never hidden, so the grid never changes shape and nothing is locked. The tile is tall for what it can hold: a
+   hamza sign above the alif with the vowel over it, a zair below the yaa seat, and the two-letter jazam forms after their baa. */
+/* The question's picture is a hamza on its seat: in Madani an alif with a hamza sign and a vowel over it is the tallest stack
+   the Qaida draws in one glyph, and a zair under the alif seat hangs as far below. shell.centerInk centres the line box, not
+   the ink, so at 375px the paish on an alif seat came within 1.8px of the top of the (clipping) prompt. Measured 2026-09-30
+   in the browser pane, all fifteen forms, both scripts, ink against the prompt's box: 2.15 times the glyph in place of 1.9
+   left 7.1px at worst; 2.3 leaves 12.7px at 375px (Madani, a hamza on an alif with paish, at the top; a hamza under the
+   alif with zair, 18.6px, at the bottom) and 34px or more in Indo-Pak. */
+:root[data-rule] .prompt {
+  min-height: calc(var(--prompt-size) * 2.3);
+}
+
+.seat-strip {
+  display: flex;
+  direction: rtl;
+  justify-content: center;
+  gap: clamp(0.5rem, 2.5vw, 1rem);
+  margin: 1rem auto 0;
+}
+
+.seat-strip .pair-cell {
+  direction: ltr;
+}
+
+.seat-strip .rule-cell {
+  width: var(--tile);
+}
+
+.seat-note,
+.same-line,
+.script-line {
+  max-width: 46ch;
+  margin: 0.75rem auto 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-foreground);
+}
+
+.script-line {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+}
+
+.rule-grid {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 34rem;
+  margin: 1.5rem auto 0;
+}
+
+.rule-row {
+  display: grid;
+  direction: rtl;
+  /* Four seats on the hamza's grid; Lesson 17's rows set --cols themselves (the round taa's grid is three across, the end yaa's four). */
+  grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)) minmax(4.25rem, 1.1fr);
+  gap: 0.375rem;
+  align-items: center;
+}
+
+/* Lesson 17: each shape's grid has a small heading of its own, in the muted body voice the grid's column heads have. */
+.rule-grid-title {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+.rule-grid-title:first-child {
+  margin-top: 0;
+}
+
+.rule-head {
+  align-items: end;
+}
+
+.rule-col {
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+.rule-cell {
+  width: 100%;
+  max-width: calc(var(--tile) * 1.2); /* fluid on a phone, and no bigger than a mark lesson's tile on a wide screen */
+  justify-self: center;
+  aspect-ratio: 5 / 7.4;
+  padding: 0.375rem 0 0.875rem;
+}
+
+.rule-cell .glyph {
+  line-height: 1.85;
+}
+
+/* A form whose part comes later: still a button, still says its sound, only quieter. */
+.rule-cell[data-state='later'] {
+  opacity: 0.45;
+}
+
+.rule-dash {
+  text-align: center;
+  color: var(--color-muted-foreground);
+  opacity: 0.5;
+}
+
+.rule-label {
+  display: grid;
+  gap: 0.125rem;
+  direction: ltr;
+  padding-inline-start: 0.25rem;
+  text-align: left;
+}
+
+.rule-name,
+.rule-sound {
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.rule-name {
+  color: var(--color-foreground);
+}
+
+.rule-sound {
+  color: var(--color-muted-foreground);
+}
+
+/* The row the same-sound line is about: the one last tapped, or the one just missed. */
+.rule-row[data-current] .rule-name,
+.rule-row[data-current] .rule-sound {
+  color: var(--color-accent);
+}
+
+/* Under a wrong answer: the same sound on every seat, drawn small. */
+.seat-echo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 0.75rem;
+  margin: 0.5rem auto 0;
+  font-size: 0.9375rem;
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+.seat-echo-forms {
+  display: inline-flex;
+  direction: rtl;
+  gap: 0.875rem;
+}
+
+.seat-echo-form {
+  font-family: var(--font-letter);
+  font-size: 1.75rem;
+  line-height: 1.9;
+  color: var(--color-foreground);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The rows arrive 35ms apart, as the pairs of a mark lesson do. */
+  :root:not([data-arrive='all']) .rule-grid.arrive .rule-row {
+    animation: rise 700ms var(--ease-out) backwards;
+    animation-delay: calc(120ms + var(--i, 0) * 35ms);
+  }
+}
+
+@media (max-width: 599px) {
+  .rule-grid {
+    gap: 0.375rem;
+  }
+
+  .rule-row {
+    gap: 0.25rem;
+    grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)) minmax(3.75rem, 1fr);
+  }
+}
+
+/* Lesson 18 - Al-, the third rule page and the first with the Qur'an's own WORDS (docs/lesson-18/01 §6). An item is a whole word, so
+   the tile is wide and short where the hamza's is tall and narrow, the question's picture is a word and not one glyph, and the two
+   places the lesson is about (the laam of Al-, and the letter after it) are lit inside the word. A lit place is a span holding only a
+   colour and a tint: that does not break Arabic joining, so the word still reads as one word (measured in the browser pane, both
+   scripts). Read = the laam is said; silent = the laam is not said; twice = the letter its shadda doubles. Never colour alone: the
+   marks themselves (a jazam, a shadda) are what the student is learning to read, and the lines under the board say so. */
+.unit {
+  --unit-lit: var(--color-accent);
+  --unit-quiet: var(--color-muted-foreground);
+}
+
+/* Inside a tile (paper, in either theme) the tile's own colours: the page's muted grey is made for the dark page and all but vanishes
+   on paper. */
+.word-cell .unit {
+  --unit-lit: var(--tile-mark);
+  --unit-quiet: var(--tile-muted);
+}
+
+/* The tint is a band across the letters and not the whole line box, which at this size is a tall stripe: 30% to 80% of the box is
+   where a letter's body sits in both faces. */
+.unit[data-role='read'],
+.unit[data-role='twice'] {
+  color: var(--unit-lit);
+  background: linear-gradient(to bottom, transparent 30%, rgb(var(--rgb-accent) / 0.28) 30%, rgb(var(--rgb-accent) / 0.28) 80%, transparent 80%);
+}
+
+.unit[data-role='silent'] {
+  color: var(--unit-quiet);
+  background: linear-gradient(to bottom, transparent 30%, rgb(var(--rgb-foreground) / 0.1) 30%, rgb(var(--rgb-foreground) / 0.1) 80%, transparent 80%);
+}
+
+:root[data-rule='al'] .prompt {
+  min-height: calc(var(--prompt-size) * 1.7);
+}
+
+:root[data-rule='al'] .prompt-glyph {
+  font-size: calc(var(--prompt-size) * 0.7);
+  line-height: 1.75;
+  white-space: nowrap;
+}
+
+.word-row {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.word-row .rule-label {
+  padding-inline-start: 0;
+  text-align: center;
+}
+
+/* A row of words, five across where the board is wide enough and as many as fit where it is not, the last line centred: no orphan
+   pinned to one side. */
+.word-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  direction: rtl;
+  gap: 0.375rem;
+}
+
+.word-tiles .word-cell {
+  flex: 0 0 6.25rem;
+  width: 6.25rem;
+}
+
+.word-cell {
+  position: relative;
+  max-width: none;
+  aspect-ratio: auto;
+  min-height: calc(var(--tile) * 1.1);
+  padding: 0.375rem 0.25rem 1.125rem;
+}
+
+.word-cell .glyph {
+  font-size: calc(var(--tile) * 0.46);
+  line-height: 1.95;
+  white-space: nowrap;
+}
+
+/* Where in the Qur'an the word was copied from, small under it. */
+.word-ref {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0.3rem;
+  font-size: 0.6875rem;
+  line-height: 1;
+  text-align: center;
+  color: var(--tile-muted);
+}
+
+.seat-strip .word-cell {
+  width: clamp(8.25rem, 40vw, 12.5rem);
+  min-height: calc(var(--tile) * 1.5);
+}
+
+.seat-strip .word-cell .glyph {
+  font-size: calc(var(--tile) * 0.72);
+}
+
+.sun-letters {
+  display: grid;
+  gap: 0.125rem;
+  max-width: 46ch;
+  margin: 0.75rem auto 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+.sun-letters-glyphs {
+  font-family: var(--font-letter);
+  font-size: 1.5rem;
+  line-height: 1.7;
+  text-wrap: balance;
+  color: var(--color-foreground);
+}
+
+.seat-echo-word {
+  font-size: 2.25rem;
+  line-height: 1.9;
+  white-space: nowrap;
+}
+
+/* Lesson 19 - the joining alif, the fourth rule page and the first with PAIRS of the Qur'an's words (docs/lesson-19/01 §4). It is
+   Lesson 18's page with a pair where there was a word, so the tile is wider and the letters a little smaller; and three more places
+   are lit besides the alif: carry = the letter a joined sound runs on from (and a verb's third letter), short and long = the long vowel.
+   They are drawn like read and twice (the accent), silent stays the dim one: the alif that is not read. */
+.unit[data-role='carry'],
+.unit[data-role='short'],
+.unit[data-role='long'],
+.unit[data-role='ask'],
+.unit[data-role='end'],
+.unit[data-role='sign'] {
+  color: var(--unit-lit);
+  background: linear-gradient(to bottom, transparent 30%, rgb(var(--rgb-accent) / 0.28) 30%, rgb(var(--rgb-accent) / 0.28) 80%, transparent 80%);
+}
+
+:root[data-rule='wasl'] .prompt,
+:root[data-rule='madd'] .prompt,
+:root[data-rule='silent'] .prompt,
+:root[data-rule='stop'] .prompt {
+  min-height: calc(var(--prompt-size) * 1.7);
+}
+
+:root[data-rule='wasl'] .prompt-glyph,
+:root[data-rule='madd'] .prompt-glyph,
+:root[data-rule='silent'] .prompt-glyph,
+:root[data-rule='stop'] .prompt-glyph {
+  font-size: calc(var(--prompt-size) * 0.75);
+  line-height: 1.85;
+  white-space: nowrap;
+}
+
+/* Three words on their own, one for each vowel: they may wrap where the screen is narrow, and the captions are longer than Lesson 18's. */
+:root[data-rule='wasl'] .seat-strip,
+:root[data-rule='madd'] .seat-strip,
+:root[data-rule='silent'] .seat-strip,
+:root[data-rule='stop'] .seat-strip {
+  flex-wrap: wrap;
+}
+
+:root[data-rule='wasl'] .seat-strip .word-cell,
+:root[data-rule='madd'] .seat-strip .word-cell,
+:root[data-rule='silent'] .seat-strip .word-cell,
+:root[data-rule='stop'] .seat-strip .word-cell {
+  width: clamp(6.5rem, 28vw, 9.5rem);
+}
+
+:root[data-rule='wasl'] .seat-strip .word-cell .glyph,
+:root[data-rule='madd'] .seat-strip .word-cell .glyph,
+:root[data-rule='silent'] .seat-strip .word-cell .glyph,
+:root[data-rule='stop'] .seat-strip .word-cell .glyph {
+  font-size: calc(var(--tile) * 0.5);
+}
+
+/* The caption is as wide as its tile and no wider, so three tiles stay across on a phone. */
+:root[data-rule='wasl'] .seat-strip .pair-caption,
+:root[data-rule='madd'] .seat-strip .pair-caption,
+:root[data-rule='silent'] .seat-strip .pair-caption,
+:root[data-rule='stop'] .seat-strip .pair-caption {
+  max-width: clamp(6.5rem, 28vw, 9.5rem);
+  font-size: 0.75rem;
+}
+
+/* Lesson 20 - the three captions are not the same length, and a grid cell stretches its tile to fill the row the tallest caption makes, so
+   the tile with the shortest caption came out taller than the others (measured at 375px: 81px against 73.5px). The tiles keep their own
+   height and each caption hangs from its tile. */
+:root[data-rule='madd'] .seat-strip .pair-cell,
+:root[data-rule='silent'] .seat-strip .pair-cell,
+:root[data-rule='stop'] .seat-strip .pair-cell {
+  align-content: start;
+}
+
+/* A pair needs a wider tile than a word, and smaller letters in it, so two fit across a phone and the pair is never clipped. */
+.word-tiles .word-pair {
+  flex: 0 0 10.25rem;
+  width: 10.25rem;
+}
+
+.word-pair .glyph {
+  font-size: calc(var(--tile) * 0.34);
+}
+
+:root[data-rule='wasl'] .seat-echo-word,
+:root[data-rule='madd'] .seat-echo-word,
+:root[data-rule='silent'] .seat-echo-word,
+:root[data-rule='stop'] .seat-echo-word {
+  font-size: 1.75rem;
+}
+
+/* Lesson 21 - letters that are not read, and the first question to TAP a letter (docs/lesson-21/01 §5). The word is shown with every letter its own
+   span; a span holding only a colour does not break Arabic joining (Lesson 18, measured), so the word still reads as one word. A tap target is a
+   letter's own box, widened a little by an absolutely placed pseudo-element, which is out of the flow and so cannot touch the shaping. Nothing is
+   tinted until the answer is in: a lit letter in the question would be the answer. */
+.unit.tap {
+  position: relative;
+  cursor: pointer;
+  border-radius: 0.2em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.unit.tap::before {
+  content: '';
+  position: absolute;
+  inset: -0.2em -0.16em;
+}
+
+@media (hover: hover) {
+  .unit.tap:not([aria-disabled='true']):hover {
+    background: linear-gradient(to bottom, transparent 30%, rgb(var(--rgb-accent) / 0.16) 30%, rgb(var(--rgb-accent) / 0.16) 80%, transparent 80%);
+  }
+}
+
+.unit.tap:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* After the answer: gold on the right letter with a line under it (never colour alone), the wrong one quiet with a dashed line, the rest dim. */
+.unit.tap[aria-disabled='true'] {
+  cursor: default;
+}
+
+.unit.tap[data-verdict='right'] {
+  color: var(--color-accent);
+  background: linear-gradient(to bottom, transparent 30%, rgb(var(--rgb-accent) / 0.28) 30%, rgb(var(--rgb-accent) / 0.28) 80%, transparent 80%);
+  text-decoration: underline solid;
+  text-decoration-thickness: 0.05em;
+  text-underline-offset: 0.3em;
+}
+
+.unit.tap[data-verdict='wrong'] {
+  color: var(--color-muted-foreground);
+  text-decoration: underline dashed;
+  text-decoration-thickness: 0.04em;
+  text-underline-offset: 0.3em;
+}
+
+.unit.tap[data-verdict='dim'] {
+  opacity: 0.55;
+}
+
+/* The word is the whole of the question, and the narrowest letter in it (an alif) is a tap target, so it is drawn larger than Lesson 20's: measured at
+   375px the widest word of the lesson left 83px to spare on each side at 56px, and the narrowest letter's target was 30px. It grows with the screen and
+   stops before the prompt's own height does. */
+:root[data-rule='silent'] .prompt-word {
+  font-size: clamp(3.5rem, 3rem + 7vw, 6.5rem);
+}
+
+/* A tap question in the first two parts has no "none" answer, so the answers box is empty and takes no room; with it, one button, centred. */
+:root[data-rule='silent'] .choices:empty {
+  display: none;
+}
+
+/* Lesson 22 - stopping (docs/lesson-22/01 §4). Under each of the three words on their own: how it is said at a stop, composed by the kit and never the
+   printed word, so it is drawn smaller than the word and after a plain label that says what it is. The end that changed is lit as the word's is. */
+.word-said {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  max-width: clamp(6.5rem, 28vw, 9.5rem);
+  font-size: 0.75rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+/* The captions above them are one line or two on a phone, which left the three stopped forms at three heights (measured at 375px): two lines' room each. */
+:root[data-rule='stop'] .seat-strip .pair-caption {
+  min-height: 2.5em;
+}
+
+.word-said-glyph {
+  font-family: var(--font-letter);
+  font-size: calc(var(--tile) * 0.42);
+  line-height: 1.9;
+  white-space: nowrap;
+  color: var(--color-foreground);
+}
+
+/* A sign's list shows the sign itself, as the student's own script prints it, on a short tatweel so it has a line to sit over. A sign is a small mark
+   drawn high, so it is set large (measured: at 2.25rem it was smaller than the list's own heading). */
+.rule-sign {
+  display: block;
+  font-family: var(--font-letter);
+  font-size: 4rem;
+  line-height: 1.15;
+  color: var(--color-accent);
+}
+
+/* A lit sign rides on a space (Quran.com puts one before every sign, in both scripts), so the tint is drawn high, where the sign is, and not across
+   the empty middle of the line where a letter's body would be. */
+.unit[data-role='sign'] {
+  background: linear-gradient(to bottom, transparent 2%, rgb(var(--rgb-accent) / 0.28) 2%, rgb(var(--rgb-accent) / 0.28) 42%, transparent 42%);
+}
+
+/* The question's word is drawn in the text colour and only its lit place in gold: a prompt is gold on every other page, so a gold sign on a gold word
+   could only be told by its tint band, and an Indo-Pak sign rides on a zero-width space, whose band has no width at all (measured at 375px). */
+:root[data-rule='stop'] .prompt-word {
+  color: var(--color-foreground);
+}
+
+/* Under a wrong answer about a stop word: the printed word, the word "said", and how it is said at a stop. */
+.seat-echo-said {
+  align-self: center;
+  font-size: 0.8125rem;
+  color: var(--color-muted-foreground);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-arrive='all']) .rule-grid.arrive .word-row {
+    animation: rise 700ms var(--ease-out) backwards;
+    animation-delay: calc(120ms + var(--i, 0) * 35ms);
+  }
 }
 
 /* The trio: the letter, then with the stroke of the lesson before, then with this one. Three tiles and two arrows in a row,

@@ -232,7 +232,11 @@
         return true;
       };
 
-      const others = shuffle(items.filter((other) => other.id !== item.id));
+      // A drill that mixes questions (Lesson 19: "how do you start it?" beside "is the alif read?") tags each item with the question it
+      // answers, `askGroup`, and an answer to one question is never offered to another. An item with no tag, which is every item of every
+      // lesson before it, is dealt exactly as before: the filter is a no-op.
+      const group = item.askGroup;
+      const others = shuffle(items.filter((other) => other.id !== item.id && (group == null || other.askGroup === group)));
       if (settings.familyFirst && count > 0) {
         for (const other of others) {
           if (sharesFamily(item, other) && take(other)) break;
@@ -258,13 +262,23 @@
     }
 
     function makeQuestion(item, format, n, fromDeck) {
-      const wanted = clamp(Math.round(Number(settings.choices)) || DEFAULTS.choices, 2, 6) - 1;
-      const spread = distractorsFor(item, format, wanted);
-      if (!spread.length) return null; // below two choices there is no question to ask
       const prompt = { mode: format.ask };
       if (format.ask === 'glyph') prompt.glyph = item.glyph;
       else if (format.ask === 'name') prompt.name = item.name;
       else if (format.ask === 'sound') prompt.audio = item.audio;
+
+      // A format may bring its own answers (Lesson 21's "tap the letter": the answers are the word's own letters, which are not other items). It
+      // says which answer is right (`correctFor`); they keep the order it gave them, which here is the order the letters are read in. Every other
+      // format has no `choicesFor`, so it is dealt exactly as before.
+      if (typeof format.choicesFor === 'function') {
+        const own = format.choicesFor(item);
+        if (!Array.isArray(own) || own.length < 2) return null;
+        return { n, format, item, prompt, choices: own, correct: format.correctFor(item), answered: false, verdict: null, fromDeck: Boolean(fromDeck) };
+      }
+
+      const wanted = clamp(Math.round(Number(settings.choices)) || DEFAULTS.choices, 2, 6) - 1;
+      const spread = distractorsFor(item, format, wanted);
+      if (!spread.length) return null; // below two choices there is no question to ask
 
       const total = spread.length + 1;
       const others = shuffle(spread);
@@ -274,7 +288,7 @@
       for (let i = 0, next = 0; i < total; i += 1) {
         if (i !== at) choices[i] = others[next++];
       }
-      return { n, format, item, prompt, choices, answered: false, verdict: null, fromDeck: Boolean(fromDeck) };
+      return { n, format, item, prompt, choices, correct: item.id, answered: false, verdict: null, fromDeck: Boolean(fromDeck) };
     }
 
     function advance() {
@@ -310,7 +324,7 @@
       if (!chosen) return null;
 
       const item = question.item;
-      const right = chosen.id === item.id;
+      const right = chosen.id === question.correct;
       const before = streakOf(item.id);
       const streak = shell.recordAnswer(lesson, item.id, right);
       question.answered = true;

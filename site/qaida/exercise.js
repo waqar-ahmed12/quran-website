@@ -199,6 +199,46 @@
       [['س', 'damma'], ['ك', 'shadda-fatha'], ['ر', 'dammatain']], // sukkarun, "sugar"
       [['ي', 'fatha'], ['ر', 'damma'], ['د', 'shadda-damma']], // yaruddu, "he gives back"
     ],
+    // docs/lesson-16/05 §2: twelve words with a hamza, alif seats first (the seat the student knows), then the yaa and wow
+    // seats, the line last. A seat is written as its Madani letter and drawn by rules.js for the script in use, so word 1 is
+    // an alif seat in Madani and a bare alif in Indo-Pak; word 6 is an alif with a jazam in Indo-Pak (docs/lesson-16/02 §2).
+    // Ordinary spellings, not quotations; candidates for the teacher's check. Word 10 is not the plan's لؤلؤ: its last
+    // hamza sits on a wow with two paish, which is not one of the fifteen forms, so a word with one hamza on a wow was chosen.
+    hamza: [
+      [['أ', 'fatha'], ['ك', 'fatha'], ['ل', 'fatha']], // 'akala, "he ate"
+      [['أ', 'fatha'], ['خ', 'fatha'], ['ذ', 'fatha']], // 'akhadha, "he took"
+      [['أ', 'fatha'], ['ب', 'dammatain']], // 'abun, "a father"
+      [['إ', 'kasra'], ['ذ', 'fatha-alif']], // 'idhaa, "when"
+      [['ق', 'fatha'], ['ر', 'fatha'], ['أ', 'fatha']], // qara'a, "he read" - the alif seat at the end
+      [['ي', 'fatha'], ['أ', 'sukun'], ['ك', 'damma'], ['ل', 'damma']], // ya'kulu, "he eats" - in Indo-Pak an alif with a jazam
+      [['س', 'damma'], ['ئ', 'kasra'], ['ل', 'fatha']], // su'ila, "he was asked"
+      [['ب', 'kasra'], ['ئ', 'sukun'], ['ر', 'dammatain']], // bi'run, "a well"
+      [['ذ', 'kasra'], ['ئ', 'sukun'], ['ب', 'dammatain']], // dhi'bun, "a wolf"
+      [['م', 'damma'], ['ؤ', 'sukun'], ['ل', 'kasra'], ['م', 'dammatain']], // mu'limun, "painful"
+      [['ش', 'fatha-yaa'], ['ء', 'dammatain']], // shay'un, "a thing" - on the line, after a yaa with a jazam
+      [['ج', 'fatha'], ['ز', 'fatha-alif'], ['ء', 'fathatain']], // jazaa'an, "a reward" - on the line, with two zabar
+    ],
+    // docs/lesson-17/01 §6: twelve words, six ending in a round taa and six in an end yaa. A round taa is the key ة, with the mark
+    // it carries (two paish in three, two zabar in two — the ones with no alif after them — and two zair in one); an end yaa is
+    // the key ى with 'aa' (four: its small alif, or in Indo-Pak a khari zabar on the letter before) or 'ee' (two: bare in Madani,
+    // with a jazam in Indo-Pak). Ordinary spellings, not quotations; candidates for the teacher's check. Left out on purpose: "hudan"
+    // (two zabar on the daal, so no small alif: a stop changes it, Lesson 22's), "salaatun" (the mushaf's spelling is Lesson 21's)
+    // and anything with the article (Lesson 18). Several meet an earlier lesson's mark in the same word, the ones to look at in both
+    // scripts: a shadda (words 1, 8, 11), a long "ee" (word 3), a long "oo" (words 5, 10) and a hamza on a seat (word 7).
+    ends: [
+      [['ج', 'fatha'], ['ن', 'shadda-fatha'], ['ة', 'dammatain']], // jannatun, "a garden"
+      [['ش', 'fatha'], ['ج', 'fatha'], ['ر', 'fatha'], ['ة', 'fathatain']], // shajaratan, "a tree" - two zabar, no alif after it
+      [['م', 'fatha'], ['د', 'kasra-yaa'], ['ن', 'fatha'], ['ة', 'dammatain']], // madiinatun, "a city"
+      [['ن', 'kasra'], ['ع', 'sukun'], ['م', 'fatha'], ['ة', 'kasratain']], // ni'matin, "a blessing"
+      [['س', 'damma-waw'], ['ر', 'fatha'], ['ة', 'dammatain']], // suuratun, "a surah"
+      [['ق', 'kasra'], ['ب', 'sukun'], ['ل', 'fatha'], ['ة', 'fathatain']], // qiblatan, "a direction" - two zabar, no alif after it
+      [['إ', 'kasra'], ['ل', 'fatha'], ['ى', 'aa']], // 'ilaa, "to"
+      [['ح', 'fatha'], ['ت', 'shadda-fatha'], ['ى', 'aa']], // hattaa, "until"
+      [['ب', 'fatha'], ['ل', 'fatha'], ['ى', 'aa']], // balaa, "yes, indeed"
+      [['م', 'damma-waw'], ['س', 'fatha'], ['ى', 'aa']], // muusaa, "Musa"
+      [['ر', 'fatha'], ['ب', 'shadda-kasra'], ['ى', 'ee']], // rabbii, "my Lord"
+      [['ن', 'fatha'], ['ف', 'sukun'], ['س', 'kasra'], ['ى', 'ee']], // nafsii, "my soul"
+    ],
     // docs/lesson-9/05 §3: twelve words, exactly as the mushaf spells them (docs/lesson-9/05 §1) — khari zabar in
     // six, khari zair in three, ulta paish in four, every one built from a mark this lesson teaches. Four of them
     // (words 2, 11 and 12, and spell.js's own walkthrough word 3) are the ones docs/lesson-9/05 §4 is least sure of;
@@ -219,6 +259,19 @@
     ],
   };
 
+  // Lesson 18 (docs/lesson-18/01 §6): twelve of the Qur'an's own words, COPIED and named by reference (docs/pass-2/02 §3), so an
+  // entry here is a reference string ("55:9:2") and not a list of [key, mark] pairs. al.js holds them (`READING`), drawn by
+  // rules.wordText for the script in use. No list above can change: only this one holds strings.
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.al) WORDS.al = window.qaidaRules.KITS.al.READING;
+  // Lesson 19: pairs and words, the same references (docs/lesson-19/01 §8), drawn by rules.wordText for the script in use.
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.wasl) WORDS.wasl = window.qaidaRules.KITS.wasl.READING;
+  // Lesson 20: words and pairs with and without the wavy line, the same references (docs/lesson-20/01 §8).
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.madd) WORDS.madd = window.qaidaRules.KITS.madd.READING;
+  // Lesson 21: words with a letter that is not read, a wow that carries "aa", and words where every letter is read (docs/lesson-21/01 §7).
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.silent) WORDS.silent = window.qaidaRules.KITS.silent.READING;
+  // Lesson 22: places to stop, seven verse ends and five words with a stop sign, every kind of end the lesson teaches (docs/lesson-22/01 §7).
+  if (window.qaidaRules && window.qaidaRules.KITS && window.qaidaRules.KITS.stop) WORDS.stop = window.qaidaRules.KITS.stop.READING;
+
   // Exposed so tools/qaida-words-check.js can check every word, on every lesson, without a browser (docs/lesson-8/06
   // §3). Before the grid guard below: the data exists whether or not this particular page has a .mashq to draw it in.
   window.qaidaExerciseWords = WORDS;
@@ -226,8 +279,11 @@
   const grid = document.querySelector('.mashq');
   if (!grid) return;
 
-  // A single mark (lessons 4-6, 8) or a SET (Lesson 9's "standing" — marks.markOf returns null for a set, docs/lesson-9/04 §6).
-  const mark = marks.markOf(root.dataset.mark) || marks.setOf(root.dataset.mark);
+  // A single mark (lessons 4-6, 8), a SET (Lesson 9's "standing" — marks.markOf returns null for a set, docs/lesson-9/04 §6),
+  // or, from Lesson 16, a RULE (`data-rule`, rules.js): its `id` and `lesson` are all this file reads.
+  const rules = window.qaidaRules;
+  const rule = rules && rules.RULES[root.dataset.rule];
+  const mark = marks.markOf(root.dataset.mark) || marks.setOf(root.dataset.mark) || rule;
   const words = mark && WORDS[mark.id];
   if (!mark || !words) return;
 
@@ -241,7 +297,16 @@
   }
 
   function glyphFor(names, word) {
+    // A copied word (Lesson 18) is a reference: the Qur'an's own text for it, in the script in use.
+    if (typeof word === 'string') return rules.wordText(word);
+    // A round taa or an end yaa (Lesson 17): rules.js draws the whole word, since the long "aa" touches the letter before it.
+    if (rules && rules.hasEnd && rules.hasEnd(word)) {
+      return rules.wordUnits(word, (key) => (names.get(key) ? names.get(key).glyph : key)).join('');
+    }
     return word.map(([key, id]) => {
+      // A hamza seat (docs/lesson-16/03 §8): rules.js draws it for the script in use, null for every other key.
+      const seat = rules && rules.seatOf(key);
+      if (seat) return seat + marks.drawnOf(marks.markOf(id));
       const found = names.get(key);
       return marks.glyphOf(found ? found.glyph : key, marks.markOf(id));
     }).join('');
@@ -249,7 +314,8 @@
 
   function paint() {
     const names = lettersMap();
-    if (lede) lede.textContent = fill(lede.dataset.template, { mark: marks.nameOf(mark, shell) });
+    // A rule has no single mark to name: its lede is a plain line.
+    if (lede) lede.textContent = fill(lede.dataset.template, { mark: rule ? '' : marks.nameOf(mark, shell) });
 
     grid.textContent = '';
     words.forEach((word, i) => {

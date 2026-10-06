@@ -483,13 +483,13 @@ async function main() {
   check(/^\S+ with tashdeed and zabar: said twice/.test($('.spell-caption').textContent), 'the zabar set names it tashdeed in the walkthrough', $('.spell-caption').textContent);
   await setNames('fatha');
 
-  console.log('\nThe ways out: Previous goes to Lesson 14, Next to Lesson 16 (not built yet)');
+  console.log('\nThe ways out: Previous goes to Lesson 14, Next to Lesson 16 (built 2026-09-30: a real link now)');
   check($('.prev').attrs.href === 'lesson-14.html' && $('.prev span').textContent === 'Previous: Sukoon', 'Previous goes to Lesson 14', $('.prev span').textContent);
   check($('.spell-more a').attrs.href === 'exercise-15.html' && fs.existsSync(path.join(dir, 'exercise-15.html')), 'Practice reading goes to exercise-15.html, which exists');
   check($('.next span').textContent === 'Next: Hamza' && !$('.next').attrs['data-last'], 'Next reads "Next: Hamza"', $('.next span').textContent);
   location.href = '';
   click($('.next'), 1);
-  check(location.href === '' && /isn.t built yet/.test($('.note').textContent || ''), 'and it says so instead of going anywhere, until Lesson 16 exists', $('.note').textContent);
+  check(location.href === 'lesson-16.html', 'and it goes to Lesson 16, which is built (it said "not built yet" until Lesson 16 existed)', location.href);
   await setNames('zabar');
   check($('.prev span').textContent === 'Previous: Jazam' && $('.next span').textContent === 'Next: Hamza', 'in the zabar set, Previous follows the names', $('.prev span').textContent);
   await setNames('fatha');
@@ -507,7 +507,7 @@ async function main() {
   console.log('\nThe reading page');
   const ex = fs.readFileSync(path.join(dir, 'exercise-15.html'), 'utf8');
   check(/data-mark="shadda"/.test(ex) && /href="lesson-15\.html"/.test(ex), 'exercise-15.html teaches the shadda set and goes back to Lesson 15');
-  check(/data-next-fatha="Next: Hamza"/.test(ex) && !/data-last/.test(ex), 'its Next goes on to Lesson 16 (not built yet)');
+  check(/data-next-fatha="Next: Hamza"/.test(ex) && !/data-last/.test(ex), 'its Next goes on to Lesson 16');
   check(!/[ً-ْٰۖ-ۭ]/.test(ex), 'and holds no literal combining mark');
 
   console.log(failed === 0 ? '\nAll checks passed.' : '\n' + failed + ' check(s) FAILED.');

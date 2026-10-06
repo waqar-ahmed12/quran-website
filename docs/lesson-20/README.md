@@ -1,7 +1,22 @@
+---
+tags: [lesson-20, madd, wavy-line, rule-page, built]
+---
 # Lesson 20 — The wavy line: hold it longer: lesson plan
 
-*One-file plan, written 2026-09-28. It becomes a full folder before it is built. Read `docs/pass-2/` first. The script
-facts are `docs/pass-2/01` §6, checked against Quran.com.*
+*One-file plan, written 2026-09-28; **built 2026-10-05** (the user: "please make the next lesson in line"). The plan below is kept as it was
+written, with the build's own notes in [[docs/lesson-20/01-design|01 Design]] and [[docs/lesson-20/02-build-record|02 Build record]]. Read
+[[docs/pass-2/README|Pass 2]] first. The script facts are [[docs/pass-2/01-what-the-two-scripts-print|pass-2/01]] §6, checked against Quran.com.*
+
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · before it [[docs/lesson-19/README|Lesson 19, the joining alif]] · after it [[docs/lesson-21/README|Lesson 21, letters that are not read]]
+
+## Status — built (2026-10-05)
+
+Built on the README's recommendations: **only the words on the page ("longer", "longest"), no beats**, the next-word case taught as **longer**, and
+**both scripts**, with Lesson 18's honest line about the stand-in font. **Nine places differ from this plan**, each with its reason in
+[[docs/lesson-20/02-build-record|02 Build record]] §2; the ones that matter most: **a "shadda or jazam" is a shadda** (the only line before a jazam is
+the opening letters, Lesson 28's); **الضَّآلِّينَ is out** (it ends its verse, and its Indo-Pak text carries a private-use sign; its sister ٱلضَّآلُّونَ stands
+in, and it is Lesson 23's); **the wavy line is one code point, U+0653** though Indo-Pak uses U+06E4 in more than half its wavy lines; and **the
+by-ear question is built** as a kit flag (`byEar`), so a recorded word is asked by ear from its first question and nothing waits on a recording.
 
 | | |
 |---|---|

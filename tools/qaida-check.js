@@ -1326,6 +1326,45 @@ console.log('\nThe fence: lessons 4-14 come out identical after Lesson 15');
   }
 }
 
+// ---- 9f7. The fence for lessons 4-15, written before Lesson 16's rules.js and rule-lesson.js existed -------------------
+// docs/lesson-16/06 §2, step 1. The same recipe as 9f6, over `lesson <= 15`, taken with rules.js not yet written. Lesson 16
+// is a rule page and adds files; marks.js, mark-lesson.js and practice.js are not edited, so this must not move.
+
+console.log('\nThe fence: lessons 4-15 come out identical after Lesson 16');
+{
+  const crypto = require('crypto');
+  const probe = boot();
+  const lines = [];
+  for (const [name, mark] of Object.entries(probe.marks.MARKS)) {
+    if (mark.lesson > 15) continue;
+    for (const script of ['madani', 'indopak']) {
+      const w = boot();
+      w.shell.state.script = script;
+      const own = w.marks.MARKS[name];
+      for (const it of w.marks.allItems(w.shell, own)) lines.push(['item', name, script, it.id, it.glyph, it.key].join('|'));
+      for (const it of w.marks.twinItems(w.shell, own, { keys: own.first })) lines.push(['twin', name, script, it.id, it.glyph, it.key].join('|'));
+      for (const n of [1, 2]) {
+        for (const row of w.marks.boardRows(w.shell, own, n)) {
+          lines.push(['row', name, script, n, row.key, row.marked, row.joined, row.others.map((o) => `${o.id}:${o.glyph}`).join(',')].join('|'));
+        }
+        lines.push(['sample', name, script, n, w.marks.sampleOf(w.shell, own, n)].join('|'));
+      }
+    }
+  }
+  const hash = crypto.createHash('sha256').update(lines.join('\n')).digest('hex');
+  check(lines.length === 2604 && hash === '5496ff23143fa6ff798359d0185ea40383ba38d5b3616ada5e5f6345686eca01',
+    'every item, twin, board row and sample of lessons 4-15, in both scripts, is exactly what it was before Lesson 16', `${lines.length} ${hash}`);
+  const world = boot();
+  for (const n of [4, 5, 6, 8, 10, 11, 12, 13, 14]) {
+    const mark = Object.values(world.marks.MARKS).find((m) => m.lesson === n);
+    for (let k = 0; k < 3; k += 1) world.shell.recordAnswer(n, 'ب' + world.marks.suffixOf(mark), true);
+    check(world.shell.masteredCount(n) === 1, `masteredCount(${n}) counts one mastered item of its own`, String(world.shell.masteredCount(n)));
+  }
+  const shadda = world.marks.marksOf('shadda')[0];
+  for (let k = 0; k < 3; k += 1) world.shell.recordAnswer(15, 'ب' + world.marks.suffixOf(shadda), true);
+  check(world.shell.masteredCount(15) === 1, 'masteredCount(15) counts one mastered item of its own', String(world.shell.masteredCount(15)));
+}
+
 // ---- 9g. Lesson 9: a mark the two scripts write with different characters -----------------------------------------
 // docs/lesson-9/06 §3. The data layer only: marks.js, shell.js's masteredCount and audio.js's groups(), in node. The
 // page is tools/qaida-lesson9-check.js.
@@ -2277,7 +2316,9 @@ console.log('\nLesson 15: the shadda');
       `'${m.audio}' is one recording group of 27 rows, each shown with the lead and the letter's two marks`, String(rows.length));
     check(rows.length > 0 && /"ab-ba".*alif with fatha, then .+ with .+, said twice/.test(rows[0].say), `and the teacher is told the sound is said twice`, rows[0] && rows[0].say);
   }
-  check(wantedRows.length === 365 + 81, 'the recordings page now lists 81 more rows: 446 in all', String(wantedRows.length));
+  // Lesson 16 adds one more row (the closed "a'", `hamza-jazam`), but only where rules.js is loaded: this context has not
+  // loaded it, so it is still Lesson 15's 446. The row itself is checked in tools/qaida-rules-check.js.
+  check(wantedRows.length === 365 + 81, 'the recordings page (without rules.js) lists 81 more rows: 446 in all', String(wantedRows.length));
   const manifest = JSON.parse(fs.readFileSync(path.join(dir, 'audio', 'manifest.json'), 'utf8'));
   check(['shadda-fatha', 'shadda-kasra', 'shadda-damma'].every((k) => manifest[k] !== undefined), 'manifest.json has the three shadda groups');
 
@@ -2290,8 +2331,11 @@ console.log('\nLesson 15: the shadda');
   check(shell.LESSONS.length === 29 && shell.LESSONS.every((entry, i) => entry.n === i + 1), 'the home lists 29 lessons, in order');
   check(shell.LESSONS.filter((entry) => entry.part === 2).map((entry) => entry.n).join() === Array.from({ length: 15 }, (_, i) => i + 15).join()
     && shell.LESSONS.filter((entry) => !entry.part).length === 14, 'lessons 15-29 are the second part; 1-14 have no `part` and so are the first');
-  check(shell.LESSONS.filter((entry) => entry.built).length === 15 && shell.LESSONS.find((entry) => entry.n === 15).built === true, 'only lessons 1-15 are built');
-  check(shell.LESSONS.filter((entry) => entry.n > 15).every((entry) => !entry.href && !entry.built && entry.title.fatha && entry.lede), 'and each later lesson has a title and a line, and leads nowhere');
+  check(shell.LESSONS.filter((entry) => entry.built).length === 22 && shell.LESSONS.find((entry) => entry.n === 22).built === true, 'only lessons 1-22 are built');
+  check(shell.LESSONS.filter((entry) => entry.n > 22).every((entry) => !entry.href && !entry.built && entry.title.fatha && entry.lede), 'and each later lesson has a title and a line, and leads nowhere');
+  const hamzaRow = shell.LESSONS.find((entry) => entry.n === 16);
+  check(hamzaRow.href === 'lesson-16.html' && hamzaRow.progress === 'drill' && hamzaRow.part === 2 && hamzaRow.cp === undefined && !hamzaRow.tail,
+    'Lesson 16 is a real link in the second part, with no `cp`: every id in its record is one of its fifteen forms (docs/lesson-16/03 §8)');
   const row = shell.LESSONS.find((entry) => entry.n === 15);
   check(row.href === 'lesson-15.html' && row.progress === 'drill' && JSON.stringify(row.cp) === JSON.stringify([[0x064E, 0x0651], [0x0650, 0x0651], [0x064F, 0x0651]]) && !row.tail,
     'the home has Lesson 15 as a real link, counting ids that end in a vowel and the shadda');

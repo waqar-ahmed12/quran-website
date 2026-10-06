@@ -1,7 +1,21 @@
+---
+tags: [lesson-21, silent-letters, tap-the-letter, rule-page, built]
+---
 # Lesson 21 — Letters that are not read: lesson plan
 
-*One-file plan, written 2026-09-28. It becomes a full folder before it is built. Read `docs/pass-2/` first, above all
-`docs/pass-2/01` §2, checked against Quran.com, which is this lesson's whole foundation.*
+*One-file plan, written 2026-09-28; **built 2026-10-06** (the user: "go ahead and make the next lesson"). The plan below is kept as it was written, with the build's own notes in
+[[docs/lesson-21/01-design|01 Design]] and [[docs/lesson-21/02-build-record|02 Build record]]. Read [[docs/pass-2/README|Pass 2]] first, above all
+[[docs/pass-2/01-what-the-two-scripts-print|pass-2/01]] §2, checked against Quran.com, which is this lesson's whole foundation.*
+
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · before it [[docs/lesson-20/README|Lesson 20, the wavy line]] · after it [[docs/lesson-22/README|Lesson 22, stopping]]
+
+## Status — built (2026-10-06)
+
+Built on the README's recommendations, with **two things the plan did not say**: **thirty items** (18 words, 12 questions about one letter), in **three parts** (tap the letter; read,
+or not read?; all together, where "none" is an answer), and **the first question to tap a letter**, which needed the one change to the engine this pass was allowed
+(`practice.js`: a format may bring its own answers). **The plan's showpiece words are out** (the word for "those" and the word for prayer with its article), **the alif of *ana* is
+out** (a third answer), and **the Indo-Pak rule is stated and measured** against the whole Qur'an: 87% of Madani's circles agree with it, and the teacher still confirms it. The
+nine places that differ, and the user's list, are in [[docs/lesson-21/02-build-record|02 Build record]] §2 and §4.
 
 | | |
 |---|---|

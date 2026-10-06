@@ -63,9 +63,9 @@
   // The words for each position; the page overwrites these from its tagged elements, so they can be edited.
   const TEMPLATES = {
     isolated: '{name}, on its own',
-    initial: '{name}, start of a word',
-    medial: '{name}, middle of a word',
-    final: '{name}, end of a word',
+    initial: '{name}, start',
+    medial: '{name}, middle',
+    final: '{name}, end',
     joined: '{name}, joined',
   };
 
