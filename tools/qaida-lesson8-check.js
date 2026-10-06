@@ -267,7 +267,7 @@ async function main() {
   console.log('\nThe head');
   check($('h1').textContent === 'Fatha and alif' && doc.title.startsWith('Lesson 8: Fatha and alif'), 'the title is Fatha and alif in the fatha set', `${$('h1').textContent} / ${doc.title}`);
   check($('.title-mark').textContent === 'ب' + FATHA + ALIF, 'the big glyph is baa with fatha and alif, composed');
-  check($('.eyebrow').textContent === 'Lesson 8 of 14' && all('.track li').findIndex((li) => li.classes().includes('now')) === 7, 'it says which lesson it is, and lights the eighth of the track');
+  check($('.eyebrow').textContent === 'Lesson 8 of 29' && all('.track li').findIndex((li) => li.classes().includes('now')) === 7, 'it says which lesson it is, and lights the eighth of the track');
   check($('.bar').attrs['aria-valuemax'] === '27', 'the bar\'s total is 27, not 29');
 
   console.log('\nThe board: a trio, wider tiles, the joined block');
@@ -384,7 +384,7 @@ async function main() {
   const html = raw;
   check(!/[ً-ْ]/.test(html), 'lesson-8.html holds no literal combining mark: the title glyph is a numeric reference');
   check(/&#x628;&#x64E;&#x627;/.test(html), 'the title glyph is baa, U+064E and U+0627');
-  check(!/\b29\b/.test(html.replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page: this lesson has 27');
+  check(!/\b29\b/.test(html.replace(/Lesson \d+ of 29/g, '').replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page: this lesson has 27');
   const visible = html.replace(/<!--[\s\S]*?-->/g, '').replace(/data-words-attr="[^"]*"/g, '').replace(/data-trace="[^"]*"/g, '').replace(/\bdata-[\w-]+=/g, '');
   check(!/\b(incorrect|wrong|try again|madd)\b/i.test(visible), 'no scolding anywhere, and no "madd" (the user\'s plain-names rule)');
   check(!fs.existsSync(path.join(dir, 'lesson-8.js')) && all('.title-mark').length === 1, 'there is no lesson-8.js: mark-lesson.js is the page');

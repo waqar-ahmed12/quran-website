@@ -416,7 +416,7 @@
     section('Page look, spacing & progress bar', true);
     option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
     option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
-    option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
+    option('Lesson track', { Show: 'show', Hide: 'hide' }, 'track');
     option('After the last letter', { 'Settles down': 'settle', 'Keeps glowing': 'glow', 'No fuss': 'none' }, 'finish');
     option('Big alif by the title', { Center: 'alif', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
     option('Big alif font', { 'Amiri Quran': 'amiri', 'Indo-Pak Noto': 'noto', Scheherazade: 'scheherazade' }, 'titlemarkFont');
@@ -629,7 +629,7 @@
     edgeSlider();
     option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
     option('Bar look', { Line: 'line', 'A step per letter': 'steps' }, 'bar');
-    option('14-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
+    option('Lesson track', { Show: 'show', Hide: 'hide' }, 'track');
     option('When it says you seem ready', { 'Settles down': 'settle', 'Keeps glowing': 'glow', 'No fuss': 'none' }, 'finish');
     const mark = shapes ? 'haa' : marked ? 'baa with its mark' : 'baa';
     option(`Big ${mark} by the title`, { Center: 'ba', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');

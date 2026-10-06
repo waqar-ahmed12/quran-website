@@ -276,8 +276,8 @@ async function main() {
   check($('.title-mark').textContent === LEAD + 'ب' + JAZAM_M, 'the big glyph, Madani: the lead, baa, then U+06E1', $('.title-mark').textContent);
   const glyphs = all('.band-glyph').map((g) => g.textContent);
   check(glyphs.length === 2 && glyphs.every((g) => g.startsWith(LEAD)) && glyphs[0].endsWith(JAZAM_M), 'both rail glyphs start with the lead', glyphs.join(' | '));
-  check($('.eyebrow').textContent === 'Lesson 14 of 14' && all('.track li').findIndex((li) => li.classes().includes('now')) === 13 && all('.track li').length === 14,
-    'Lesson 14 of 14, the fourteenth of the track lit');
+  check($('.eyebrow').textContent === 'Lesson 14 of 29' && all('.track li').findIndex((li) => li.classes().includes('now')) === 13 && all('.track li').length === 29,
+    'Lesson 14 of 29, the fourteenth of the track lit');
   check($('.bar').attrs['aria-valuemax'] === '27', 'the bar\'s total is 27');
 
   console.log('\nThe board: a trio after the lead, and the lines that explain it');
@@ -470,7 +470,7 @@ async function main() {
   console.log('\nThe markup');
   check(!/[ً-ٗۡۥۦ]/.test(raw), 'lesson-14.html holds no literal combining mark');
   check(/&#x627;&#x64E;&#x628;&#x652;/.test(raw), 'the title glyph is alif, U+064E, baa, U+0652');
-  check(!/\b29\b/.test(raw.replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page');
+  check(!/\b29\b/.test(raw.replace(/Lesson \d+ of 29/g, '').replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page');
   const visible = raw.replace(/<!--[\s\S]*?-->/g, '').replace(/data-words-attr="[^"]*"/g, '').replace(/data-trace="[^"]*"/g, '').replace(/\bdata-[\w-]+=/g, '').replace(/Next: (Shadda|Tashdeed)/g, '');
   check(!/\b(incorrect|wrong|try again|leen|madd|shadda|tajweed|qalqalah)\b/i.test(visible), 'no scolding, and no "leen", "madd" or tajweed word (the plain-names rule; docs/lesson-14/01 §6)');
   check(!/data-same|pair-equals|data-lam-alif/.test(raw.replace(/<!--[\s\S]*?-->/g, '')), 'no same-sound tile or lam-alif wording carried over from lessons 9-13');

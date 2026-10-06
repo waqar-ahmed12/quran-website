@@ -279,7 +279,7 @@ async function main() {
   console.log('\nThe head');
   check($('h1').textContent === 'Kasra and yaa' && doc.title.startsWith('Lesson 13: Kasra and yaa'), 'the title is Kasra and yaa in the fatha set', $('h1').textContent + ' / ' + doc.title);
   check($('.title-mark').textContent === 'ف' + KASRA + YAA, 'the big glyph, Madani: faa, kasra and a bare yaa, composed: the word "in"', $('.title-mark').textContent);
-  check($('.eyebrow').textContent === 'Lesson 13 of 14' && all('.track li').findIndex((li) => li.classes().includes('now')) === 12, 'Lesson 13 of 14, the thirteenth of the track lit');
+  check($('.eyebrow').textContent === 'Lesson 13 of 29' && all('.track li').findIndex((li) => li.classes().includes('now')) === 12, 'Lesson 13 of 29, the thirteenth of the track lit');
   check($('.bar').attrs['aria-valuemax'] === '27', 'the bar\'s total is 27');
 
   console.log('\nThe board: the quartet, the same-sound tile, the jazam line, the joined block');
@@ -448,7 +448,7 @@ async function main() {
   console.log('\nThe markup');
   check(!/[\u064B-\u0657\u06E1\u06E5\u06E6]/.test(raw), 'lesson-13.html holds no literal combining mark');
   check(/&#x641;&#x650;&#x64A;&#x652;/.test(raw), 'the title glyph is faa, U+0650, U+064A, U+0652');
-  check(!/\b29\b/.test(raw.replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page');
+  check(!/\b29\b/.test(raw.replace(/Lesson \d+ of 29/g, '').replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page');
   const visible = raw.replace(/<!--[\s\S]*?-->/g, '').replace(/data-words-attr="[^"]*"/g, '').replace(/data-trace="[^"]*"/g, '').replace(/\bdata-[\w-]+=/g, '');
   check(!/\b(incorrect|wrong|try again|leen|madd)\b/i.test(visible), 'no scolding, and no "leen" or "madd" (the plain-names rule)');
   check(!/\blam-alif\b|data-lam-alif/.test(raw.replace(/<!--[\s\S]*?-->/g, '')), 'no lam-alif wording at all');

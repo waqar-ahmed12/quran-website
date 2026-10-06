@@ -271,7 +271,7 @@ async function main() {
   check($('h1').textContent === 'Kasra' && doc.title.startsWith('Lesson 5: Kasra'), 'the title is Kasra in the fatha set', `${$('h1').textContent} / ${doc.title}`);
   check($('.title-mark').textContent === 'د' + KASRA && $('.title-mark').attrs['aria-hidden'] === 'true', 'the big glyph is daal with the mark, composed, and hidden from a screen reader');
   check($('.next').querySelector('span').textContent === 'Next: Damma', 'the way on says Damma', $('.next').querySelector('span').textContent);
-  check($('.eyebrow').textContent === 'Lesson 5 of 14' && all('.track li').findIndex((li) => li.classes().includes('now')) === 4, 'it says which lesson it is, and lights the fifth of the track');
+  check($('.eyebrow').textContent === 'Lesson 5 of 29' && all('.track li').findIndex((li) => li.classes().includes('now')) === 4, 'it says which lesson it is, and lights the fifth of the track');
 
   console.log('\nThe board: a trio');
   check($('.alone-glyph').textContent === String.fromCharCode(0x25CC) + KASRA, 'the mark on its own sits on the dotted circle, and it is U+0650');

@@ -265,7 +265,7 @@ async function main() {
   console.log('\nThe head');
   check($('h1').textContent === 'Tanween' && doc.title.startsWith('Lesson 7: Tanween'), 'the title is Tanween');
   check($('.title-mark').textContent === 'ب' + FATHATAIN, 'the big glyph is baa with fathatain, composed');
-  check($('.eyebrow').textContent === 'Lesson 7 of 14' && all('.track li').findIndex((li) => li.classes().includes('now')) === 6, 'it says which lesson it is, and lights the seventh of the track');
+  check($('.eyebrow').textContent === 'Lesson 7 of 29' && all('.track li').findIndex((li) => li.classes().includes('now')) === 6, 'it says which lesson it is, and lights the seventh of the track');
 
   console.log('\nThe board: a trio in a warm-up part');
   check($('.pairs').attrs['data-board'] === 'trio', 'part 1 draws a trio (auto picks it for a warm-up)', $('.pairs').attrs['data-board']);

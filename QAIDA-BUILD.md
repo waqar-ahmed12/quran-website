@@ -21,7 +21,7 @@ in both scripts and the per-script `sits` was not built; the board says printed 
 parts and 29 lessons** (`shell.js` rows 15–29, `part: 2`; `home.js` headings; 16–29 say "Not built yet"). Lesson 14's Next
 is an ordinary Next to Lesson 15 (its `data-last` is gone). All 17 check scripts pass. **Still the user's:** the kasra with
 the shadda against a printed Qaida, the halo on the shadda, the hum line, the words, and see "Step P1 built — Lesson 15" in
-the step log. **Left undone, and a decision:** the first-pass pages still say "Lesson N of 14" with a 14-dash track.
+the step log. **Resolved 2026-10-06 (cloud session):** lessons 1–14 now say "Lesson N of 29" with a 29-dash track like lessons 15–22; the options-panel row is "Lesson track"; the lesson 5–14 checks expect "of 29" and ignore it in their "no 29" scan. All check scripts pass.
 **Step P2, Lesson 22 (stopping), is built — the seventh and last rule lesson of P2, so step P2 is done** (2026-10-06, the user: "start the next lesson build, also tell how much is
 left", taken as the yes to the README's recommendations). `docs/lesson-22/` was written (`01-design`, `02-build-record`). **Twenty-seven items by reference**: 15 asked "how do you stop
 on this word?" (three each: a vowel, two zair or two paish, two zabar, a round taa, a long vowel at the end) and 12 "what does the lit sign say?" (three each of four signs); parts of

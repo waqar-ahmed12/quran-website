@@ -273,7 +273,7 @@ async function main() {
   console.log('\nThe head');
   check($('h1').textContent === 'Standing marks' && doc.title.startsWith('Lesson 9: Standing marks'), 'the title is Standing marks in the fatha set', `${$('h1').textContent} / ${doc.title}`);
   check($('.title-mark').textContent === 'ب' + FATHA + STANDING_FATHA, 'the big glyph is baa with khari zabar, drawn in the Madani form by default (zabar + the standing mark)', $('.title-mark').textContent);
-  check($('.eyebrow').textContent === 'Lesson 9 of 14' && all('.track li').findIndex((li) => li.classes().includes('now')) === 8, 'it says which lesson it is, and lights the ninth of the track');
+  check($('.eyebrow').textContent === 'Lesson 9 of 29' && all('.track li').findIndex((li) => li.classes().includes('now')) === 8, 'it says which lesson it is, and lights the ninth of the track');
 
   console.log('\nThe board: a trio in a warm-up part, the same-sound tile');
   check($('.pairs').attrs['data-board'] === 'trio', 'part 1 draws a trio (auto picks it for a warm-up)', $('.pairs').attrs['data-board']);
@@ -438,7 +438,7 @@ async function main() {
   check(!/\b(incorrect|wrong|try again|madd)\b/i.test(visible), 'no scolding anywhere on the page, and no "madd"');
   check(all('[data-words], [data-words-attr]').length > 30, 'every line of wording is tagged for a text field of its own');
   check(!fs.existsSync(path.join(dir, 'lesson-9.js')), 'there is no lesson-9.js: mark-lesson.js is the page');
-  check(!/\b29\b/.test(raw.replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page: this lesson has 27');
+  check(!/\b29\b/.test(raw.replace(/Lesson \d+ of 29/g, '').replace(/<!--[\s\S]*?-->/g, '')), 'no "29" anywhere on the page: this lesson has 27');
 
   console.log(failed === 0 ? '\nAll checks passed.' : `\n${failed} check(s) FAILED.`);
   process.exitCode = failed;
