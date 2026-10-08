@@ -16,6 +16,7 @@ Open **Graph view** (Ctrl+G) to see how these notes connect. Add a `[[link]]` in
 ## Second pass (lessons 15-29)
 - [[docs/pass-2/README|Pass 2 map]] - [[docs/pass-2/01-what-the-two-scripts-print|what the scripts print]] - [[docs/pass-2/02-page-types-and-questions|page types]] - [[docs/pass-2/03-open-questions|open questions]]
 - The **rule page** (born in Lesson 16, reused by 17-22): [[docs/lesson-16/03-the-rule-page|how it is built]] - [[docs/lesson-16/08-build-record|what was built and measured]] - a rule brings a **kit** (Lesson 17 was the second: [[docs/lesson-17/02-build-record|its build record]]; Lesson 18 the third, and the first with the Qur'an's own words, copied and named by reference: [[docs/lesson-18/02-build-record|its build record]]; Lesson 19 the fourth, and the first with **pairs** of words and a question for each part: [[docs/lesson-19/02-build-record|its build record]]; Lesson 20 the fifth, with one question all through and the first whose question is **heard** (`byEar`): [[docs/lesson-20/02-build-record|its build record]]; Lesson 21 the sixth, and the first whose answers are **the word's own letters** (`tapFormat`, one additive change to the engine): [[docs/lesson-21/02-build-record|its build record]]; Lesson 22 the seventh, with two name questions and a word **as it is said at a stop**, composed beside the printed one: [[docs/lesson-22/02-build-record|its build record]])
+- The **verse page** (born in Lesson 23, read and never scored): [[docs/lesson-23/01-design|how it is built and what a note may claim]] - [[docs/lesson-23/02-build-record|what was built and measured]] - the words are copied by `tools/fetch-qaida-verses.js` and named by reference; a kit (`fatiha.js`) says which notes a word carries; Lesson 29 will be its second surah
 - Where the build stands: [[QAIDA-BUILD]] (step P2 in the step log)
 
 ## Lessons
@@ -47,7 +48,8 @@ Open **Graph view** (Ctrl+G) to see how these notes connect. Add a `[[link]]` in
   - the notes: [[docs/lesson-21/01-design|01 design]]
 - 22. [[docs/lesson-22/README|Stopping]] (built 2026-10-06, the first stop signs, and a word as it is said composed beside it) - [[docs/lesson-22/02-build-record|build record]]
   - the notes: [[docs/lesson-22/01-design|01 design]]
-- 23. [[docs/lesson-23/README|Al-Fatiha]] (planned)
+- 23. [[docs/lesson-23/README|Al-Fatiha]] (built 2026-10-06, the first verse page, read and never scored) - [[docs/lesson-23/02-build-record|build record]]
+  - the notes: [[docs/lesson-23/01-design|01 design]]
 - 24. [[docs/lesson-24/README|Noon with jazam, and tanween]] (planned)
 - 25. [[docs/lesson-25/README|Meem with jazam]] (planned)
 - 26. [[docs/lesson-26/README|The bounce (qalqalah)]] (planned)
@@ -56,7 +58,7 @@ Open **Graph view** (Ctrl+G) to see how these notes connect. Add a `[[link]]` in
 - 29. [[docs/lesson-29/README|The last surahs]] (planned)
 
 ## How to keep this graph true
-When a lesson is built, in the same sitting: change its line above from *planned* to *built*, write a `NN-build-record` note in its folder that links back to its README, this map and [[QAIDA-BUILD]], and give each of its notes a `tags:` line and a `Part of` line of `[[links]]`. Lessons 16 to 22 are the model: [[docs/lesson-16/08-build-record|Lesson 16's build record]], [[docs/lesson-17/02-build-record|Lesson 17's]], [[docs/lesson-18/02-build-record|Lesson 18's]], [[docs/lesson-19/02-build-record|Lesson 19's]], [[docs/lesson-20/02-build-record|Lesson 20's]], [[docs/lesson-21/02-build-record|Lesson 21's]], [[docs/lesson-22/02-build-record|Lesson 22's]].
+When a lesson is built, in the same sitting: change its line above from *planned* to *built*, write a `NN-build-record` note in its folder that links back to its README, this map and [[QAIDA-BUILD]], and give each of its notes a `tags:` line and a `Part of` line of `[[links]]`. Lessons 16 to 23 are the model: [[docs/lesson-16/08-build-record|Lesson 16's build record]], [[docs/lesson-17/02-build-record|Lesson 17's]], [[docs/lesson-18/02-build-record|Lesson 18's]], [[docs/lesson-19/02-build-record|Lesson 19's]], [[docs/lesson-20/02-build-record|Lesson 20's]], [[docs/lesson-21/02-build-record|Lesson 21's]], [[docs/lesson-22/02-build-record|Lesson 22's]], [[docs/lesson-23/02-build-record|Lesson 23's]].
 
 ## Fixes
 Fix notes live in `fixes/` as text files. To make a fix reusable, write it as a note that links to the lesson it touched, like `[[docs/lesson-15/README|Lesson 15]]`, and tag it `#fix`.

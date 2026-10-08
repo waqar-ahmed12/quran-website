@@ -178,7 +178,11 @@
     // twelve "what does the lit sign say?", on the rule page with a kit of its own (stop.js). No `cp`, as 16-21: every id in its record is one of them.
     { n: 22, part: 2, title: { fatha: 'Stopping', zabar: 'Stopping' }, href: 'lesson-22.html', built: true,
       progress: 'drill', lede: 'How a word changes when you stop on it.' },
-    { n: 23, part: 2, title: { fatha: 'Al-Fatiha', zabar: 'Al-Fatiha' }, lede: 'The first surah, read whole.' },
+    // Lesson 23 is the first VERSE page (docs/lesson-23/): the seven verses of Al-Fatiha, copied and named by reference, read a verse at a time on a page of its
+    // own (verses.js). It is not a drill, so it has no `cp` and no drill record: what it keeps is which verses have been read, as Lesson 1 keeps which letters
+    // have been seen, and `progress: 'verses'` is how the home counts it.
+    { n: 23, part: 2, title: { fatha: 'Al-Fatiha', zabar: 'Al-Fatiha' }, href: 'lesson-23.html', built: true, progress: 'verses', verses: 7,
+      lede: 'The first surah, read whole.' },
     { n: 24, part: 2, title: { fatha: 'Noon and tanween', zabar: 'Noon and tanween' },
       lede: 'Four ways to read them: clear, merged, turned into meem, hidden.' },
     { n: 25, part: 2, title: { fatha: 'Meem with jazam', zabar: 'Meem with jazam' }, lede: 'Three ways to read it: merged, hidden, clear.' },
@@ -436,6 +440,41 @@
 
   const setup = $('.setup');
 
+  // A dot belongs between two things on one line. On a phone the line wraps, and a dot can be left starting the next
+  // line or ending this one. One that would start a line is taken out (what followed it moves to the line's start); one
+  // that ends a line is only made invisible, since taking it out could pull the next thing up beside it with no dot.
+  function tidyDots() {
+    // No-op outside a real browser (the checks in tools/ hand-make a DOM with no layout to measure).
+    if (!setup || typeof setup.getBoundingClientRect !== 'function') return;
+    const dots = [...setup.querySelectorAll('.dot')];
+    for (const dot of dots) {
+      dot.hidden = false;
+      dot.style.visibility = '';
+    }
+    const middle = (el) => {
+      const box = el.getBoundingClientRect();
+      return box.top + box.height / 2;
+    };
+    for (const dot of dots) {
+      const before = dot.previousElementSibling;
+      const after = dot.nextElementSibling;
+      if (!before || !after) continue;
+      const y = middle(dot);
+      if (Math.abs(middle(before) - y) > 2) dot.hidden = true;
+      else if (Math.abs(middle(after) - y) > 2) dot.style.visibility = 'hidden';
+    }
+  }
+
+  if (setup && typeof ResizeObserver === 'function') {
+    let width = 0;
+    new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width === width) return;
+      width = entry.contentRect.width;
+      tidyDots();
+    }).observe(setup);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(tidyDots);
+  }
+
   function renderSetup() {
     root.dataset.script = state.script;
     root.dataset.names = state.names;
@@ -448,6 +487,7 @@
       fill('.setup-script', state.script);
       fill('.setup-names', state.names);
       fill('.setup-grouping', state.grouping);
+      tidyDots();
     }
     if (chooser) {
       for (const input of chooser.querySelectorAll('input')) input.checked = input.value === state[input.name];

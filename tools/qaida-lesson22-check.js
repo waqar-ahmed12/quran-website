@@ -778,19 +778,19 @@ async function pageHalf() {
   const c3 = stepsOf();
   check(units().join('') === data[c.ref].madani && c3[1] === `At a stop the round taa is said “h”: “${c.sounds[1]}”.`, 'word 3: the round taa said "h"', c3.join(' / '));
 
-  console.log('\nThe ways out: Previous goes to Lesson 21, Next to Lesson 23 (not built yet)');
+  console.log('\nThe ways out: Previous goes to Lesson 21, Next to Lesson 23 (built since: a real link)');
   check($('.prev').attrs.href === 'lesson-21.html' && $('.prev span').textContent === 'Previous: Letters that are not read', 'Previous goes to Lesson 21', $('.prev span').textContent);
   check($('.spell-more a').attrs.href === 'exercise-22.html' && fs.existsSync(path.join(dir, 'exercise-22.html')), 'Practice reading goes to exercise-22.html, which exists');
   check($('.next span').textContent === 'Next: Al-Fatiha' && !$('.next').attrs['data-last'], 'Next reads "Next: Al-Fatiha"', $('.next span').textContent);
   w.location.href = '';
   click($('.next'), 1);
-  check(w.location.href === '' && /isn.t built yet/.test($('.note').textContent || ''), 'and it says so instead of going anywhere, until Lesson 23 exists', $('.note').textContent);
+  check(w.location.href === 'lesson-23.html', 'and it goes to lesson-23.html, which is built now (it said "not built yet" until Lesson 23 was)', String(w.location.href));
 
   console.log('\nThe home');
   const home = boot();
   const row = home.shell.LESSONS.find((l) => l.n === 22);
   check(row.built === true && row.href === 'lesson-22.html' && row.progress === 'drill' && row.part === 2 && row.cp === undefined && !row.tail, 'the home\'s row 22 is built, a drill, in the second part, with no `cp`, and leads to lesson-22.html');
-  check(home.shell.LESSONS.find((l) => l.n === 21).built && !home.shell.LESSONS.find((l) => l.n === 23).built, 'and 21 is built and 23 is not');
+  check(home.shell.LESSONS.find((l) => l.n === 21).built && home.shell.LESSONS.find((l) => l.n === 23).built, 'and 21 and 23 are built');
 
   console.log('\nThe markup');
   check(!NOMARK.test(w.raw), 'lesson-22.html holds no literal combining mark');

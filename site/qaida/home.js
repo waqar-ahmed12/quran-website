@@ -58,6 +58,10 @@
       else if (entry.progress === 'letters') {
         const seen = shell.seenCount(n);
         if (seen > 0) meta = words.progress.replaceAll('{seen}', seen).replaceAll('{total}', letters);
+      } else if (entry.progress === 'verses') {
+        // A verse page keeps which verses have been read (docs/lesson-23/01 §5), and the card says how many of the surah's.
+        const read = shell.lessonState(n).seen.length;
+        if (read > 0) meta = words.verses.replaceAll('{read}', read).replaceAll('{total}', entry.verses || read);
       } else if (entry.progress === 'drill') {
         // How many are known out of how many the lesson asks about, as the lesson last wrote it down.
         const total = shell.drillOf(n).total || letters;

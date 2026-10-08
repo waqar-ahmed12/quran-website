@@ -1,26 +1,22 @@
 <!doctype html>
-<!-- The free Qaida, Lesson 11 (QAIDA-BUILD.md, step 9): paish, then a wow — the long "oo". "Bu" becomes "buu",
-     told apart from the lesson before ("bau"). Lesson 10's machinery: an id is the letter and three code points
-     (paish, wow, jazam) in both scripts, the tile is wide, and the halo rings the wow. The scripts disagree about
-     the mark: Indo-Pak writes a jazam on this wow and Madani leaves it bare (docs/lesson-11/02 §2), so the board's
-     jazam line has one wording per script. 27 letters, as in Lesson 10 — no alif, no hamza. The engine is
-     practice.js, the data layer marks.js, the page's code mark-lesson.js; this file is lesson-10.html with
-     docs/lesson-11/04 applied, and the specification is docs/lesson-11/.
-
-     The mark is a combining character and is never pasted into a file: it is composed by marks.js, and written here
-     as a numeric reference where it must be written at all. Every element that holds a marked letter is
-     aria-hidden and its container carries the name. -->
-<html lang="en"
-      data-mark="damma-waw" data-tiles="paper" data-size="comfortable" data-group="1" data-band="1"
-      data-review="0" data-distractors="which-mark" data-twins="alternate" data-board="quad" data-arrows="last" data-point="halo"
-      data-ask="mark" data-choices="4" data-advance="auto" data-miss="trace" data-arrive="stagger" data-peek="under"
+<!-- The free Qaida, Lesson 23 (QAIDA-BUILD.md, step P3): Al-Fatiha, the first surah read whole. The first VERSE page: not a drill and not a rule lesson, so it
+     has no parts, no questions and no board of rows. What is on it is the surah as the mushaf prints it, in the student's own script: one verse large with its words
+     as buttons, and a card for a tapped word that says WHY it is read the way it is, one line a reason, each pointing to the lesson that taught it; then the whole
+     surah together; then three of the longer words spelled through a piece at a time. Shown, never scored, like "Say it" and "Write it". No meanings and no
+     translation, as every reading page since 2026-09-27.
+     The verses are copied by tools/fetch-qaida-verses.js into verse-words.js, word by word, in both scripts, unmodified, and named by reference only; fatiha.js says
+     which notes a word carries; verses.js is the page's code. No Arabic is typed in this file: the title glyph is written as numeric references, and every element
+     that holds Qur'an text is aria-hidden or carries its own name. practice.js, rules.js, rule-lesson.js and every earlier lesson are untouched. The Qur'an
+     fonts: Madani is drawn in Amiri Quran; Indo-Pak in the stand-in until a licensed Indo-Pak face is in (docs/lesson-23/01 §3). This file is lesson-22.html with the
+     middle replaced; the specification is docs/lesson-23/ (01 is this page and its reasons). -->
+<html lang="en" data-surah="1" data-size="comfortable"
       data-progress="title" data-bar="line" data-track="show" data-finish="settle"
-      data-titlemark="baa" data-titlemark-font="amiri" data-tailfit="wide" data-bg="light" data-madani-font="scheherazade"
+      data-titlemark="baa" data-titlemark-font="amiri" data-bg="light" data-madani-font="scheherazade"
       data-indopak-font="noto">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lesson 11: Paish and wow · Free Qaida</title>
+  <title>Lesson 23: Al-Fatiha · Free Qaida</title>
   <meta name="theme-color" content="#1F1A18">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231F1A18'/><path d='M8 7v18c3-2 6-2 8 0 2-2 5-2 8 0V7c-3-2-6-2-8 0-2-2-5-2-8 0z' fill='none' stroke='%23C9A046' stroke-width='2' stroke-linejoin='round'/><line x1='16' y1='7' x2='16' y2='25' stroke='%23C9A046' stroke-width='1.5'/></svg>">
   <!-- Light or dark before the page draws: the choice made here or on the home page (same site, same storage),
@@ -42,10 +38,10 @@
   <script src="voice-store.js" defer></script>
   <script src="voice.js" defer></script>
   <script src="trace.js" defer></script>
-  <script src="practice.js" defer></script>
   <script src="marks.js" defer></script>
-  <script src="mark-lesson.js" defer></script>
-  <script src="spell.js" defer></script>
+  <script src="verse-words.js" defer></script>
+  <script src="fatiha.js" defer></script>
+  <script src="verses.js" defer></script>
   <!-- TEMPORARY, local preview only: looks to try and a text field for every line. Delete this line and
        qaida-options.js once the look is chosen. -->
   <script src="qaida-options.js" defer></script>
@@ -54,7 +50,7 @@
   <div class="top-sentinel" aria-hidden="true"></div>
   <a class="skip" href="#lesson" data-words="Skip link (keyboard only)">Skip to the lesson</a>
 
-  <header class="topbar">
+<header class="topbar">
     <div class="where">
       <a class="brand" href="../">
         <svg class="mark" viewBox="-12 -12 24 24" aria-hidden="true" focusable="false">
@@ -112,22 +108,24 @@
     </div>
   </header>
 
-  <main class="lesson" id="lesson" tabindex="-1">
+  <main class="lesson verses" id="lesson" tabindex="-1">
     <header class="lesson-head">
       <div class="head-text">
         <div class="course">
-          <p class="eyebrow" data-words="Lesson number">Lesson 11 of 14</p>
-          <!-- The whole Qaida at a glance: this lesson in gold, the other 13 to come. -->
+          <p class="eyebrow" data-words="Lesson number">Lesson 23 of 29</p>
+          <!-- The whole Qaida at a glance: this lesson in gold, the other 28 around it. -->
           <ol class="track" aria-hidden="true">
-            <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
-            <li></li><li></li><li class="now"></li><li></li><li></li><li></li>
+            <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+            <li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li>
+            <li></li><li></li><li class="now"></li><li></li><li></li><li></li><li></li><li></li><li></li>
           </ol>
         </div>
-        <!-- The title follows the student's choice of names, and mark-lesson.js writes it on every change. It is an
-             attribute and not the heading's own text so the teacher's edit is not overwritten at the next switch. -->
+        <!-- The title follows the student's choice of names, and verses.js writes it on every change. It is an attribute and not
+             the heading's own text so the teacher's edit is not overwritten at the next switch. The name has no zabar/fatha form,
+             so both are the same. -->
         <h1 data-words-attr="data-title-zabar|Lesson title (zabar);data-title-fatha|Lesson title (fatha)"
-            data-title-zabar="Paish and wow" data-title-fatha="Damma and waw">Paish and wow</h1>
-        <p class="lede" data-words="Line under the title">A wow after the mark makes the sound long: “oo”.</p>
+            data-title-zabar="Al-Fatiha" data-title-fatha="Al-Fatiha">Al-Fatiha</h1>
+        <p class="lede" data-words="Line under the title">The first surah of the Qur’an, read a verse at a time, with a note on each word for why it is read that way.</p>
         <!-- What the student chose on their first visit, and a way to change it. shell.js fills in the spans. -->
         <p class="setup"
            data-madani="Madani script" data-indopak="Indo-Pak script"
@@ -142,226 +140,182 @@
           <button class="link open-settings" type="button" aria-haspopup="dialog"><span data-words="Settings line: change link">Change</span></button>
         </p>
       </div>
-      <!-- The lesson's subject in one glyph: baa with paish and wow (and the jazam, in Indo-Pak). mark-lesson.js
-           composes it for the script in use. -->
-      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">&#x628;&#x64F;&#x648;&#x652;</span>
+      <!-- The lesson's subject in one glyph: the end of a verse around a seven, U+06DD U+0667. As numeric references, so no Arabic is typed here. -->
+      <span class="title-mark" lang="ar" dir="rtl" aria-hidden="true">&#x6DD;&#x667;</span>
     </header>
 
-    <!-- The two parts. An order, never a chain of locks: every button works at any time, and a part opened out of turn is
-         advised once and then let through (docs/lesson-2/09-going-in-order.md). mark-lesson.js builds the buttons. -->
-    <nav class="bands" aria-label="The two parts of this lesson"
-         data-group1="Meet the mark" data-group2="All the letters"
-         data-group-done="Done" data-group-now="You’re here" data-group-later="Comes later"
-         data-group-label="Part {n}, {name}. {state}"
-         data-group-early="This part comes later. You can carry on if you like — each one builds on the one before."
-         data-group-announce="Part {n}, {name}."
-         data-words-attr="aria-label|Group rail: label;data-group1|Group 1 name;data-group2|Group 2 name;data-group-done|Group rail: a finished group;data-group-now|Group rail: the current group;data-group-later|Group rail: a later group;data-group-label|Group rail: what a screen reader hears ({n}, {name} and {state} are filled in);data-group-early|Advice: a group opened out of turn;data-group-announce|Announced for screen readers: a new group ({n} and {name} are filled in)">
-      <ol></ol>
-    </nav>
-    <div class="struggle band-advice" hidden>
-      <p class="struggle-text"></p>
-    </div>
-    <p class="sr-only band-announce" role="status" aria-live="polite" aria-atomic="true"></p>
-
-    <!-- No counts on the page (the user, 2026-09-20). The bar is the whole lesson and says how it is going in words; the
-         line under it appears only when the open part is done. 27 letters, not 29 (docs/lesson-11/02 §3): no alif, no hamza. -->
+    <!-- No parts and no questions: this lesson is READ, not drilled (docs/lesson-23/01 §1), so there is no rail. The bar is how many of the seven verses
+         have been read, in words, as every lesson's is (no counts on the page, the user, 2026-09-20). A verse counts once a word of it has been
+         tapped, it has been heard or said, or the student has moved on from it. -->
     <div class="progress">
       <div class="progress-row">
         <p class="progress-text" id="progress-text"
            data-stage0="Just starting" data-stage1="Getting going" data-stage2="Getting there"
-           data-stage3="Nearly there" data-stage4="All known"
-           data-words-attr="data-stage0|Progress line, nothing known yet;data-stage1|Progress line, a little known;data-stage2|Progress line, about half known;data-stage3|Progress line, most known;data-stage4|Progress line, every letter known"></p>
+           data-stage3="Nearly there" data-stage4="Every verse read"
+           data-words-attr="data-stage0|Progress line, no verse read yet;data-stage1|Progress line, a few verses read;data-stage2|Progress line, about half the verses read;data-stage3|Progress line, most of the verses read;data-stage4|Progress line, every verse read"></p>
         <button class="link reset" type="button" hidden
                 data-label="Start again" data-confirm="Tap again to clear"
                 data-words-attr="data-label|Start again link;data-confirm|Start again, asking to be sure"></button>
       </div>
-      <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="27" aria-valuenow="0">
+      <div class="bar" role="progressbar" aria-labelledby="progress-text" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0">
         <span class="fill"></span>
       </div>
-      <p class="band-line" hidden
-         data-done="All of this group"
-         data-words-attr="data-done|Progress line, every letter in this group known"></p>
-      <!-- The recordings for this lesson are of the SOUND ("baa"), not of the letter's name. mark-lesson.js hides this once
-           they are all in. -->
+      <!-- No recording of the verses yet: the teacher records them one at a time, under their numbers (docs/lesson-23/01 §8). verses.js hides this once every
+           verse is in; until then the Hear buttons are not shown for a verse that has none. -->
       <p class="sound-note" hidden
-         data-none="Hearing practice opens when the recordings arrive."
-         data-some="Hearing practice is open for the letters that are recorded."
+         data-none="Hearing the verses opens when they are recorded."
+         data-some="Hearing is open for the verses that are recorded."
          data-words-attr="data-none|Sound line, nothing recorded;data-some|Sound line, some recorded"></p>
     </div>
 
-    <!-- The teaching half: the mark, then the letter with and without it. The drill below is the testing half. Every tile is
-         a button: tapping it says the letter (and, once recorded, the sound). -->
-    <section class="marks-board" aria-labelledby="board-title"
-             data-mark-alone="This is {mark}."
-             data-mark-sits="The {other} sits above the letter, and the wow comes right after it."
-             data-pair-bare="The letter on its own" data-pair-other="With {other}"
-             data-pair-marked="With {mark}: oo"
-             data-same="The same sound: {name} with {sameMark}"
-             data-mark-does="The {other} you know, then a wow. Together they make it long: oo."
-             data-joined="The wow joins the letter before it — unless that letter never joins the next one."
-             data-joined-note="The first joins on. The second stands on its own."
-             data-skip-note="Alif and hamza are not in this table."
-             data-words-attr="data-mark-alone|Board: the mark on its own ({mark} is filled in);data-mark-sits|Board: where the mark sits ({other} is filled in);data-pair-bare|Board: the row, the bare side;data-pair-other|Board: the row, the middle column ({other} is filled in);data-pair-marked|Board: the row, this lesson's mark ({other} is filled in);data-mark-does|Board: what the mark does ({other} is filled in);data-same|Board: the same-sound tile's caption, part 1 only ({name} and {sameMark} are filled in);data-joined|Board: the joined example;data-joined-note|Board: what the joined example shows;data-skip-note|Board: why alif and hamza are missing, part 2 only">
+    <!-- Step 1: one verse at a time, large, in the Qur'an's own text and print. Every word is a button: tap it and its card says why it is read that way, one
+         line a reason, each pointing to the lesson that taught it. Nothing is asked and nothing is marked. No word is typed here: verses.js draws every
+         one from verse-words.js, and fatiha.js says which notes a word carries, so no Arabic and no combining mark is in this file. -->
+    <section class="verse-board" aria-labelledby="board-title"
+             data-word-label="Word {n}, verse {verse}."
+             data-verse-label="Verse {n} of {total}"
+             data-verse-button="Verse {n}"
+             data-card-title="Word {n}"
+             data-hint="Tap a word to see why it is read the way it is."
+             data-card-lead="Why it is read this way"
+             data-lesson-link="Lesson {n}"
+             data-lesson-later="Comes in Lesson {n}"
+             data-note-jazam="A {jazam} on a letter means it has no vowel of its own: it closes the sound before it."
+             data-note-shadda="A shadda means the letter is said twice: once to close the sound before it, once with its own vowel."
+             data-note-hamza="This alif is the seat of a hamza. What you say is the hamza, with its {vowel}."
+             data-note-allah="The name of Allah: the laam of Al- and the laam of the name run together and are said as one doubled laam."
+             data-note-sun="Al- before a sun letter: the laam is not read, and the letter after it is said twice."
+             data-note-moon="Al- before a moon letter: the laam is read, and it has a {jazam}."
+             data-note-joined="The alif at the start is not read here, because the word before runs straight into it."
+             data-note-start="You start on this alif here, so it is read, with a {vowel}."
+             data-note-standing="A small standing {fatha} makes a long “aa”."
+             data-note-long-aa="A {fatha} with an alif after it is a long “aa”."
+             data-note-zabar-waw="A {fatha} before a wow with a {jazam} says “aw”."
+             data-note-long-oo="A {damma} with a wow after it is a long “oo”."
+             data-note-zabar-yaa="A {fatha} before a yaa with a {jazam} says “ai”."
+             data-note-long-ee="A {kasra} with a yaa after it is a long “ee”."
+             data-note-madd="The wavy line says to hold the long vowel longer than usual."
+             data-note-stop="The last word of a verse. If you stop on it, the way it ends changes."
+             data-note-sign="A small stop sign follows this word. It tells you whether to stop here; each sign is explained in the lesson."
+             data-note-noon-clear="The noon here is said clearly. How it works comes later."
+             data-note-meem-clear="The meem at the end is said clearly. How it works comes later."
+             data-note-heavy="A heavy letter: said with a full mouth. The recording carries it, and a later lesson explains it."
+             data-font-note="These are the Qur’an’s own words in its Indo-Pak print. Until its own font is added they are drawn in a stand-in, so a few letters and signs may look a little different from your printed Qur’an."
+             data-words-attr="data-word-label|Verse: what a screen reader hears on a word ({n} and {verse} are filled in);data-verse-label|Verse: which verse, of how many ({n} and {total} are filled in);data-verse-button|Verse: a verse's own button, for a screen reader ({n} is filled in);data-card-title|Word card: what a screen reader hears as its name ({n} is filled in);data-hint|Verse: the line before a word is tapped;data-card-lead|Word card: the line over the reasons;data-lesson-link|Word card: the link to a lesson that is built ({n} is filled in);data-lesson-later|Word card: a lesson that is not built yet ({n} is filled in);data-note-jazam|Reason: a jazam ({jazam} is the student's word for it);data-note-shadda|Reason: a shadda;data-note-hamza|Reason: a hamza on an alif ({vowel} is its vowel);data-note-allah|Reason: the name of Allah;data-note-sun|Reason: Al- before a sun letter;data-note-moon|Reason: Al- before a moon letter ({jazam} is the student's word for it);data-note-joined|Reason: a joining alif that is not read;data-note-start|Reason: a joining alif that is read, because the verse starts on it ({vowel} is its vowel);data-note-standing|Reason: a standing zabar ({fatha} is the student's word for it);data-note-long-aa|Reason: a long aa;data-note-zabar-waw|Reason: aw ({fatha} and {jazam} are the student's words);data-note-long-oo|Reason: a long oo ({damma} is the student's word);data-note-zabar-yaa|Reason: ai ({fatha} and {jazam} are the student's words);data-note-long-ee|Reason: a long ee ({kasra} is the student's word);data-note-madd|Reason: the wavy line;data-note-stop|Reason: the end of a verse;data-note-sign|Reason: a small stop sign after the word;data-note-noon-clear|Reason: a noon said clearly, which a later lesson explains;data-note-meem-clear|Reason: a meem said clearly, which a later lesson explains;data-note-heavy|Reason: a heavy letter, which a later lesson explains;data-font-note|Board: the line only an Indo-Pak student sees, about the stand-in font">
       <div class="section-head">
-        <p class="eyebrow" data-words="Board: step label">Step 1</p>
-        <h2 class="section-title board-title" id="board-title" tabindex="-1" data-words="Board: heading">Look at the mark</h2>
-        <p class="section-guide" data-words="Board: guide line">The mark above the letter, and a wow right after it. Tap any of them to hear it.</p>
+        <p class="eyebrow" data-words="Verse: step label">Step 1</p>
+        <h2 class="section-title board-title" id="board-title" tabindex="-1" data-words="Verse: heading">Read it a verse at a time</h2>
+        <p class="section-guide" data-words="Verse: guide line">Each word is the Qur’an’s own. Tap one to see why it is read the way it is, and which lesson taught it.</p>
       </div>
 
-      <!-- The mark alone, on the dotted circle that a combining mark expects to sit on, with the wow after it. -->
-      <div class="mark-alone">
-        <span class="alone-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
-        <p class="alone-label"></p>
-        <p class="alone-sits"></p>
+      <!-- Which verse: its own small tracker, the same shape as the spelling walk-through's, kept apart from the lesson's bar above. -->
+      <div class="verse-nav" role="group" aria-label="Which verse"
+           data-words-attr="aria-label|Verse: the group of verse buttons, for a screen reader">
+        <p class="verse-label"></p>
+        <div class="verse-steps"></div>
       </div>
 
-      <!-- One letter, four times: bare, with paish, with zabar and wow, and with paish and wow — short "bu", "bau", and
-           the long "buu" together — then the same sound written as a mark (part 1 only). -->
-      <div class="pair-feature" role="list"></div>
-
-      <!-- The small mark on the wow (docs/lesson-11/04 §3). The scripts differ here: Indo-Pak writes it and Madani
-           does not, so each has its own line. {jazam} is the student's own word for it, {other} is paish. -->
-      <p class="jazam-note"
-         data-template="The small mark on the wow is {jazam}. It means the wow has no sound of its own, so it runs into the {other}. You’ll meet {jazam} on every letter in a later lesson."
-         data-template-indopak="The wow carries a {jazam} here too, as in the last lesson. What changed is the mark before it: after {other}, the wow makes the sound long."
-         data-template-madani="Here the wow has no mark on it. After {other}, a bare wow makes the sound long. In the last lesson the wow had a {jazam}, and said au."
-         data-jazam-zabar="jazam" data-jazam-fatha="sukoon"
-         data-words-attr="data-template|Board: the jazam line, the fallback ({jazam} and {other} are filled in);data-template-indopak|Board: the jazam line in Indo-Pak ({jazam} and {other} are filled in);data-template-madani|Board: the jazam line in Madani ({jazam} and {other} are filled in);data-jazam-zabar|Board: the jazam's name (zabar names);data-jazam-fatha|Board: the jazam's name (fatha names)"></p>
-      
-      <!-- The part's letters, as a quartet: the letter, with paish, with zabar and wow, with paish and wow. A row in the
-           options panel narrows this to a trio or pairs. -->
-      <div class="pairs" role="list"></div>
-
-      <!-- The wow joins the letter before it, or stands apart: the bridge back to Lesson 3, shown and never drilled.
-           No laam example: laam and wow are not one shape. -->
-      <div class="joined" hidden>
-        <span class="joined-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
-        <p class="joined-text"></p>
-        <p class="joined-note"></p>
-      </div>
-      <!-- As on Lesson 8 (docs/lesson-8/02 §2): explains the gap — 27 letters, not 29 — once the table actually has
-           one to explain. -->
-      <p class="skip-note" hidden></p>
-
-      <!-- The order is a suggestion, not a lock: a student may go on, and is told that the exercise is what makes it stay. -->
-      <p class="shapes-hint"
-         data-words="Board: hint about moving on">You can move on to the other part whenever you like, but do the exercise first: it is what makes it stay.</p>
-      <!-- The way from looking to practising: the exercise is underneath, and this takes the student there. -->
-      <div class="shapes-actions">
-        <button class="button primary practise" type="button">
-          <span data-words="Board: practise button">Practise this group</span>
-          <svg class="arrow down" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 5v14M6 13l6 6 6-6" />
-          </svg>
-        </button>
-      </div>
-    </section>
-
-    <section class="drill" aria-labelledby="drill-title">
-      <!-- Says what this half is for: it is an exercise, and nothing here is marked or timed. -->
-      <div class="section-head">
-        <p class="eyebrow" data-words="Practice: step label">Step 2</p>
-        <h2 class="section-title" id="drill-title" tabindex="-1" data-words="Practice: heading">Now practise</h2>
-        <p class="section-guide" data-words="Practice: guide line">This is an exercise. There is no timer, and nothing here is marked.</p>
+      <div class="verse-stage">
+        <p class="verse-line" lang="ar" dir="rtl"></p>
       </div>
 
-      <!-- The question changes with every question, so the group of answers is named by it. -->
-      <p class="ask" id="ask"
-         data-glyph="Which letter is this, and what is on it?" data-name="Which one is this?"
-         data-spot="Which one has {mark} on it?" data-sound="Which one says this?"
-         data-words-attr="data-glyph|Question: showing a letter with its mark;data-name|Question: giving a name;data-spot|Question: which one has the mark on it ({mark} is filled in);data-sound|Question: hearing a sound"></p>
-      <div class="prompt" data-play="Play the sound"
-           data-words-attr="data-play|Question: play button"></div>
-      <div class="choices" role="group" aria-labelledby="ask"></div>
-
-      <!-- Both live regions are here, empty, from the first paint: one inserted at the moment of its first message is
-           not announced. A bare review letter is answered in words of its own: "with no mark". -->
-      <p class="verdict" role="status" aria-live="polite" aria-atomic="true"
-         data-right="Yes — {name} with {mark}." data-right-bare="Yes — {name}, with no mark."
-         data-wrong="That one is {chosen}. This is {name} with {mark}." data-wrong-bare="That one is {chosen}. This is {name}, with no mark."
-         data-pool-error="Something is missing here — reload the page and it should come back."
-         data-words-attr="data-right|Answer: when right ({name} and {mark} are filled in);data-right-bare|Answer: when right, a letter with no mark;data-wrong|Answer: when not ({chosen}, {name} and {mark} are filled in);data-wrong-bare|Answer: when not, a letter with no mark;data-pool-error|Answer line: nothing to ask"></p>
-      <p class="sr-only announce" role="status" aria-live="polite"
-         data-template="Question {n}."
-         data-words-attr="data-template|Announced for screen readers: a new question ({n} is filled in)"></p>
-
-      <!-- Under an answer, not a panel over it: a panel would take the keyboard and hide the choices the student is
-           learning from. It is a strip because a choice is itself a button and cannot hold buttons of its own. -->
-      <div class="after" hidden>
-        <span class="after-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
-        <span class="after-name"></span>
-        <button class="button quiet hear" type="button">
+      <!-- Hear is only offered for a verse that has a recording: a wordless hum in place of a verse would not be a verse. Say it is always offered, and
+           is never scored (docs/your-voice/01 §3). -->
+      <div class="verse-controls">
+        <button class="button quiet hear hear-verse" type="button" hidden>
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
             <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5" />
           </svg>
-          <span data-words="Hear it button">Hear it</span>
+          <span data-words="Verse: hear the verse button">Hear the verse</span>
         </button>
-        <button class="button quiet say" type="button" aria-haspopup="dialog">
+        <button class="button quiet say say-verse" type="button" aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <rect x="9" y="3" width="6" height="11" rx="3" />
             <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
           </svg>
-          <span data-words="Say it button">Say it</span>
+          <span data-words="Verse: say the verse button">Say the verse</span>
         </button>
-        <!-- "Write it" opens the letter WITH its mark, its wow and the jazam: writing the whole item is the lesson. -->
-        <button class="button quiet trace" type="button" aria-haspopup="dialog">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
-            <path d="M14.5 6.5l3 3" />
+      </div>
+
+      <p class="verse-hint"></p>
+
+      <!-- A tapped word: the word, large, what to do with it, and the reasons. -->
+      <div class="word-card" hidden>
+        <p class="word-card-word" lang="ar" dir="rtl" aria-hidden="true"></p>
+        <div class="word-card-tools">
+          <button class="button quiet hear hear-word" type="button" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
+              <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5" />
+            </svg>
+            <span data-words="Word card: hear the word button">Hear the word</span>
+          </button>
+          <button class="button quiet say say-word" type="button" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="9" y="3" width="6" height="11" rx="3" />
+              <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
+            </svg>
+            <span data-words="Word card: say the word button">Say it</span>
+          </button>
+          <!-- "Write it" opens the WHOLE word, as it is printed: the word is what there is to write. -->
+          <button class="button quiet trace write-word" type="button" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19z" />
+              <path d="M14.5 6.5l3 3" />
+            </svg>
+            <span data-words="Word card: write the word button">Write it</span>
+          </button>
+        </div>
+        <p class="word-card-lead"></p>
+        <ul class="word-notes"></ul>
+      </div>
+
+      <!-- The Indo-Pak student's line about the stand-in font. Hidden for a Madani student. -->
+      <p class="lead-line" hidden></p>
+
+      <div class="verse-moves">
+        <button class="button quiet verse-prev" type="button">
+          <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
           </svg>
-          <span data-words="Write it button">Write it</span>
+          <span data-words="Verse: previous verse button">Previous verse</span>
         </button>
-        <button class="button next-question" type="button">
-          <span data-words="Next question button">Next</span>
+        <button class="button primary verse-next" type="button"
+                data-next="Next verse" data-last="The whole surah"
+                data-words-attr="data-next|Verse: next verse button;data-last|Verse: the button on the last verse, which goes on to the whole surah">
+          <span></span>
           <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M5 12h14M13 6l6 6-6 6" />
           </svg>
         </button>
       </div>
-
-      <!-- Advice, never a block. Both lines are for the teacher to read first: they are what a beginner who is
-           finding this hard will see. -->
-      <div class="advice" role="status" aria-live="polite"
-           data-struggling="{name} keeps slipping. Look at it again at the top of the page."
-           data-ready-group="You seem to know this part. The next one is ready when you are."
-           data-ready-lesson="You seem to know {mark} on every letter."
-           data-words-attr="data-struggling|Advice: one letter is hard ({name} is filled in);data-ready-group|Advice: a group is known;data-ready-lesson|Advice: the whole lesson is known ({mark} is filled in)">
-        <div class="struggle" hidden>
-          <p class="struggle-text"></p>
-          <div class="struggle-buttons">
-            <button class="button quiet show-me" type="button" data-words="Advice: show me button">Show me</button>
-            <button class="button quiet trace" type="button" aria-haspopup="dialog" data-words="Advice: write it button">Write it</button>
-          </div>
-        </div>
-        <p class="ready-note" hidden></p>
-      </div>
-
-      <!-- The words that build every letter's name, so a name is edited once and every name follows. {name} is the
-           letter's, {mark} the student's own word for the stroke. -->
-      <span hidden
-            data-name-marked="{name} with {mark}" data-name-bare="{name}"
-            data-words-attr="data-name-marked|Item name, a letter with the mark ({name} and {mark} are filled in);data-name-bare|Item name, a letter with no mark ({name} is filled in)"></span>
-      <!-- Lesson 2's table of look-alikes, groups between commas: which letters are offered as wrong answers for each other. -->
-      <span hidden data-groups="ب ت ث ن ي, ج ح خ ع غ, د ذ ر ز و, س ش ص ض, ط ظ, ف ق ك, ل ا, م ه, ء و"
-            data-words-attr="data-groups|Look-alike letters (groups between commas)"></span>
     </section>
 
-    <!-- Real words, made only from letters and marks this lesson has taught: the traditional spelling method (the
-         user's own example, 2026-09-27) — name each letter with its mark, then put it together with what came
-         before, one letter at a time, to the whole word. Shown, never scored, like "Write it" and "Say it"; no
-         audio here yet (the user, 2026-09-27: "no speech for now"). The words themselves are candidates (spell.js),
-         to be checked before they ship. Which word is on screen is its own small tracker, kept apart from the
-         Part 1 / Part 2 rail above: that one is about meeting the mark, this one is about which word. -->
+    <!-- Step 2: the whole surah, as the mushaf prints it, the seven verses one after another. The verse-end sign is a button back to its verse. -->
+    <section class="surah-page" aria-labelledby="surah-title"
+             data-go="Go back to verse {n}"
+             data-words-attr="data-go|Whole surah: what a screen reader hears on a verse's end sign ({n} is filled in)">
+      <div class="section-head">
+        <p class="eyebrow" data-words="Whole surah: step label">Step 2</p>
+        <h2 class="section-title" id="surah-title" tabindex="-1" data-words="Whole surah: heading">The whole surah</h2>
+        <p class="section-guide" data-words="Whole surah: guide line">The seven verses together, as they are printed. Read it through, and stop at each round mark.</p>
+      </div>
+      <div class="surah-text" lang="ar" dir="rtl"></div>
+    </section>
+
+    <!-- Step 3: three words spelled through one piece at a time, the traditional method, shown and never scored. The pieces and the sounds said aloud in each
+         are candidates (fatiha.js, `WALK`), to be checked by the teacher before they ship. -->
     <section class="spell" aria-labelledby="spell-title"
-             data-word-label="Word {n} of {total}" data-word-button="Word {n}"
-             data-letter-line="{name} with {mark}: {sound}." data-blend-line="Put together: {sound}."
-             data-whole-line="The whole word: {sound}." data-meaning-line="It means “{meaning}.”"
-             data-words-attr="data-word-label|Spell it: which word, of how many ({n} and {total} are filled in);data-word-button|Spell it: a word's own button, for a screen reader ({n} is filled in);data-letter-line|Spell it: naming a letter ({name}, {mark} and {sound} are filled in);data-blend-line|Spell it: a blend so far ({sound} is filled in);data-whole-line|Spell it: the finished word ({sound} is filled in);data-meaning-line|Spell it: what the word means ({meaning} is filled in)">
+             data-word-label="Word {n} of {total}"
+             data-word-button="Word {n}"
+             data-piece-line="This piece: “{sound}”."
+             data-whole-line="The whole word: {sound}."
+             data-words-attr="data-word-label|Spell it: which word, of how many ({n} and {total} are filled in);data-word-button|Spell it: a word's own button, for a screen reader ({n} is filled in);data-piece-line|Spell it: each piece ({sound} is filled in);data-whole-line|Spell it: the finished word ({sound} is filled in)">
       <div class="section-head">
         <p class="eyebrow" data-words="Spell it: step label">Step 3</p>
-        <h2 class="section-title" id="spell-title" tabindex="-1" data-words="Spell it: heading">Spell a word</h2>
-        <p class="section-guide" data-words="Spell it: guide line">Put letters together, one at a time, to read a real word.</p>
+        <h2 class="section-title" id="spell-title" tabindex="-1" data-words="Spell it: heading">Read it a piece at a time</h2>
+        <p class="section-guide" data-words="Spell it: guide line">Three of the longer words, one piece at a time, then the whole word.</p>
       </div>
 
       <div class="spell-words" role="group" aria-label="Which word">
@@ -372,7 +326,6 @@
       <div class="spell-stage" role="group" aria-labelledby="spell-title">
         <p class="spell-glyph" lang="ar" dir="rtl" aria-hidden="true"></p>
         <p class="spell-caption" role="status" aria-live="polite"></p>
-        <p class="spell-meaning" hidden></p>
       </div>
       <div class="spell-controls">
         <button class="button quiet spell-back" type="button" data-words="Spell it: back button">Back</button>
@@ -380,18 +333,10 @@
         <button class="button primary spell-restart" type="button" hidden data-words="Spell it: start over button">Start over</button>
         <button class="button primary spell-nextword" type="button" hidden data-words="Spell it: next word button">Next word</button>
       </div>
-
-      <!-- The extra list is its own page, the same as every mark lesson since Lesson 4: a printed Qaida's own
-           "mashq" (exercise) page, twelve words, no meanings, no walkthrough — exercise-11.html. -->
-      <div class="spell-more">
-        <h3 class="spell-more-title" data-words="Spell it: more words heading">More words to read</h3>
-        <p class="spell-more-guide" data-words="Spell it: more words guide line">Twelve more, using oo — no translations, just reading.</p>
-        <a class="button quiet" href="exercise-11.html" data-words="Spell it: more words link">Practice reading →</a>
-      </div>
     </section>
 
     <footer class="lesson-end">
-      <!-- The star and its rules draw into place once the lesson says you seem ready. -->
+      <!-- The star and its rules draw into place once every verse has been read. -->
       <svg class="ornament" viewBox="-120 -12 240 24" aria-hidden="true" focusable="false">
         <line class="rule left" x1="-100" y1="0" x2="-24" y2="0" />
         <line class="rule right" x1="24" y1="0" x2="100" y2="0" />
@@ -402,9 +347,9 @@
         </g>
       </svg>
       <p class="end-line"
-         data-before="Work through both parts to finish the lesson."
-         data-finished="You can tell oo from au and u. This lesson is marked as done. You can keep practising as long as you like."
-         data-words-attr="data-before|Last line, before the lesson says you seem ready;data-finished|Last line, once it does ({other} can be filled in)"></p>
+         data-before="Read all seven verses to finish the lesson."
+         data-finished="You have read the whole of Al-Fatiha, a verse at a time. This lesson is marked as done. You can come back to it as often as you like."
+         data-words-attr="data-before|Last line, before every verse has been read;data-finished|Last line, once it has"></p>
       <div class="onward">
         <a class="button back" href="./">
           <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -412,20 +357,18 @@
           </svg>
           <span data-words="Back to the lessons button">Back to the Qaida</span>
         </a>
-        <!-- Lesson 10 is always built by the time this page can be reached, so this is a plain link; the label follows
-             the student's choice of names, and mark-lesson.js writes it in. -->
-        <a class="button quiet prev" href="lesson-10.html"
-           data-prev-zabar="Previous: Zabar and wow" data-prev-fatha="Previous: Fatha and waw"
+        <!-- Lesson 22 is always built by the time this page can be reached, so this is a plain link. -->
+        <a class="button quiet prev" href="lesson-22.html"
+           data-prev-zabar="Previous: Stopping" data-prev-fatha="Previous: Stopping"
            data-words-attr="data-prev-zabar|Previous lesson button (zabar names);data-prev-fatha|Previous lesson button (fatha names)">
           <svg class="arrow back-arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M19 12H5M11 6l-6 6 6 6" />
           </svg>
           <span></span>
         </a>
-        <!-- Lesson 12 is built now, so this reads the page's own row in shell.js and goes there; the note at the
-             bottom of the screen is for a lesson that is not built yet (mark-lesson.js's own next button). -->
+        <!-- Lesson 24 is not built yet, so a click shows the note at the bottom of the screen; the moment it is, it is a link. Not locked: the lesson only recommends. -->
         <button class="button primary next" type="button"
-                data-next-zabar="Next: Zabar and yaa" data-next-fatha="Next: Fatha and yaa" data-soon="The next lesson isn’t built yet."
+                data-next-zabar="Next: Noon and tanween" data-next-fatha="Next: Noon and tanween" data-soon="The next lesson isn’t built yet."
                 data-words-attr="data-next-zabar|Next lesson button (zabar names);data-next-fatha|Next lesson button (fatha names);data-soon|Note: the next lesson is not built yet">
           <span></span>
           <svg class="arrow" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

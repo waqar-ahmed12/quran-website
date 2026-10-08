@@ -182,7 +182,8 @@ body::before {
   height: var(--topbar-h);
   padding-inline: var(--gutter);
   border-bottom: 1px solid transparent;
-  background: rgb(var(--rgb-background) / 0.95);
+  /* Solid: at 95% the page scrolling under it showed through as ghost text and buttons, plainest on ivory. */
+  background: var(--color-background);
   transition: border-color 300ms ease;
 }
 
@@ -333,14 +334,26 @@ a.crumb:hover {
   }
 }
 
-/* Too narrow for the name and where you are: the star stands in for the name, as on the home page. */
+/* Too narrow for the name and where you are: the star stands in for the name, as on the home page. The site name is
+   .brand-name, not .name: a letter tile's .name starts hidden until it is peeked, and it hid the name here too. */
 @media (max-width: 419px) {
-  .brand .name {
+  .brand-name {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
+  }
+
+  /* The star alone is 20px wide: a 44px touch area round it, reaching into the space either side. */
+  .brand {
+    position: relative;
+  }
+
+  .brand::before {
+    content: '';
+    position: absolute;
+    inset: 0 -12px;
   }
 
   .crumb::before {
@@ -1226,6 +1239,21 @@ a.crumb:hover {
   transform: none;
 }
 
+/* Nothing to go to (the first verse has no previous one, the first piece of a word no Back): faded, and it no longer
+   answers the pointer, so it never looks like a button that does nothing. */
+button.button:disabled,
+button.button:disabled:hover {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--color-muted-foreground);
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.button:disabled:active {
+  transform: none;
+}
+
 /* A short note at the bottom of the screen, for stand-ins. */
 .note {
   position: fixed;
@@ -1749,7 +1777,9 @@ a.crumb:hover {
   background: rgb(var(--rgb-accent) / 0.06);
 }
 
+/* Cinzel has no even-width figures, so "11" is 6px narrower than "04": a set width keeps every title in line. */
 .card-n {
+  min-width: 1.25rem;
   font-family: var(--font-display);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -2043,7 +2073,7 @@ a.crumb:hover {
 
 /* A button that doesn't ask for attention: the quiet outline used for "back", "hear it" and "trace it". */
 .button.quiet {
-  min-height: 40px;
+  min-height: 44px; /* quiet in colour, not in size: every target is 44px (qaida.md) */
   padding: 0 1rem;
   border-color: var(--line);
   font-size: 0.875rem;
@@ -3278,16 +3308,21 @@ a.crumb:hover {
   color: var(--color-muted-foreground);
 }
 
+/* 1rem apart, so each 28px step can have a 44px touch area (below) without reaching into the next one's. */
 .spell-words-nav {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
+/* margin: 0, because the step being shown is also .current, and Lesson 1's .current (the bar under the letters)
+   gave it a top margin that dropped it below the rest of the row. */
 .word-step {
+  position: relative;
   display: grid;
   place-items: center;
   width: 1.75rem;
   height: 1.75rem;
+  margin: 0;
   padding: 0;
   border: 1.5px solid var(--line);
   border-radius: 50%;
@@ -3297,6 +3332,12 @@ a.crumb:hover {
   font-size: 0.8125rem;
   cursor: pointer;
   transition: border-color 200ms ease, color 200ms ease, background-color 200ms ease;
+}
+
+.word-step::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem;
 }
 
 @media (hover: hover) {
@@ -4682,6 +4723,283 @@ code {
   .list td {
     padding: 0.5rem 0.4rem;
   }
+}
+
+/* Lesson 23 - the verse page (docs/lesson-23/01 §9). The first page of the Qaida that shows the Qur'an's own text at length, so it has a face of its own:
+   Madani is drawn in Amiri Quran whatever the lettering option says (the options panel changes the Qaida's letters, never the Qur'an's print), and Indo-Pak in
+   the stand-in until a licensed Indo-Pak Qur'an face is in. The size and the leading are on :root so the options panel's sliders can move them. A verse is
+   large, its words are buttons, a tapped word opens a card of reasons, and nothing is marked: no right and wrong colour anywhere on this page. */
+:root {
+  --font-quran: 'Amiri Quran', 'Scheherazade New', serif;
+  --verse-size: clamp(2.125rem, 1.55rem + 3vw, 3.5rem);
+  --verse-leading: 2.1;
+}
+
+:root[data-script='indopak'] {
+  --font-quran: var(--font-indopak);
+}
+
+.verse-board,
+.surah-page,
+.verses .spell {
+  max-width: 46rem;
+  margin: clamp(1.5rem, 3.5vh, 2.5rem) auto 0;
+}
+
+.verse-board {
+  margin-top: clamp(0.75rem, 1.6vh, 1.25rem);
+}
+
+.surah-page,
+.verses .spell {
+  padding-top: clamp(1.25rem, 3vh, 2rem);
+  border-top: 1px solid var(--line);
+}
+
+/* Which verse: the same small circles as the spelling walk-through's words, with a gold ring once a verse has been read. */
+.verse-nav {
+  display: grid;
+  justify-items: center;
+  gap: 0.625rem;
+  margin-top: 1.25rem;
+}
+
+.verse-label {
+  margin: 0;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--color-muted-foreground);
+}
+
+.verse-steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem; /* as .spell-words-nav: room for each step's 44px touch area */
+}
+
+.word-step.seen {
+  border-color: rgb(var(--rgb-accent) / 0.5);
+  color: var(--color-foreground);
+}
+
+.verse-stage {
+  margin: 1.25rem auto 0;
+  padding: clamp(0.75rem, 2.2vw, 1.5rem) clamp(0.5rem, 2vw, 1.25rem);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--color-surface);
+}
+
+.verse-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0 0.5em;
+  margin: 0;
+  font-family: var(--font-quran);
+  font-size: var(--verse-size);
+  line-height: var(--verse-leading);
+  color: var(--color-foreground);
+}
+
+/* A word is a button, with no look of one until it is hovered, focused or picked. Its height is the line's, so it is far over the 44px a finger needs. */
+.verse-word {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0.14em;
+  border: 0;
+  border-radius: 0.3em;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+@media (hover: hover) {
+  .verse-word:hover {
+    background: rgb(var(--rgb-accent) / 0.1);
+  }
+}
+
+.verse-word:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.verse-word.picked {
+  background: rgb(var(--rgb-accent) / 0.18);
+  color: var(--color-accent);
+}
+
+:root[data-word-pick='line'] .verse-word.picked {
+  background: none;
+  box-shadow: inset 0 -0.07em 0 var(--color-accent);
+}
+
+.verse-end {
+  align-self: center;
+  font-size: 0.8em;
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.verse-controls,
+.verse-moves {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.verse-hint {
+  min-height: 1.5em; /* held on every verse, so the buttons under it never move when a word is tapped */
+  margin: 0.875rem auto 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--color-muted-foreground);
+}
+
+.verse-hint[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+/* A tapped word: the word, large, what to do with it, and why it is read the way it is. */
+.word-card {
+  max-width: 36rem;
+  margin: 0.875rem auto 0;
+  padding: 1.25rem clamp(0.875rem, 3vw, 1.5rem) 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.word-card-word {
+  margin: 0;
+  font-family: var(--font-quran);
+  font-size: clamp(2.75rem, 2.2rem + 2.6vw, 4.25rem);
+  line-height: 1.9;
+  color: var(--color-accent);
+}
+
+.word-card-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.word-card-lead {
+  margin: 1.25rem 0 0.5rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--color-muted-foreground);
+}
+
+.word-notes {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: start;
+}
+
+.word-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.125rem 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.625rem;
+  background: rgb(var(--rgb-foreground) / 0.04);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.note-text {
+  flex: 1 1 15rem;
+  color: var(--color-foreground);
+}
+
+.note-lesson {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  color: var(--color-accent);
+}
+
+a.note-lesson {
+  text-underline-offset: 0.2em;
+}
+
+.note-lesson.later {
+  color: var(--color-muted-foreground);
+}
+
+/* The whole surah, as printed: one run of text with a round mark after each verse, and each mark a way back to its verse. */
+.surah-text {
+  margin: 1.25rem 0 0;
+  padding: clamp(0.75rem, 2.2vw, 1.5rem) clamp(0.75rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  font-family: var(--font-quran);
+  font-size: calc(var(--verse-size) * 0.78);
+  line-height: calc(var(--verse-leading) + 0.1);
+  text-align: justify;
+  text-align-last: center;
+  color: var(--color-foreground);
+}
+
+:root[data-surah-layout='lines'] .surah-verse {
+  display: block;
+  text-align: center;
+}
+
+.surah-end {
+  position: relative;
+  padding: 0 0.1em;
+  border: 0;
+  border-radius: 0.3em;
+  background: none;
+  font: inherit;
+  font-size: 0.8em;
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+/* The mark is about 33px wide on a phone: 6px more each side makes the touch area 44px, and the text round it stays put. */
+.surah-end::after {
+  content: '';
+  position: absolute;
+  inset: 0 -6px;
+}
+
+.surah-end:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* The spelling walk-through here is of Qur'an words, so it is drawn in the Qur'an's face, and a piece is a run of letters rather than one letter. */
+.verses .spell-glyph {
+  font-family: var(--font-quran);
+}
+
+/* "Say it" on a verse puts a whole verse in the panel, and on a word one word: the panel's glyph is the Qur'an's own print at a size a verse fits. */
+[data-surah] .echo-glyph {
+  font-family: var(--font-quran);
+  font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
+  line-height: 2;
+  overflow-wrap: anywhere;
 }
 
 /* TRYOUT: the options panel (qaida-options.js), as on the home page. Delete with it. */

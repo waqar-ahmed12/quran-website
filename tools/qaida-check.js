@@ -2331,8 +2331,8 @@ console.log('\nLesson 15: the shadda');
   check(shell.LESSONS.length === 29 && shell.LESSONS.every((entry, i) => entry.n === i + 1), 'the home lists 29 lessons, in order');
   check(shell.LESSONS.filter((entry) => entry.part === 2).map((entry) => entry.n).join() === Array.from({ length: 15 }, (_, i) => i + 15).join()
     && shell.LESSONS.filter((entry) => !entry.part).length === 14, 'lessons 15-29 are the second part; 1-14 have no `part` and so are the first');
-  check(shell.LESSONS.filter((entry) => entry.built).length === 22 && shell.LESSONS.find((entry) => entry.n === 22).built === true, 'only lessons 1-22 are built');
-  check(shell.LESSONS.filter((entry) => entry.n > 22).every((entry) => !entry.href && !entry.built && entry.title.fatha && entry.lede), 'and each later lesson has a title and a line, and leads nowhere');
+  check(shell.LESSONS.filter((entry) => entry.built).length === 23 && shell.LESSONS.find((entry) => entry.n === 23).built === true, 'only lessons 1-23 are built');
+  check(shell.LESSONS.filter((entry) => entry.n > 23).every((entry) => !entry.href && !entry.built && entry.title.fatha && entry.lede), 'and each later lesson has a title and a line, and leads nowhere');
   const hamzaRow = shell.LESSONS.find((entry) => entry.n === 16);
   check(hamzaRow.href === 'lesson-16.html' && hamzaRow.progress === 'drill' && hamzaRow.part === 2 && hamzaRow.cp === undefined && !hamzaRow.tail,
     'Lesson 16 is a real link in the second part, with no `cp`: every id in its record is one of its fifteen forms (docs/lesson-16/03 §8)');

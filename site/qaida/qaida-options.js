@@ -658,6 +658,42 @@
     footSlider();
   }
 
+  // Lesson 23, the verse page (docs/lesson-23/01 §9): nothing to drill and no question, so only how the Qur'an text and the page around it look.
+  if (lesson && lesson.kind === 'verses') {
+    section('The verse', true);
+    const verseSize = parseFloat(getComputedStyle(root).getPropertyValue('--verse-size')) || 3;
+    slider('Verse size', 1.75, 5, 0.125, verseSize, show, (v) => root.style.setProperty('--verse-size', `${v}rem`));
+    const verseLeading = parseFloat(getComputedStyle(root).getPropertyValue('--verse-leading')) || 2.1;
+    slider('Space between lines', 1.5, 3.5, 0.1, verseLeading, (v) => v.toFixed(1), (v) => root.style.setProperty('--verse-leading', String(v)));
+    option('A word that is picked', { 'Gold wash': 'wash', 'Gold underline': 'line' }, 'wordPick');
+    option('The whole surah', { 'Run on, as printed': 'run', 'A verse to a line': 'lines' }, 'surahLayout');
+    actions('Try it', {
+      'Verse 7, the longest': () => lesson.show(6),
+      'Verse 1': () => lesson.show(0),
+      'Clear progress': () => lesson.clear(),
+      'First-visit choice': () => shell.askAgain(),
+    });
+    actions('Sound and writing', {
+      'Play the stand-in': () => window.qaidaAudio && window.qaidaAudio.play('letters', 'ا'),
+      'Stop': () => window.qaidaAudio && window.qaidaAudio.stop(),
+      'Open the blank board': () => window.qaidaTrace && window.qaidaTrace.open(),
+    });
+
+    voiceSection();
+
+    section('Page look, spacing & progress bar', true);
+    option('Progress bar', { 'Under the title': 'title', 'Stays at the top': 'top' }, 'progress');
+    option('Bar look', { Line: 'line', 'A step per verse': 'steps' }, 'bar');
+    option('29-lesson track', { Show: 'show', Hide: 'hide' }, 'track');
+    option('When every verse is read', { 'Settles down': 'settle', 'Keeps glowing': 'glow', 'No fuss': 'none' }, 'finish');
+    option('Big mark by the title', { Center: 'baa', Top: 'top', Watermark: 'watermark', Hide: 'none' }, 'titlemark');
+    option('Background', { Plain: 'plain', 'Soft light': 'light', 'Star pattern': 'pattern' }, 'bg');
+    gapSlider('--drill-end-gap', 'Gap: verses to the star');
+    starGapSlider();
+    textGapSlider();
+    footSlider();
+  }
+
   if (home) {
     section('The lesson list', true);
     option('Lesson cards', { Quiet: 'quiet', Paper: 'paper', 'Gold wash': 'gold' }, 'cards');

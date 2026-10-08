@@ -1,6 +1,20 @@
+---
+tags: [lesson-23, al-fatiha, verse-page, built]
+---
 # Lesson 23 — Al-Fatiha: lesson plan
 
-*One-file plan, written 2026-09-28. It becomes a full folder before it is built. Read `docs/pass-2/` first.*
+*One-file plan, written 2026-09-28; **built 2026-10-06** (the user: "do the next lesson"). The plan below is kept as it was written, with the build's own notes in
+[[docs/lesson-23/01-design|01 Design]] and [[docs/lesson-23/02-build-record|02 Build record]]. Read [[docs/pass-2/README|Pass 2]] first.*
+
+**Part of:** [[MAP]] · [[QAIDA-BUILD]] · before it [[docs/lesson-22/README|Lesson 22, stopping]] · after it [[docs/lesson-24/README|Lesson 24, noon and tanween]]
+
+## Status — built (2026-10-06)
+
+The first **verse page**: read and never scored, a verse at a time, with a card for a tapped word that says why it is read that way and which lesson taught it. The words are copied from
+Quran.com by `tools/fetch-qaida-verses.js` and named by reference. **Two things the plan did not know:** the two mushafs print some words differently, so **a note is shown only where it is true in
+the student's own script**; and **two Indo-Pak words carry Quran.com's private-use signs**, which the page leaves out when it draws. **Not solved, and shipped without:** the Indo-Pak Qur'an font (the
+stand-in, with its one line), and whose voice reads the verses (Hear is hidden until a verse or word is recorded). Where it differs and what is still the user's:
+[[docs/lesson-23/02-build-record|02 Build record]] §2 and §4.
 
 | | |
 |---|---|

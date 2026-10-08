@@ -22,6 +22,16 @@ parts and 29 lessons** (`shell.js` rows 15–29, `part: 2`; `home.js` headings; 
 is an ordinary Next to Lesson 15 (its `data-last` is gone). All 17 check scripts pass. **Still the user's:** the kasra with
 the shadda against a printed Qaida, the halo on the shadda, the hum line, the words, and see "Step P1 built — Lesson 15" in
 the step log. **Left undone, and a decision:** the first-pass pages still say "Lesson N of 14" with a 14-dash track.
+**Step P3, Lesson 23 (Al-Fatiha), is built — the first VERSE page, read and never scored** (2026-10-06, the user: "do the next lesson"). `docs/lesson-23/` was written (`01-design`,
+`02-build-record`). `lesson-23.html`, `verses.js`, `fatiha.js` (the kit) and `verse-words.js` (the seven verses, **copied** from Quran.com by `tools/fetch-qaida-verses.js`, both scripts, a hash the check
+recomputes). One verse at a time, its words as buttons; a tapped word says **why it is read that way, one line a reason, each pointing to the lesson that taught it** (Lesson 24, 25 and 27 say "Comes in
+Lesson N"); the whole surah; three words spelled through. **No question, no score, no engine change.** It keeps which verses have been read; the home card says "3 of 7 verses read". **Found by running
+the check on the real copy:** the two mushafs print some words differently, so **a note is shown only where it is true in the student's own script** (a standing zabar or an alif; a jazam on the yaa; a stop
+sign at a verse's end; Allah with no shadda in Indo-Pak); **two Indo-Pak words carry Quran.com's private-use signs**, kept in the copy and left out when drawn. **Not solved:** Madani is drawn in Amiri Quran
+(its jazam looks like the open head, by eye); **Indo-Pak is still the stand-in** (the licensed face is the launch blocker); **no recordings, so Hear is hidden**; Say it works. Measured at 375px: no overflow,
+no word button under 44px. All 25 check scripts pass (`node tools/qaida-lesson23-check.js` is new, 110 checks). **Documented in the Obsidian graph** (`MAP.md`, `docs/lesson-23/`). See **"Step P3 built —
+Lesson 23"** in the step log. **Still the user's:** `docs/lesson-23/02` §4. **Next: Lesson 24 (noon and tanween), step P4** — the biggest difference between the two scripts in the pass; **six lessons are
+left (24–29)**. Skills: `ui-ux-pro-max`, `full-output-enforcement` (step P4).
 **Step P2, Lesson 22 (stopping), is built — the seventh and last rule lesson of P2, so step P2 is done** (2026-10-06, the user: "start the next lesson build, also tell how much is
 left", taken as the yes to the README's recommendations). `docs/lesson-22/` was written (`01-design`, `02-build-record`). **Twenty-seven items by reference**: 15 asked "how do you stop
 on this word?" (three each: a vowel, two zair or two paish, two zabar, a round taa, a long vowel at the end) and 12 "what does the lit sign say?" (three each of four signs); parts of
@@ -36,9 +46,8 @@ forms' heights and a 3+1 wrap on a phone. Measured at 375px, both scripts, all 2
 rows). **Ships in both scripts**, with Lesson 18's line about the stand-in font. All 24 check scripts pass (`node tools/qaida-lesson22-check.js` is new, 179 checks). **Documented in the
 Obsidian graph** (`MAP.md`, `docs/lesson-22/`). See **"Step P2 built — Lesson 22"** in the step log. **Still the user's:** `docs/lesson-22/02` §4 — the four meanings against the list at
 the end of the teacher's mushaf, **the Madani circle (the Qur'an font decision)**, a laam-alif on a verse end, the look, the words and their sounds, and one recording per word.
-**Next: Lesson 23 (Al-Fatiha), step P3** — the verse page, a new page type; it waits on **the Qur'an fonts** (Madani: measure Amiri Quran; Indo-Pak: a licensed font that draws Quran.com's
-private-use verse signs) and **whose voice reads the verses** (`docs/pass-2/03` §3, §5). Or, the user's choice, the first-pass loose ends (the "of 14" pages), or steps 10–13. Skills:
-`ui-ux-pro-max`, `high-end-visual-design` (step P3).
+*(Its Next was Lesson 23, which is now built: see above. It had waited on the Qur'an fonts and whose voice reads the verses; neither is settled, and the page ships without them: the Madani
+text in Amiri Quran, Indo-Pak in the stand-in with its one line, Hear hidden until there is a recording.)* Skills: `ui-ux-pro-max`, `high-end-visual-design` (step P3).
 **Step P2, Lesson 21 (letters that are not read), is built — the sixth rule lesson, and the first whose question is to TAP a letter** (2026-10-06, the user: "go ahead and make
 the next lesson, tell me what lesson number that is", taken as the yes to the README's recommendations and to the one change to the engine `docs/pass-2/02` §2 left for this
 lesson). `docs/lesson-21/` was written (`01-design`, `02-build-record`). **Thirty items by reference**: 18 words (6 with the alif after a plural wow, 4 with the wow after the
@@ -1356,6 +1365,50 @@ recommendations, and to building without a separate look at lessons 7–9 first 
 **Still the user's** (`docs/lesson-10/06` §4): does the jazam read as a mark on the wow, and is it the shape your
 mushaf prints; does the halo sit on the wow (it behaves as Lesson 8's does, and at this size wraps most of the item);
 دَوْ standing apart; the walkthrough; the reading page. And the words — every one is Claude's candidate.
+
+### UI audit, 2026-10-07 — eight fixes across every Qaida page
+
+*The user: "look at all the project files, and tell me if there are any short comings ... i want perfect ui ux".* All 44 pages were
+loaded in the browser pane at 375px and 1280px and measured (overflow, touch targets against qaida.md's 44px rule, labels,
+alignment), then looked at in both themes. Found and fixed:
+- **The site name was invisible in every Qaida top bar**, since step 1: it was a `.name`, and a letter tile's `.name` starts
+  at `opacity: 0` until peeked. It is now `.brand-name` (all 44 pages). Only the star showed.
+- **The step being shown in every spelling walkthrough (lessons 4–23) and Lesson 23's verse steps sat ~10px lower** than the
+  others: it is also `.current`, which Lesson 1's bar gives a top margin. `.word-step` now sets `margin: 0`.
+- **The settings line** ("Madani script · Fatha, kasra, damma · Shape families") left a dot at the start or end of a line
+  on a phone. `shell.js` `tidyDots` hides a dot the line breaks at (measured, and again on resize and once fonts load).
+- **Lesson numbers on the home** are Cinzel, which has no even-width figures, so titles were up to 6px out of line:
+  `.card-n` has a set width.
+- **Disabled buttons looked live** (Previous verse on verse 1, Back on a word's first piece): faded now, as `.link:disabled`
+  already was.
+- **The top bar is solid**: at 95% the page under it showed through as ghost buttons, plainest on ivory.
+- **Touch targets to 44px**: the quiet buttons (40px), the walkthrough and verse steps (28px, a touch area round each and
+  1rem between them), Lesson 23's verse-end marks in the whole surah (33px wide), and the star alone on a phone (20px).
+- **A favicon on every Qaida page** (none before: a blank tab and a 404 for `/favicon.ico`), the landing page's; and a
+  description on the Qaida home, its own lede.
+
+All 25 check scripts and the 43 scroll checks pass; no console errors. **Left as they are, on purpose:** 11px labels (qaida.md
+specifies them), the options panels and `recordings.html` (step 13 removes them).
+
+### Step P3 built — Lesson 23 (Al-Fatiha, the first verse page)
+
+*2026-10-06. The user: "do the next lesson".* Full record in `docs/lesson-23/02-build-record.md`; the reasons in `01-design.md`. In short:
+- **A page type of its own**, `verses.js` (`<html data-surah="1">`), **read and never scored**: one verse at a time with its words as buttons, a card for a tapped word that says why it is read that
+  way (one line a reason, each pointing to the lesson that taught it), the whole surah, and three words spelled through. No question, no `practice.js`. What it keeps is **which verses have been
+  read** (`shell.markSeen`), and the home card says "3 of 7 verses read" (`progress: 'verses'`).
+- **The words are copied, never typed**: `tools/fetch-qaida-verses.js` → `verse-words.js` (29 words, both scripts, unmodified, a SHA-256 the check recomputes); the verse-end sign is drawn by the page.
+  `fatiha.js` is the kit (20 kinds, each with a test of the word's own text and the lesson that taught it, and the notes of all 29 words by reference).
+- **Found by running the check against the real copy, which corrected the plan:** the two mushafs print some words differently (a standing zabar in Madani is a zabar and an alif in Indo-Pak; Indo-Pak puts
+  a jazam on the yaa and a stop sign at most verse ends; the Indo-Pak name of Allah has no shadda), so **a note is shown only where it is true in the student's script**; 1:7:2 is a shadda, not "Al- and a
+  sun letter"; a hamza can be the second letter; a doubled yaa is not a long "ee"; **two Indo-Pak words carry Quran.com's private-use signs** (left out when drawn, kept in the copy).
+- **The Qur'an fonts, not solved:** Madani is drawn in Amiri Quran (its jazam looks like the open head, by eye); **Indo-Pak is still the stand-in** with its one honest line. **No voice yet:** Hear is
+  hidden until a verse or word is recorded; Say it works.
+- **Checks:** `node tools/qaida-lesson23-check.js` (new, 110 checks); `qaida-check.js` (lessons 1–23 built) and `qaida-lesson18-check.js` to `qaida-lesson22-check.js` updated. **All 25 scripts pass.**
+  **Browser pane:** both scripts, desktop and 375px, no overflow, no word button under 44px (one was 37px: `min-width: 44px`), no console errors.
+- **Obsidian:** `MAP.md` (Lesson 23 built, the verse page), `docs/lesson-23/` (`tags:`, a `Part of` line on every note, `01-design`, `02-build-record`).
+
+**Still the user's** (`docs/lesson-23/02` §4): the Madani verses against a printed mushaf; the Indo-Pak look and the licensed face (**still the launch blocker**); whose voice reads the verses;
+the words, and the sounds of the three spelled words; whether a stop sign at a verse's end needs a fuller line.
 
 ### Step P2 built — Lesson 22 (stopping)
 

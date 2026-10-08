@@ -978,7 +978,7 @@ async function pageHalf() {
   const home = boot();
   const row = home.shell.LESSONS.find((l) => l.n === 21);
   check(row.built === true && row.href === 'lesson-21.html' && row.progress === 'drill' && row.part === 2 && row.cp === undefined && !row.tail, 'the home\'s row 21 is built, a drill, in the second part, with no `cp`, and leads to lesson-21.html');
-  check(home.shell.LESSONS.find((l) => l.n === 20).built && home.shell.LESSONS.find((l) => l.n === 22).built && !home.shell.LESSONS.find((l) => l.n === 23).built, 'and 20 and 22 are built and 23 is not');
+  check(home.shell.LESSONS.find((l) => l.n === 20).built && home.shell.LESSONS.find((l) => l.n === 22).built && home.shell.LESSONS.find((l) => l.n === 23).built, 'and 20, 22 and 23 are built');
 
   console.log('\nThe markup');
   check(!NOMARK.test(w.raw), 'lesson-21.html holds no literal combining mark');

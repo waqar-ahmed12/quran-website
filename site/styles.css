@@ -574,6 +574,17 @@ html::-webkit-scrollbar {
     clip-path: inset(50%);
     white-space: nowrap;
   }
+
+  /* The star alone is 20px wide: a 44px touch area round it, reaching into the space either side. */
+  .topbar .brand {
+    position: relative;
+  }
+
+  .topbar .brand::before {
+    content: '';
+    position: absolute;
+    inset: 0 -12px;
+  }
 }
 
 /* The top bar and the words beside the book arrive a beat after the page loads, one after another. */

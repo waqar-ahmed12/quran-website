@@ -533,6 +533,11 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      through the swing. The dark take is untouched. TRYOUT **Opening and aayat → Light book sway** (As before /
      Smoothed, default Smoothed). videos/build-light-geom.js rewrites `rightsLight` in main.js (74 frames on 2026-09-19);
      this doesn't depend on those numbers.
+   - **UI audit, 2026-10-07** (the user: "i want perfect ui ux"). From the early audit's list: the title is now "Alif to
+     Ayah · Learn to read the Qur’an" (was "Qur'an") with a description (the line under the headline) and Open Graph title
+     and description, still no og:image; the name has `translate="no"`; the email field has `spellcheck="false"`. New: on
+     phones, where only the star shows, it has a 44px touch area (it was 20px). The Qaida's fixes are in `QAIDA-BUILD.md`
+     ("UI audit, 2026-10-07").
    WebP conversion needs a tool; do it after the PC is cleaned (e.g. `sharp` in Node), aiming for a few MB total.
    **Before launch, check the free Qaida is live.** The line under the headline promises it. If it isn't ready, change
    the line so visitors aren't sent looking for something that doesn't exist yet. The site name also needs adding.
