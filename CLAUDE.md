@@ -3,7 +3,14 @@
 **Start here:** read `WEBSITE-BUILD.md` (current build instructions), then `PLAN.md` and
 `design-system/quran-landing/MASTER.md`. Where they conflict, `WEBSITE-BUILD.md` wins.
 
-## This PC is infected (Grenam/Renamer worm, found 2026-09-13)
+## Where this runs now (2026-11-24)
+
+The old Windows PC was infected and has been sold. Until the new PC arrives (about a week), the user instructs Claude
+from their phone, in cloud sessions on this GitHub repo: the user can't run scripts or open localhost, so run and check
+things yourself, commit and push, and describe results in words. Read `docs/handoff.md` first: where the work stands.
+On the new PC (clean), the rules below no longer apply; ask before assuming anything about it.
+
+## The old PC only (sold 2026-11): it was infected (Grenam/Renamer worm, found 2026-09-13)
 
 - Never run `python`, `py`, `pip`, `ffmpeg`, Git Bash, or anything under `C:\ffmpeg-8.1.2-essentials_build\` or
   `%LOCALAPPDATA%\Programs\`. Running an infected `.exe` spreads the worm.
@@ -20,7 +27,10 @@
 ## Working with the user
 
 - Build one phase at a time (order in `WEBSITE-BUILD.md`, §7) and get sign-off before the next.
-- The user prefers to run scripts themselves and paste the output: save the script, give one copy-paste command.
+- At a PC, the user prefers to run scripts themselves and paste the output: save the script, give one copy-paste command.
+  From the phone they can't: run it yourself.
+- **The user teaches by spelling out (hijje):** "Kaaf zabar ka, Taa zair ti: kati, Baa zabar ba: katiba". Keep recordings in
+  separate pieces (letter name, mark name, sound) so the site can chain them; record whole words, never stitch syllables.
 - **Qaida work:** read `QAIDA-BUILD.md` (steps, skills, decisions) and `QAIDA-CONTENT.md`. End every reply about the
   Qaida with one line: current step, its skills, next step (the user asked, 2026-09-14).
 - **Building Lesson 2 (step 4)?** Read `docs/lesson-2/` first — the full specification, `README.md` in that folder
