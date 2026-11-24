@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Check the letters</title>
+<style>
+  :root { --bg: #faf8f3; --card: #fff; --ink: #1d1b16; --muted: #6b665a; --line: #e4dfd2; --accent: #1f6f5c; --warn: #9a5b00; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15140f; --card: #1f1d17; --ink: #efeadc; --muted: #a49d8b; --line: #36322a; --accent: #5fc3a6; --warn: #e0a24a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  p { margin: 0 0 12px; color: var(--muted); }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  li { display: grid; grid-template-columns: 2.2rem 3rem 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  li.playing { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  li.extra { border-style: dashed; }
+  .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .play { width: 3rem; padding: 6px 0; }
+  .meta { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  select { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); min-width: 11rem; }
+  .ar { font-family: "Noto Naskh Arabic", "Amiri", serif; font-size: 1.15em; }
+  #status { min-height: 1.5em; color: var(--warn); }
+  pre { white-space: pre-wrap; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-size: .85rem; }
+  @media (max-width: 480px) { li { grid-template-columns: 1.8rem 2.8rem 1fr; } li select { grid-column: 1 / -1; min-width: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Check the letters</h1>
+  <p>The teacher's recording, cut where he pauses. Press ▶ to hear each item, and if the letter beside it is wrong, change it.
+     The guesses assume he reads in Indo-Pak order and adds ے at the end. Nothing here is uploaded anywhere: this page only runs on this computer.</p>
+  <div class="bar">
+    <button class="primary" id="all">▶ Play all in turn</button>
+    <button id="stop">■ Stop</button>
+    <button id="done">I've checked them, show the result</button>
+  </div>
+  <div id="status" role="status">Loading the recording…</div>
+  <ol id="list"></ol>
+  <pre id="result" hidden></pre>
+</main>
+<script>
+(async () => {
+  const FILE = 'WhatsApp Audio 2026-10-14 at 3.46.52 AM - Copy.mp4';
+  const LETTERS = [
+    ['ا', 'Alif'], ['ب', 'Baa'], ['ت', 'Taa'], ['ث', 'Thaa'], ['ج', 'Jeem'], ['ح', 'Ḥaa'], ['خ', 'Khaa'], ['د', 'Daal'],
+    ['ذ', 'Dhaal'], ['ر', 'Raa'], ['ز', 'Zaa'], ['س', 'Seen'], ['ش', 'Sheen'], ['ص', 'Ṣaad'], ['ض', 'Ḍaad'], ['ط', 'Ṭaa'],
+    ['ظ', 'Ẓaa'], ['ع', 'ʿAyn'], ['غ', 'Ghayn'], ['ف', 'Faa'], ['ق', 'Qaaf'], ['ک', 'Kaaf'], ['ل', 'Laam'], ['م', 'Meem'],
+    ['ن', 'Noon'], ['و', 'Waaw'], ['ہ', 'Haa'], ['ء', 'Hamzah'], ['ی', 'Yaa'],
+  ];
+  const EXTRA = [['ے', 'Baṛī Ye (not in the Qaida\'s 29)'], ['لا', 'Laam-alif (not in the Qaida\'s 29)'],
+    ['?', 'Not a letter / something else'], ['x', 'A letter, but a bad take']];
+  const status = document.getElementById('status');
+  const list = document.getElementById('list');
+
+  const ctx = new AudioContext();
+  const data = await fetch(encodeURIComponent(FILE)).then((r) => r.arrayBuffer());
+  const audio = await ctx.decodeAudioData(data);
+  const pcm = audio.getChannelData(0);
+  const sr = audio.sampleRate;
+
+  // Loudness in 10 ms steps; an item is anything above -45 dB, joined across dips under 250 ms, at least 80 ms long,
+  // and loud enough to be speech (a peak above -30 dB). The same cut the analysis used.
+  const hop = Math.round(sr / 100);
+  const db = [];
+  for (let i = 0; i + hop <= pcm.length; i += hop) {
+    let s = 0;
+    for (let j = i; j < i + hop; j += 1) s += pcm[j] * pcm[j];
+    db.push(10 * Math.log10(s / hop + 1e-12));
+  }
+  const raw = [];
+  let start = -1;
+  for (let i = 0; i <= db.length; i += 1) {
+    const on = i < db.length && db[i] > -45;
+    if (on && start < 0) start = i;
+    if (!on && start >= 0) { raw.push([start, i]); start = -1; }
+  }
+  const joined = [];
+  for (const g of raw) {
+    const last = joined[joined.length - 1];
+    if (last && g[0] - last[1] < 25) last[1] = g[1]; else joined.push([...g]);
+  }
+  const items = joined.filter(([a, b]) => b - a >= 8 && Math.max(...db.slice(a, b)) > -30)
+    // the last half-second is the phone being handled, not speech
+    .filter(([a]) => a / 100 < audio.duration - 0.8);
+
+  const options = [...LETTERS, ...EXTRA];
+  items.forEach(([a, b], i) => {
+    const li = document.createElement('li');
+    const guess = i < 29 ? LETTERS[i][0] : i === 29 ? 'ے' : '?';
+    if (i >= 29) li.className = 'extra';
+    const play = document.createElement('button');
+    play.className = 'play';
+    play.textContent = '▶';
+    play.setAttribute('aria-label', `Play item ${i + 1}`);
+    play.addEventListener('click', () => playOne(i));
+    const n = document.createElement('span');
+    n.className = 'n';
+    n.textContent = i + 1;
+    const meta = document.createElement('span');
+    meta.className = 'meta';
+    meta.textContent = `${(a / 100).toFixed(1)}s · ${((b - a) / 100).toFixed(1)}s long`;
+    const select = document.createElement('select');
+    select.setAttribute('aria-label', `Item ${i + 1} is`);
+    for (const [glyph, name] of options) {
+      const o = document.createElement('option');
+      o.value = glyph;
+      o.textContent = `${glyph}  ${name}`;
+      if (glyph === guess) o.selected = true;
+      select.append(o);
+    }
+    li.append(n, play, meta, select);
+    list.append(li);
+  });
+  status.textContent = items.length === 30 ? '' : `Found ${items.length} items (expected 30).`;
+
+  let current = null;
+  let queue = [];
+  function stop() {
+    queue = [];
+    if (current) { current.onended = null; current.stop(); current = null; }
+    document.querySelectorAll('li.playing').forEach((li) => li.classList.remove('playing'));
+  }
+  function playOne(i, next) {
+    stop();
+    if (next) queue = next;
+    if (ctx.state === 'suspended') ctx.resume();
+    const [a, b] = items[i];
+    const from = Math.max(0, a / 100 - 0.08);
+    const to = Math.min(audio.duration, b / 100 + 0.12);
+    const src = ctx.createBufferSource();
+    src.buffer = audio;
+    src.connect(ctx.destination);
+    src.start(0, from, to - from);
+    current = src;
+    const li = list.children[i];
+    li.classList.add('playing');
+    li.scrollIntoView({ block: 'nearest' });
+    src.onended = () => {
+      li.classList.remove('playing');
+      current = null;
+      if (queue.length) setTimeout(() => queue.length && playOne(queue[0], queue.slice(1)), 450);
+    };
+  }
+  document.getElementById('all').addEventListener('click', () => playOne(0, items.slice(1).map((_, i) => i + 1)));
+  document.getElementById('stop').addEventListener('click', stop);
+  document.getElementById('done').addEventListener('click', () => {
+    const lines = [...list.querySelectorAll('select')].map((s, i) => `${i + 1} ${s.value} ${items[i][0] / 100}-${items[i][1] / 100}`);
+    const result = document.getElementById('result');
+    result.textContent = lines.join('\n');
+    result.hidden = false;
+    window.__review = lines;
+    result.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
+})().catch((e) => { document.getElementById('status').textContent = `Could not load the recording: ${e.message}`; });
+</script>
+</body>
+</html>

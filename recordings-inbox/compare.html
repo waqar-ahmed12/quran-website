@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before and after</title>
+<style>
+  :root { --bg: #faf8f3; --card: #fff; --ink: #1d1b16; --muted: #6b665a; --line: #e4dfd2; --accent: #1f6f5c; --flag: #9a5b00; --flag-bg: #fbf0dc; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15140f; --card: #1f1d17; --ink: #efeadc; --muted: #a49d8b; --line: #36322a; --accent: #5fc3a6; --flag: #e0a24a; --flag-bg: #2e2416; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  p { margin: 0 0 12px; color: var(--muted); }
+  /* The controls stay at the top while the letters scroll under them. */
+  .bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin: 16px -16px 12px; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  button, select { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  li { display: grid; grid-template-columns: 2rem 1fr auto auto 7.5rem; align-items: center; gap: 10px; padding: 8px 10px; background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  li.flagged { background: var(--flag-bg); }
+  li.playing { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .who { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+  .ar { font-family: "Noto Naskh Arabic", "Amiri", serif; font-size: 1.4rem; line-height: 1; }
+  .note { font-size: .85rem; color: var(--muted); }
+  .note b { color: var(--flag); font-weight: 600; }
+  .ab { min-width: 6.5rem; }
+  .ab.removed { color: var(--muted); border-style: dashed; }
+  #status { color: var(--flag); }
+  @media (max-width: 560px) {
+    li { grid-template-columns: repeat(3, 1fr); }
+    .n { grid-column: 1; }
+    .who { grid-column: 2 / -1; }
+    .ab { min-width: 0; padding: 8px 6px; font-size: .9rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Before and after</h1>
+  <p>Each letter cut out on its own. <b>Before</b> is the recording as it is. <b>After</b> has the room's low rumble filtered
+     out and the sharp hiss softened, only at the moments the hiss is too strong. Both play at the same volume, so you
+     compare only the sound. <b>Removed</b> plays only what was taken out, made louder so you can hear it: if it's a short
+     "sss", that's the change. The letters you flagged are shaded.</p>
+  <div class="bar">
+    <label>Soften the hiss:
+      <select id="strength">
+        <option value="0">Off (rumble filter only)</option>
+        <option value="1">Gentle</option>
+        <option value="2" selected>Medium</option>
+        <option value="3">Strong</option>
+        <option value="4">Very strong (to hear what it does)</option>
+      </select>
+    </label>
+    <button class="primary" id="all">▶ Play all, after</button>
+    <button id="stop">■ Stop</button>
+    <span id="status" role="status">Loading the recording…</span>
+  </div>
+  <ol id="list"></ol>
+</main>
+<script>
+(async () => {
+  const FILE = 'WhatsApp Audio 2026-10-14 at 3.46.52 AM - Copy.mp4';
+  const LETTERS = [
+    ['ا', 'Alif'], ['ب', 'Baa'], ['ت', 'Taa'], ['ث', 'Thaa'], ['ج', 'Jeem'], ['ح', 'Ḥaa'], ['خ', 'Khaa'], ['د', 'Daal'],
+    ['ذ', 'Dhaal'], ['ر', 'Raa'], ['ز', 'Zaa'], ['س', 'Seen'], ['ش', 'Sheen'], ['ص', 'Ṣaad'], ['ض', 'Ḍaad'], ['ط', 'Ṭaa'],
+    ['ظ', 'Ẓaa'], ['ع', 'ʿAyn'], ['غ', 'Ghayn'], ['ف', 'Faa'], ['ق', 'Qaaf'], ['ک', 'Kaaf'], ['ل', 'Laam'], ['م', 'Meem'],
+    ['ن', 'Noon'], ['و', 'Waaw'], ['ہ', 'Haa'], ['ء', 'Hamzah'], ['ی', 'Yaa'],
+  ];
+  // What the user heard, 2026-10-14: Khaa a bit extreme; Zaa, Seen, Sheen, Saad sharp hissing; Ayn and Faa extreme.
+  const FLAGGED = { 7: 'You said: a bit extreme', 11: 'You said: sharp hiss', 12: 'You said: sharp hiss',
+    13: 'You said: sharp hiss', 14: 'You said: sharp hiss', 18: 'You said: extreme', 20: 'You said: extreme' };
+  const AYN_NOTE = 'Its loudness and hiss measure normal, so this is how it was said. Softening can’t change that; a re-take can.';
+  const ALIF_STARTS = 3.12; // before this, the teacher left the room silent on purpose
+  const status = document.getElementById('status');
+  const list = document.getElementById('list');
+
+  // Decode at the file's own rate, so the cuts and filters are exact; playback resamples if it must.
+  const bytes = await fetch(encodeURIComponent(FILE)).then((r) => r.arrayBuffer());
+  const src = await new OfflineAudioContext(1, 1, 44100).decodeAudioData(bytes);
+  const sr = src.sampleRate;
+  const raw = src.getChannelData(0);
+  const ctx = new AudioContext();
+
+  // --- Where each letter is (the same cut as the listening page) -----------------------------------------------------
+  const hop = Math.round(sr / 100);
+  const levels = (sig) => {
+    const out = [];
+    for (let i = 0; i + hop <= sig.length; i += hop) {
+      let s = 0;
+      for (let j = i; j < i + hop; j += 1) s += sig[j] * sig[j];
+      out.push(10 * Math.log10(s / hop + 1e-12));
+    }
+    return out;
+  };
+  const db = levels(raw);
+  const runs = [];
+  let start = -1;
+  for (let i = 0; i <= db.length; i += 1) {
+    const on = i < db.length && db[i] > -45;
+    if (on && start < 0) start = i;
+    if (!on && start >= 0) { runs.push([start, i]); start = -1; }
+  }
+  const joined = [];
+  for (const g of runs) {
+    const last = joined[joined.length - 1];
+    if (last && g[0] - last[1] < 25) last[1] = g[1]; else joined.push([...g]);
+  }
+  const items = joined.filter(([a, b]) => b - a >= 8 && Math.max(...db.slice(a, b)) > -30)
+    .filter(([a]) => a / 100 < src.duration - 0.8)
+    .slice(0, 29); // the 30th is an extra Yaa: left out
+  items[0][0] = Math.round(ALIF_STARTS * 100);
+
+  // --- Low rumble: a 4th-order high-pass at 75 Hz, under any adult voice ------------------------------------------
+  function highpass(input, f0) {
+    const out = Float32Array.from(input);
+    const w0 = 2 * Math.PI * f0 / sr;
+    const c = Math.cos(w0);
+    const alpha = Math.sin(w0) / (2 * Math.SQRT1_2);
+    const a0 = 1 + alpha;
+    const b0 = (1 + c) / 2 / a0, b1 = -(1 + c) / a0, b2 = (1 + c) / 2 / a0, a1 = -2 * c / a0, a2 = (1 - alpha) / a0;
+    for (let pass = 0; pass < 2; pass += 1) {
+      let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+      for (let i = 0; i < out.length; i += 1) {
+        const xi = out[i];
+        const y = b0 * xi + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2;
+        x2 = x1; x1 = xi; y2 = y1; y1 = y;
+        out[i] = y;
+      }
+    }
+    return out;
+  }
+
+  // --- The hiss: a de-esser. Above 3 kHz, turned down only in the moments it is louder than a normal letter's -------
+  function fft(re, im) {
+    const n = re.length;
+    for (let i = 1, j = 0; i < n; i += 1) {
+      let bit = n >> 1;
+      for (; j & bit; bit >>= 1) j ^= bit;
+      j ^= bit;
+      if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; }
+    }
+    for (let len = 2; len <= n; len <<= 1) {
+      const ang = -2 * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang);
+      for (let i = 0; i < n; i += len) {
+        let cr = 1, ci = 0;
+        for (let k = 0; k < len / 2; k += 1) {
+          const h = i + k + len / 2;
+          const vr = re[h] * cr - im[h] * ci, vi = re[h] * ci + im[h] * cr;
+          re[h] = re[i + k] - vr; im[h] = im[i + k] - vi;
+          re[i + k] += vr; im[i + k] += vi;
+          const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t;
+        }
+      }
+    }
+  }
+  const N = 1024, H = 512;
+  const win = Float64Array.from({ length: N }, (_, i) => Math.sin(Math.PI * (i + 0.5) / N)); // sine in and out: sums to 1
+  const lo = Math.floor(2500 * N / sr), full = Math.ceil(3500 * N / sr), detect = Math.floor(3000 * N / sr);
+  const frameCount = Math.ceil(raw.length / H) + 1;
+
+  function hissLevels(sig) {
+    const out = new Float64Array(frameCount);
+    for (let f = 0; f < frameCount; f += 1) {
+      const re = new Float64Array(N), im = new Float64Array(N), s0 = f * H - H;
+      for (let i = 0; i < N; i += 1) re[i] = (sig[s0 + i] || 0) * win[i];
+      fft(re, im);
+      let e = 0;
+      for (let k = detect; k < N / 2; k += 1) e += re[k] * re[k] + im[k] * im[k];
+      out[f] = 10 * Math.log10(e + 1e-12);
+    }
+    return out;
+  }
+
+  // Gentle, medium, strong: how far above a normal letter's hiss it may go, and how hard it is pulled back.
+  const SETTINGS = [null, { over: 8, ratio: 2 }, { over: 5, ratio: 3 }, { over: 2, ratio: 4 }, { over: -2, ratio: 8 }];
+  function deEss(sig, hiss, setting) {
+    const reduction = new Float64Array(frameCount);
+    if (!setting) return { out: sig, reduction };
+    // A normal letter: the middle of the 29 letters' loudest hiss.
+    const peaks = items.map(([a, b]) => {
+      let m = -200;
+      for (let f = Math.floor(a * hop / H); f <= Math.ceil(b * hop / H) + 1; f += 1) m = Math.max(m, hiss[f + 1] ?? -200);
+      return m;
+    }).sort((p, q) => p - q);
+    const threshold = peaks[14] + setting.over;
+    const want = Float64Array.from(hiss, (l) => Math.min(18, Math.max(0, (l - threshold) * (1 - 1 / setting.ratio))));
+    // Look one frame ahead and behind (nothing slips through at a hiss's start), then let go over about 60 ms.
+    let held = 0;
+    for (let f = 0; f < frameCount; f += 1) {
+      const target = Math.max(want[f], want[f - 1] || 0, want[f + 1] || 0);
+      held = Math.max(target, held - 2);
+      reduction[f] = held;
+    }
+    const out = new Float32Array(sig.length + N);
+    for (let f = 0; f < frameCount; f += 1) {
+      const re = new Float64Array(N), im = new Float64Array(N), s0 = f * H - H;
+      for (let i = 0; i < N; i += 1) re[i] = (sig[s0 + i] || 0) * win[i];
+      fft(re, im);
+      const r = reduction[f];
+      if (r > 0) {
+        for (let k = lo; k <= N / 2; k += 1) {
+          const amount = k >= full ? r : r * (k - lo) / (full - lo);
+          const g = 10 ** (-amount / 20);
+          re[k] *= g; im[k] *= g;
+          if (k > 0 && k < N / 2) { re[N - k] *= g; im[N - k] *= g; }
+        }
+      }
+      for (let i = 0; i < N; i += 1) im[i] = -im[i];
+      fft(re, im);
+      for (let i = 0; i < N; i += 1) {
+        const at = s0 + i;
+        if (at >= 0 && at < out.length) out[at] += (re[i] / N) * win[i];
+      }
+    }
+    return { out: out.subarray(0, sig.length), reduction };
+  }
+
+  // --- One letter, cut out, faded, at a common volume ------------------------------------------------------------
+  function cut(sig, [a, b]) {
+    const from = Math.max(0, Math.round((a / 100 - 0.06) * sr));
+    const to = Math.min(sig.length, Math.round((b / 100 + 0.18) * sr));
+    const clip = Float32Array.from(sig.subarray(from, to));
+    const fadeIn = Math.round(0.015 * sr), fadeOut = Math.round(0.06 * sr);
+    for (let i = 0; i < fadeIn; i += 1) clip[i] *= 0.5 - 0.5 * Math.cos(Math.PI * i / fadeIn);
+    for (let i = 0; i < fadeOut; i += 1) clip[clip.length - 1 - i] *= 0.5 - 0.5 * Math.cos(Math.PI * i / fadeOut);
+    return clip;
+  }
+  function loudness(clip) {
+    const l = levels(clip);
+    const top = Math.max(...l);
+    let sum = 0, n = 0;
+    for (const v of l) if (v > top - 20) { sum += 10 ** (v / 10); n += 1; }
+    return 10 * Math.log10(sum / n);
+  }
+  const peakOf = (clip) => {
+    let peak = 0;
+    for (const v of clip) peak = Math.max(peak, Math.abs(v));
+    return peak;
+  };
+  // One volume per letter, measured on the untouched recording and then used for Before, After and Removed alike.
+  // (Measuring After on its own would turn a softened letter back up, hiss and all: the first version did that.)
+  function gainsFor(clips) {
+    const louds = clips.map(loudness);
+    const target = [...louds].sort((p, q) => p - q)[14];
+    return clips.map((clip, i) => Math.min(10 ** ((target - louds[i]) / 20), 0.89 / peakOf(clip))); // never above -1 dB
+  }
+  const scaled = (clip, gain) => {
+    const g = Math.min(gain, 0.89 / (peakOf(clip) || 1));
+    return clip.map((v) => v * g);
+  };
+
+  const cleanBase = highpass(raw, 75);
+  const hiss = hissLevels(cleanBase);
+  const rawClips = items.map((it) => cut(raw, it));
+  const gains = gainsFor(rawClips);
+  const before = rawClips.map((clip, i) => scaled(clip, gains[i]));
+  const filtered = items.map((it) => cut(cleanBase, it));
+  const REMOVED_BOOST = 4; // +12 dB, so a faint "sss" can be heard at all; the page says so
+  let after = [];
+  let removed = [];
+  let cutBy = [];
+
+  function build(strength) {
+    const { out, reduction } = deEss(cleanBase, hiss, SETTINGS[strength]);
+    const softened = items.map((it) => cut(out, it));
+    after = softened.map((clip, i) => scaled(clip, gains[i]));
+    // Only what the softening took away (both sides already past the rumble filter, so nothing else shows up here).
+    removed = softened.map((clip, i) => scaled(clip.map((v, j) => (filtered[i][j] - v)), gains[i] * REMOVED_BOOST));
+    cutBy = items.map(([a, b]) => {
+      let m = 0;
+      for (let f = Math.floor(a * hop / H); f <= Math.ceil(b * hop / H) + 1; f += 1) m = Math.max(m, reduction[f + 1] || 0);
+      return m;
+    });
+    draw();
+  }
+
+  function draw() {
+    list.textContent = '';
+    items.forEach((_, i) => {
+      const li = document.createElement('li');
+      if (FLAGGED[i + 1]) li.className = 'flagged';
+      const n = document.createElement('span');
+      n.className = 'n';
+      n.textContent = i + 1;
+      const who = document.createElement('div');
+      who.className = 'who';
+      const ar = document.createElement('span');
+      ar.className = 'ar';
+      ar.lang = 'ar';
+      ar.textContent = LETTERS[i][0];
+      const name = document.createElement('span');
+      name.textContent = LETTERS[i][1];
+      const note = document.createElement('span');
+      note.className = 'note';
+      const parts = [];
+      if (FLAGGED[i + 1]) parts.push(`<b>${FLAGGED[i + 1]}.</b>`);
+      if (cutBy[i] >= 1) parts.push(`Hiss softened by up to ${cutBy[i].toFixed(0)} dB.`);
+      if (i + 1 === 18) parts.push(AYN_NOTE);
+      note.innerHTML = parts.join(' ');
+      who.append(ar, name, note);
+      const b = document.createElement('button');
+      b.className = 'ab';
+      b.textContent = '▶ Before';
+      b.addEventListener('click', () => play(before, i));
+      const a = document.createElement('button');
+      a.className = 'ab';
+      a.textContent = '▶ After';
+      a.addEventListener('click', () => play(after, i));
+      let r = document.createElement('span');
+      if (cutBy[i] >= 1) {
+        r = document.createElement('button');
+        r.className = 'ab removed';
+        r.textContent = '▶ Removed';
+        r.title = 'Only the hiss that was taken out, made 12 dB louder so you can hear it';
+        r.addEventListener('click', () => play(removed, i));
+      }
+      li.append(n, who, b, a, r);
+      list.append(li);
+    });
+  }
+
+  let current = null;
+  let queue = [];
+  function stop() {
+    queue = [];
+    if (current) { current.onended = null; current.stop(); current = null; }
+    document.querySelectorAll('li.playing').forEach((li) => li.classList.remove('playing'));
+  }
+  function play(set, i, next) {
+    stop();
+    if (next) queue = next;
+    if (ctx.state === 'suspended') ctx.resume();
+    const buffer = ctx.createBuffer(1, set[i].length, sr);
+    buffer.copyToChannel(set[i], 0);
+    const node = ctx.createBufferSource();
+    node.buffer = buffer;
+    node.connect(ctx.destination);
+    node.start();
+    current = node;
+    const li = list.children[i];
+    li.classList.add('playing');
+    li.scrollIntoView({ block: 'nearest' });
+    node.onended = () => {
+      li.classList.remove('playing');
+      current = null;
+      if (queue.length) setTimeout(() => queue.length && play(after, queue[0], queue.slice(1)), 400);
+    };
+  }
+
+  // The chosen strength is remembered on this computer, so a reload keeps it.
+  const strength = document.getElementById('strength');
+  try {
+    const saved = localStorage.getItem('compare-strength');
+    if (saved && strength.querySelector(`option[value="${saved}"]`)) strength.value = saved;
+  } catch { /* storage blocked: start at Medium */ }
+  strength.addEventListener('change', () => {
+    stop();
+    try { localStorage.setItem('compare-strength', strength.value); } catch { /* not remembered, still works */ }
+    status.textContent = 'Working…';
+    setTimeout(() => { build(Number(strength.value)); status.textContent = ''; }, 20);
+  });
+  document.getElementById('all').addEventListener('click', () => play(after, 0, items.slice(1).map((_, i) => i + 1)));
+  document.getElementById('stop').addEventListener('click', stop);
+
+  build(Number(strength.value));
+  status.textContent = '';
+  window.__compare = { items, before: () => before, after: () => after, removed: () => removed, cutBy: () => cutBy, sr };
+})().catch((e) => { document.getElementById('status').textContent = `Something went wrong: ${e.message}`; console.error(e); });
+</script>
+</body>
+</html>

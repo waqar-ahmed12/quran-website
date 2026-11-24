@@ -1,0 +1,38 @@
+{
+  "_read_me": "Where each letter name is in 'Arabic alphabet.wav' (made from the .m4a by tools/m4a-to-wav.ps1), in seconds. Worked out on 2026-11-19 from the check page's measurements (check-19-nov.html, item numbers in 'item'). 'tail' caps a long final hiss (Alif's f) at that many seconds. Read by tools/cut-letters.js.",
+  "source": "Arabic alphabet.wav",
+  "letters": [
+    { "key": "ا", "glyph": "ا", "name": "Alif", "slug": "alif", "item": 2, "from": 3.51, "to": 4.30, "fadeOut": 0.12 },
+    { "key": "ب", "glyph": "ب", "name": "Baa", "slug": "ba", "item": 3, "from": 5.17, "to": 6.57 },
+    { "key": "ت", "glyph": "ت", "name": "Taa", "slug": "ta", "item": 4, "from": 7.87, "to": 9.08 },
+    { "key": "ث", "glyph": "ث", "name": "Thaa", "slug": "tha", "item": 5, "from": 10.21, "to": 11.80, "fadeIn": 0.04 },
+    { "key": "ج", "glyph": "ج", "name": "Jeem", "slug": "jeem", "item": 6, "from": 12.97, "to": 14.40 },
+    { "key": "ح", "glyph": "ح", "name": "Ḥaa", "slug": "hha", "item": 7, "from": 15.36, "to": 17.00 },
+    { "key": "خ", "glyph": "خ", "name": "Khaa", "slug": "kha", "item": 8, "from": 17.88, "to": 19.61 },
+    { "key": "د", "glyph": "د", "name": "Daal", "slug": "dal", "item": 9, "from": 20.50, "to": 22.19 },
+    { "key": "ذ", "glyph": "ذ", "name": "Dhaal", "slug": "dhal", "item": 10, "from": 23.04, "to": 24.67, "fadeIn": 0.03 },
+    { "key": "ر", "glyph": "ر", "name": "Raa", "slug": "ra", "item": 11, "from": 25.48, "to": 26.83 },
+    { "key": "ز", "glyph": "ز", "name": "Zaa", "slug": "za", "item": 12, "from": 27.67, "to": 29.33 },
+    { "key": "س", "glyph": "س", "name": "Seen", "slug": "seen", "item": 13, "from": 30.01, "to": 32.03 },
+    { "key": "ش", "glyph": "ش", "name": "Sheen", "slug": "sheen", "item": 14, "from": 32.78, "to": 35.07 },
+    { "key": "ص", "glyph": "ص", "name": "Ṣaad", "slug": "sad", "item": 15, "from": 35.81, "to": 37.78 },
+    { "key": "ض", "glyph": "ض", "name": "Ḍaad", "slug": "dad", "item": 16, "from": 38.47, "to": 40.06 },
+    { "key": "ط", "glyph": "ط", "name": "Ṭaa", "slug": "tta", "item": 17, "from": 41.16, "to": 42.58 },
+    { "key": "ظ", "glyph": "ظ", "name": "Ẓaa", "slug": "zza", "item": 18, "from": 43.48, "to": 45.00 },
+    { "key": "ع", "glyph": "ع", "name": "ʿAyn", "slug": "ayn", "item": 19, "from": 45.85, "to": 47.27 },
+    { "key": "غ", "glyph": "غ", "name": "Ghayn", "slug": "ghayn", "item": 20, "from": 48.21, "to": 49.90 },
+    { "key": "ف", "glyph": "ف", "name": "Faa", "slug": "fa", "item": 21, "from": 50.82, "to": 52.67 },
+    { "key": "ق", "glyph": "ق", "name": "Qaaf", "slug": "qaf", "item": 22, "from": 53.50, "to": 55.16 },
+    { "key": "ك", "glyph": "ک", "name": "Kaaf", "slug": "kaf", "item": 24, "from": 58.28, "to": 59.64 },
+    { "key": "ل", "glyph": "ل", "name": "Laam", "slug": "lam", "item": 25, "from": 60.11, "to": 61.65 },
+    { "key": "م", "glyph": "م", "name": "Meem", "slug": "meem", "item": 26, "from": 62.36, "to": 63.80 },
+    { "key": "ن", "glyph": "ن", "name": "Noon", "slug": "noon", "item": 27, "from": 64.49, "to": 66.11 },
+    { "key": "و", "glyph": "و", "name": "Waaw", "slug": "waw", "item": 28, "from": 66.92, "to": 68.20 },
+    { "key": "ه", "glyph": "ہ", "name": "Haa", "slug": "ha", "item": 29, "from": 69.10, "to": 70.37, "fadeIn": 0.04 },
+    { "key": "ء", "glyph": "ء", "name": "Hamzah", "slug": "hamza", "item": 30, "from": 71.24, "to": 72.34 },
+    { "key": "ي", "glyph": "ی", "name": "Yaa", "slug": "ya", "item": 31, "from": 75.01, "to": 76.04, "fadeOut": 0.1, "note": "The second Yaa: the last take, as the script asks." }
+  ],
+  "alternates": [
+    { "key": "ي", "glyph": "ی", "name": "Yaa, first take", "slug": "ya-take1", "item": 30, "from": 73.19, "to": 74.46, "note": "Said straight after Hamzah; use instead of the second take if it sounds better." }
+  ]
+}

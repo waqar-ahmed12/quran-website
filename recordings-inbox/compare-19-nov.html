@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Before and after</title>
+<style>
+  :root { --bg: #faf8f3; --card: #fff; --ink: #1d1b16; --muted: #6b665a; --line: #e4dfd2; --accent: #1f6f5c; --flag: #9a5b00; --flag-bg: #fbf0dc;
+    --hold: #a3302a; --hold-bg: #f9e3e1; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15140f; --card: #1f1d17; --ink: #efeadc; --muted: #a49d8b; --line: #36322a; --accent: #5fc3a6; --flag: #e0a24a; --flag-bg: #2e2416;
+      --hold: #f08a80; --hold-bg: #321b19; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  p { margin: 0 0 12px; color: var(--muted); }
+  p b { color: var(--ink); }
+  .sets { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+  .sets button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  /* The controls stay at the top while the sounds scroll under them. */
+  .bar { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    margin: 12px -16px; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  button, select { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #site { margin: 0 0 4px; }
+  ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+  li { display: grid; grid-template-columns: 2rem 1fr auto auto 7.5rem; align-items: center; gap: 10px; padding: 8px 10px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  li.alt { border-style: dashed; }
+  li.softened { background: var(--flag-bg); }
+  li.held, li.missing { border-color: var(--hold); background: var(--hold-bg); }
+  li.playing { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .who { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; min-width: 0; }
+  .ar { font-family: "Noto Naskh Arabic", "Amiri", "Traditional Arabic", serif; font-size: 1.4rem; line-height: 1.2; }
+  .note { font-size: .85rem; color: var(--muted); }
+  .note b { color: var(--flag); font-weight: 600; }
+  .note strong { color: var(--hold); font-weight: 600; }
+  .ab { min-width: 6.5rem; }
+  .ab.removed { color: var(--muted); border-style: dashed; }
+  #status { color: var(--flag); }
+  .end { margin-top: 24px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  .end p { margin: 0 0 6px; }
+  code { font-size: .85em; overflow-wrap: anywhere; }
+  @media (max-width: 560px) {
+    li { grid-template-columns: repeat(3, 1fr); }
+    .n { grid-column: 1; }
+    .who { grid-column: 2 / -1; }
+    .ab { min-width: 0; padding: 8px 6px; font-size: .9rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Before and after</h1>
+  <p>The teacher's 19 November recordings, each sound cut out on its own. <b>Before</b> is the recording as it is. <b>After</b>
+     has the room's low rumble filtered out and the sharp hiss softened, only at the moments it is louder than a typical
+     sound's. Both play at the same volume, so you compare only the sound. <b>Removed</b> plays only what was taken out, made
+     12 dB louder so you can hear it. Shaded sounds are the ones the chosen level changes; red ones are kept off the site
+     until you have listened.</p>
+  <div class="sets" role="group" aria-label="Which recording">
+    <button type="button" data-set="letters">Letter names (Lessons 1–3)</button>
+    <button type="button" data-set="fatha">Zabar (Lesson 4)</button>
+    <button type="button" data-set="kasra">Zair (Lesson 5)</button>
+    <button type="button" data-set="damma">Paish (Lesson 6)</button>
+    <button type="button" data-set="mark-names">Mark names</button>
+  </div>
+  <p id="site"></p>
+  <div class="bar">
+    <label>Soften the hiss:
+      <select id="level">
+        <option value="off">Off (rumble filter only)</option>
+        <option value="gentle" selected>Gentle (on the site now)</option>
+        <option value="medium">Medium</option>
+        <option value="strong">Strong</option>
+        <option value="verystrong">Very strong (to hear what it does)</option>
+      </select>
+    </label>
+    <button class="primary" id="all">▶ Play all, after</button>
+    <button id="stop">■ Stop</button>
+    <span id="status" role="status">Loading…</span>
+  </div>
+  <ol id="list"></ol>
+  <div class="end">
+    <p><b>To change the site:</b> tell Claude what you heard: a level, a take, or a held sound that is fine after all. Or
+       run, from the project folder:</p>
+    <p><code id="command"></code></p>
+    <p>(<code>--site</code> takes off, gentle, medium, strong or verystrong; <code>--use ya=ya-take2</code> swaps in another
+       take. A held sound goes on the site once its <code>"hold"</code> line is taken out of the cut list.)</p>
+  </div>
+</main>
+<script>
+(async () => {
+  const SETS = {
+    letters: { recording: 'Arabic alphabet', cuts: 'letter-cuts', site: 'On the site now: <b>Gentle</b>, the second Laam and the second Yaa. Lessons 1–3 play these.' },
+    fatha: { recording: 'zabar', cuts: 'zabar-cuts', site: 'On the site now: <b>Gentle</b>, every sound not marked red. Lesson 4 plays these; the red ones still play the stand-in.' },
+    kasra: { recording: 'zair', cuts: 'zair-cuts', site: 'On the site now: <b>Gentle</b>, every sound not marked red. Lesson 5 plays these.' },
+    damma: { recording: 'paish', cuts: 'paish-cuts', site: 'On the site now: <b>Gentle</b>, every sound not marked red. Lesson 6 plays these.' },
+    'mark-names': { recording: 'zabar', cuts: 'mark-name-cuts', site: 'On the site now: the six plain names (the dashed ones are the other takes). Lessons 4–6 play them beside "This is zabar." and inside the spelling: "Baa, zabar, ba".' },
+  };
+  const status = document.getElementById('status');
+  const list = document.getElementById('list');
+  const select = document.getElementById('level');
+  const setButtons = [...document.querySelectorAll('.sets button')];
+  const read = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+  const write = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+
+  let set = new URLSearchParams(location.search).get('set') || read('compare-19-nov-set') || 'letters';
+  if (!SETS[set]) set = 'letters';
+  let data = { clips: [], missing: [] };
+  const cache = new Map();
+  const base = () => `${set}-19-nov/`;
+
+  // Decoded once at the files' own rate, so Removed (filter-only minus softened) lines up sample for sample.
+  const load = (version, slug) => {
+    const key = `${base()}${version}/${slug}`;
+    if (!cache.has(key)) {
+      cache.set(key, fetch(`${key}.wav`).then((r) => { if (!r.ok) throw new Error(`${version}/${slug}: ${r.status}`); return r.arrayBuffer(); })
+        .then((bytes) => new OfflineAudioContext(1, 1, 22050).decodeAudioData(bytes)));
+    }
+    return cache.get(key);
+  };
+  async function removed(version, slug) {
+    const [plain, soft] = await Promise.all([load('off', slug), load(version, slug)]);
+    const a = plain.getChannelData(0), b = soft.getChannelData(0);
+    const out = new AudioBuffer({ length: a.length, numberOfChannels: 1, sampleRate: plain.sampleRate });
+    const ch = out.getChannelData(0);
+    for (let i = 0; i < a.length; i++) ch[i] = (a[i] - (b[i] || 0)) * 4; // +12 dB
+    return out;
+  }
+
+  const ctx = new AudioContext();
+  let current = null;
+  let queue = [];
+  function stop() {
+    queue = [];
+    if (current) { current.onended = null; try { current.stop(); } catch {} current = null; }
+    document.querySelectorAll('li.playing').forEach((li) => li.classList.remove('playing'));
+  }
+  async function play(kind, i, next) {
+    stop();
+    if (next) queue = next;
+    if (ctx.state === 'suspended') await ctx.resume();
+    const clip = data.clips[i], version = select.value;
+    let buffer;
+    try {
+      buffer = kind === 'before' ? await load('before', clip.slug) : kind === 'after' ? await load(version, clip.slug) : await removed(version, clip.slug);
+    } catch (e) { status.textContent = `Could not play: ${e.message}`; return; }
+    const node = ctx.createBufferSource();
+    node.buffer = buffer;
+    node.connect(ctx.destination);
+    node.start();
+    current = node;
+    const li = list.querySelector(`li[data-i="${i}"]`);
+    if (li) { li.classList.add('playing'); li.scrollIntoView({ block: 'nearest' }); }
+    node.onended = () => {
+      if (li) li.classList.remove('playing');
+      current = null;
+      if (queue.length) setTimeout(() => { if (queue.length) play('after', queue[0], queue.slice(1)); }, 400);
+    };
+  }
+
+  function draw() {
+    const version = select.value;
+    list.textContent = '';
+    let n = 0;
+    const rows = data.clips.map((clip, i) => ({ clip, i }));
+    // A missing sound sits where its letter would be: before the first clip of a later letter (the recording's order).
+    const ORDER = ['ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'و', 'ه', 'ء', 'ي'];
+    for (const m of data.missing) {
+      const at = rows.findIndex((row) => row.clip && ORDER.indexOf(row.clip.key) > ORDER.indexOf(m.key));
+      rows.splice(at < 0 ? rows.length : at, 0, { missing: m });
+    }
+    for (const row of rows) {
+      const li = document.createElement('li');
+      const num = document.createElement('span');
+      num.className = 'n';
+      const who = document.createElement('div');
+      who.className = 'who';
+      const ar = document.createElement('span');
+      ar.className = 'ar';
+      ar.lang = 'ar';
+      const name = document.createElement('span');
+      const note = document.createElement('span');
+      note.className = 'note';
+      if (row.missing) {
+        li.className = 'missing';
+        num.textContent = ++n;
+        ar.textContent = row.missing.glyph;
+        name.textContent = row.missing.name;
+        note.innerHTML = `<strong>Not cut: ${row.missing.note}</strong>`;
+        who.append(ar, name, note);
+        li.append(num, who);
+        list.append(li);
+        continue;
+      }
+      const { clip, i } = row;
+      li.dataset.i = i;
+      const cut = clip.softened[version] || 0;
+      if (!clip.main) li.classList.add('alt');
+      if (cut >= 1) li.classList.add('softened');
+      if (clip.hold) li.classList.add('held');
+      num.textContent = clip.main ? ++n : '·';
+      ar.textContent = clip.glyph;
+      name.textContent = clip.name;
+      const parts = [];
+      if (clip.hold) parts.push(`<strong>Kept off the site: ${clip.hold}</strong>`);
+      if (cut >= 1) parts.push(`<b>Hiss softened by up to ${cut.toFixed(0)} dB.</b>`);
+      if (clip.note) parts.push(clip.note);
+      note.innerHTML = parts.join(' ');
+      who.append(ar, name, note);
+      const button = (label, kind, extra) => {
+        const b = document.createElement('button');
+        b.className = `ab ${extra || ''}`;
+        b.textContent = label;
+        b.addEventListener('click', () => play(kind, i));
+        return b;
+      };
+      const r = cut >= 1 ? button('▶ Removed', 'removed', 'removed') : document.createElement('span');
+      if (cut >= 1) r.title = 'Only the hiss that was taken out, made 12 dB louder so you can hear it';
+      li.append(num, who, button('▶ Before', 'before'), button('▶ After', 'after'), r);
+      list.append(li);
+    }
+  }
+
+  async function show(next) {
+    stop();
+    set = next;
+    write('compare-19-nov-set', set);
+    setButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.set === set)));
+    document.getElementById('site').innerHTML = SETS[set].site;
+    const s = SETS[set];
+    document.getElementById('command').textContent = `node tools/cut-letters.js "recordings-inbox/19 Nov audios 4 files/${s.recording}.wav" "recordings-inbox/19 Nov audios 4 files/${s.cuts}.json" --site gentle`;
+    status.textContent = 'Loading…';
+    data = await fetch(`${base()}clips.json`, { cache: 'no-cache' }).then((r) => r.json());
+    data.missing = data.missing || [];
+    draw();
+    status.textContent = '';
+  }
+
+  try { const saved = read('compare-19-nov-level'); if (saved && select.querySelector(`option[value="${saved}"]`)) select.value = saved; } catch {}
+  select.addEventListener('change', () => { stop(); write('compare-19-nov-level', select.value); draw(); });
+  setButtons.forEach((b) => b.addEventListener('click', () => show(b.dataset.set)));
+  document.getElementById('all').addEventListener('click', () => {
+    const order = data.clips.map((c, i) => (c.main ? i : -1)).filter((i) => i >= 0);
+    if (order.length) play('after', order[0], order.slice(1));
+  });
+  document.getElementById('stop').addEventListener('click', stop);
+  await show(set);
+  window.__compare = { get data() { return data; }, load, removed, show };
+})().catch((e) => { document.getElementById('status').textContent = `Something went wrong: ${e.message}`; console.error(e); });
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>19 Nov recordings</title>
+<style>
+  :root { --bg: #faf8f3; --card: #fff; --ink: #1d1b16; --muted: #6b665a; --line: #e4dfd2; --accent: #1f6f5c; --warn: #9a5b00; --bad: #a3302a;
+    --warn-wash: #fbf1df; --bad-wash: #f9e3e1; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #15140f; --card: #1f1d17; --ink: #efeadc; --muted: #a49d8b; --line: #36322a; --accent: #5fc3a6; --warn: #e0a24a; --bad: #f08a80;
+      --warn-wash: #2c2414; --bad-wash: #321b19; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.5rem; margin: 0 0 4px; }
+  h2 { font-size: 1.2rem; margin: 32px 0 4px; }
+  .fname { font-size: .85rem; font-weight: 400; color: var(--muted); }
+  p { margin: 0 0 12px; }
+  .lede, .sum { color: var(--muted); }
+  .sum { font-size: .9rem; font-variant-numeric: tabular-nums; }
+  .file-note { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  #status { min-height: 1.5em; color: var(--warn); }
+  ol { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; }
+  li { display: grid; grid-template-columns: 2rem 2.8rem minmax(7rem, 1fr) auto; align-items: center; gap: 4px 10px; padding: 8px 10px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+  li.listen { border-color: var(--warn); background: var(--warn-wash); }
+  li.redo { border-color: var(--bad); background: var(--bad-wash); }
+  li.mark { border-color: var(--accent); }
+  li.skip { opacity: .6; }
+  .tag { font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--ink); }
+  li.redo .tag { color: var(--bad); } li.listen .tag { color: var(--warn); } li.mark .tag { color: var(--accent); }
+  li.playing { box-shadow: 0 0 0 2px var(--accent); }
+  .n { color: var(--muted); font-variant-numeric: tabular-nums; }
+  button { font: inherit; padding: 6px 0; width: 2.8rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .ar { font-family: "Noto Naskh Arabic", "Amiri", "Traditional Arabic", serif; font-size: 1.35em; }
+  .en { color: var(--muted); }
+  .meta { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+  .note { grid-column: 3 / -1; margin: 0; font-size: .92rem; }
+  @media (max-width: 520px) { li { grid-template-columns: 1.6rem 2.8rem 1fr; } .meta { grid-column: 3; text-align: left; } .note { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The 19 Nov recordings</h1>
+  <p class="lede">Letter names, zabar, zair and paish, cut where the teacher pauses. Press ▶ to hear an item. <strong>Redo?</strong> items probably
+    need a new take, <strong>listen</strong> items need your ears, <strong>mark name</strong> items are the takes of zabar, fatha, zair,
+    kasra, paish and damma, and <strong>cut</strong> items aren't part of the Qaida. The labels come from measuring the sound, not from
+    hearing it. Nothing here is uploaded: the page only runs on this computer.</p>
+  <div id="status" role="status">Loading…</div>
+  <div id="files"></div>
+</main>
+<script src="check-19-nov-notes.js"></script>
+<script src="check-19-nov.js"></script>
+</body>
+</html>

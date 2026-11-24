@@ -1,0 +1,41 @@
+{
+  "_read_me": "Where each sound is in 'zabar.wav' (made from the .m4a by tools/m4a-to-wav.ps1), in seconds: Lesson 4's group 'fatha'. Worked out on 2026-11-19 from the check page's measurements (check-19-nov.html; 'item' is its number). Each sound ends where its vowel fades, creaky tail included. An entry with 'hold' is cut for the compare page but kept off the site until it has been listened to. Read by tools/cut-letters.js.",
+  "source": "zabar.wav",
+  "group": "fatha",
+  "letters": [
+    {"key":"ا","glyph":"اَ","name":"a","slug":"alif","item":11,"from":18.42,"to":18.86},
+    {"key":"ب","glyph":"بَ","name":"ba","slug":"ba","item":12,"from":19.92,"to":20.5},
+    {"key":"ت","glyph":"تَ","name":"ta","slug":"ta","item":13,"from":21.58,"to":22.03},
+    {"key":"ث","glyph":"ثَ","name":"tha","slug":"tha","item":14,"from":23.07,"to":23.84},
+    {"key":"ج","glyph":"جَ","name":"ja","slug":"jeem","item":15,"from":24.7,"to":25.43},
+    {"key":"ح","glyph":"حَ","name":"ḥa","slug":"hha","item":16,"from":26.26,"to":26.97},
+    {"key":"خ","glyph":"خَ","name":"kha","slug":"kha","item":17,"from":27.89,"to":28.82},
+    {"key":"د","glyph":"دَ","name":"da","slug":"dal","item":18,"from":29.57,"to":30.35},
+    {"key":"ذ","glyph":"ذَ","name":"dha","slug":"dhal","item":19,"from":31.16,"to":31.96,"hold":"The vowel lasts about 0.47 s, twice most: check it is still a short \"dha\", not \"dhaa\"."},
+    {"key":"ر","glyph":"رَ","name":"ra","slug":"ra","item":20,"from":32.7,"to":33.5,"hold":"Joined to za, with about a second of mumbling between; its vowel lasts 0.49 s."},
+    {"key":"ز","glyph":"زَ","name":"za","slug":"za","item":20,"from":33.79,"to":35.18,"hold":"Needs a new take: its vowel lasts 0.6 s, too long for a zabar."},
+    {"key":"س","glyph":"سَ","name":"sa","slug":"seen","item":21,"from":35.77,"to":36.75},
+    {"key":"ش","glyph":"شَ","name":"sha","slug":"sheen","item":22,"from":37.35,"to":38.34},
+    {"key":"ص","glyph":"صَ","name":"ṣa","slug":"sad","item":23,"from":38.71,"to":39.73},
+    {"key":"ض","glyph":"ضَ","name":"ḍa","slug":"dad","item":24,"from":40.53,"to":41.22},
+    {"key":"ط","glyph":"طَ","name":"ṭa","slug":"tta","item":25,"from":42.47,"to":42.97},
+    {"key":"ظ","glyph":"ظَ","name":"ẓa","slug":"zza","item":25,"from":43.74,"to":44.8},
+    {"key":"غ","glyph":"غَ","name":"gha","slug":"ghayn","item":29,"from":56.41,"to":57.19},
+    {"key":"ف","glyph":"فَ","name":"fa","slug":"fa","item":30,"from":58.09,"to":58.91},
+    {"key":"ق","glyph":"قَ","name":"qa","slug":"qaf","item":31,"from":59.63,"to":60.15},
+    {"key":"ك","glyph":"کَ","name":"ka","slug":"kaf","item":32,"from":61.06,"to":61.49},
+    {"key":"ل","glyph":"لَ","name":"la","slug":"lam","item":33,"from":62.4,"to":63.14},
+    {"key":"م","glyph":"مَ","name":"ma","slug":"meem","item":34,"from":64.21,"to":64.92},
+    {"key":"ن","glyph":"نَ","name":"na","slug":"noon","item":35,"from":65.63,"to":66.37},
+    {"key":"و","glyph":"وَ","name":"wa","slug":"waw","item":36,"from":67.05,"to":67.83},
+    {"key":"ه","glyph":"ہَ","name":"ha","slug":"ha","item":37,"from":68.54,"to":69.39},
+    {"key":"ء","glyph":"ءَ","name":"ʾa","slug":"hamza","item":38,"from":70.31,"to":70.93,"hold":"Almost no voice in it, as if whispered."},
+    {"key":"ي","glyph":"یَ","name":"ya","slug":"ya","item":39,"from":71.48,"to":72.28}
+  ],
+  "alternates": [
+    {"key":"ي","glyph":"یَ","name":"ya (second take)","slug":"ya-take2","item":40,"from":72.93,"to":73.51,"note":"Ya, second take: its vowel is closer to \"e\"."}
+  ],
+  "missing": [
+    {"key":"ع","glyph":"عَ","name":"ʿa","slug":"ayn","note":"Several tries (45.5–55.8 s), none clean: needs a new take."}
+  ]
+}

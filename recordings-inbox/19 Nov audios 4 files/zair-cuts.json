@@ -1,0 +1,40 @@
+{
+  "_read_me": "Where each sound is in 'zair.wav' (made from the .m4a by tools/m4a-to-wav.ps1), in seconds: Lesson 5's group 'kasra'. Worked out on 2026-11-19 from the check page's measurements (check-19-nov.html; 'item' is its number). Each sound ends where its vowel fades, creaky tail included. An entry with 'hold' is cut for the compare page but kept off the site until it has been listened to. Read by tools/cut-letters.js.",
+  "source": "zair.wav",
+  "group": "kasra",
+  "letters": [
+    {"key":"ا","glyph":"اِ","name":"i","slug":"alif","item":3,"from":23.29,"to":23.73},
+    {"key":"ب","glyph":"بِ","name":"bi","slug":"ba","item":4,"from":24.45,"to":25.36,"fadeIn":0.03},
+    {"key":"ت","glyph":"تِ","name":"ti","slug":"ta","item":5,"from":26.28,"to":26.72},
+    {"key":"ث","glyph":"ثِ","name":"thi","slug":"tha","item":6,"from":27.44,"to":28.28},
+    {"key":"ج","glyph":"جِ","name":"ji","slug":"jeem","item":7,"from":29.1,"to":29.81},
+    {"key":"ح","glyph":"حِ","name":"ḥi","slug":"hha","item":8,"from":30.41,"to":31.22},
+    {"key":"خ","glyph":"خِ","name":"khi","slug":"kha","item":9,"from":31.84,"to":32.81},
+    {"key":"د","glyph":"دِ","name":"di","slug":"dal","item":10,"from":33.51,"to":34.27},
+    {"key":"ذ","glyph":"ذِ","name":"dhi","slug":"dhal","item":11,"from":34.79,"to":35.64},
+    {"key":"ر","glyph":"رِ","name":"ri","slug":"ra","item":12,"from":36.3,"to":37.16},
+    {"key":"ز","glyph":"زِ","name":"zi","slug":"za","item":13,"from":37.71,"to":38.55},
+    {"key":"س","glyph":"سِ","name":"si","slug":"seen","item":14,"from":39.13,"to":40.08},
+    {"key":"ش","glyph":"شِ","name":"shi","slug":"sheen","item":15,"from":40.68,"to":41.54},
+    {"key":"ص","glyph":"صِ","name":"ṣi","slug":"sad","item":16,"from":42.12,"to":43},
+    {"key":"ض","glyph":"ضِ","name":"ḍi","slug":"dad","item":17,"from":43.68,"to":44.29},
+    {"key":"ط","glyph":"طِ","name":"ṭi","slug":"tta","item":18,"from":45.2,"to":45.73},
+    {"key":"ظ","glyph":"ظِ","name":"ẓi","slug":"zza","item":19,"from":46.28,"to":47.15},
+    {"key":"ع","glyph":"عِ","name":"ʿi","slug":"ayn","item":20,"from":47.64,"to":48.47,"fadeIn":0.01},
+    {"key":"غ","glyph":"غِ","name":"ghi","slug":"ghayn","item":21,"from":49.03,"to":49.9},
+    {"key":"ف","glyph":"فِ","name":"fi","slug":"fa","item":22,"from":50.75,"to":51.68},
+    {"key":"ق","glyph":"قِ","name":"qi","slug":"qaf","item":23,"from":52.51,"to":53.01},
+    {"key":"ك","glyph":"کِ","name":"ki","slug":"kaf","item":24,"from":53.76,"to":54.21},
+    {"key":"ل","glyph":"لِ","name":"li","slug":"lam","item":25,"from":54.94,"to":55.75},
+    {"key":"م","glyph":"مِ","name":"mi","slug":"meem","item":25,"from":56.06,"to":57.22,"hold":"Held about 0.6 s: check it does not sound like \"mee\" (Lesson 13)."},
+    {"key":"ن","glyph":"نِ","name":"ni","slug":"noon","item":25,"from":57.75,"to":58.65,"hold":"Held about 0.6 s: check it does not sound like \"nee\" (Lesson 13)."},
+    {"key":"و","glyph":"وِ","name":"wi","slug":"waw","item":26,"from":59.25,"to":60.07},
+    {"key":"ه","glyph":"ہِ","name":"hi","slug":"ha","item":27,"from":60.66,"to":61.6},
+    {"key":"ء","glyph":"ءِ","name":"ʾi","slug":"hamza","item":28,"from":62.59,"to":63.06},
+    {"key":"ي","glyph":"یِ","name":"yi","slug":"ya","item":29,"from":63.59,"to":64.45}
+  ],
+  "alternates": [
+    {"key":"ي","glyph":"یِ","name":"yi (second take)","slug":"ya-take2","item":30,"from":64.88,"to":65.59,"note":"Yi, second take."}
+  ],
+  "missing": []
+}

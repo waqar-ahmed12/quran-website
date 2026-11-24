@@ -1,0 +1,40 @@
+{
+  "_read_me": "Where each sound is in 'paish.wav' (made from the .m4a by tools/m4a-to-wav.ps1), in seconds: Lesson 6's group 'damma'. Worked out on 2026-11-19 from the check page's measurements (check-19-nov.html; 'item' is its number). Each sound ends where its vowel fades, creaky tail included. An entry with 'hold' is cut for the compare page but kept off the site until it has been listened to. Read by tools/cut-letters.js.",
+  "source": "paish.wav",
+  "group": "damma",
+  "letters": [
+    {"key":"ا","glyph":"اُ","name":"u","slug":"alif","item":10,"from":17.83,"to":18.37},
+    {"key":"ب","glyph":"بُ","name":"bu","slug":"ba","item":11,"from":19.08,"to":19.89},
+    {"key":"ت","glyph":"تُ","name":"tu","slug":"ta","item":12,"from":20.88,"to":21.33},
+    {"key":"ث","glyph":"ثُ","name":"thu","slug":"tha","item":13,"from":22.09,"to":22.98},
+    {"key":"ج","glyph":"جُ","name":"ju","slug":"jeem","item":14,"from":23.59,"to":24.54},
+    {"key":"ح","glyph":"حُ","name":"ḥu","slug":"hha","item":14,"from":25.06,"to":25.96,"fadeIn":0.01},
+    {"key":"خ","glyph":"خُ","name":"khu","slug":"kha","item":15,"from":26.4,"to":27.33},
+    {"key":"د","glyph":"دُ","name":"du","slug":"dal","item":16,"from":27.99,"to":28.85},
+    {"key":"ذ","glyph":"ذُ","name":"dhu","slug":"dhal","item":17,"from":29.35,"to":30.23},
+    {"key":"ر","glyph":"رُ","name":"ru","slug":"ra","item":18,"from":30.74,"to":31.65,"fadeIn":0.02},
+    {"key":"ز","glyph":"زُ","name":"zu","slug":"za","item":19,"from":32.27,"to":33.2},
+    {"key":"س","glyph":"سُ","name":"su","slug":"seen","item":20,"from":33.73,"to":34.62},
+    {"key":"ش","glyph":"شُ","name":"shu","slug":"sheen","item":21,"from":35.12,"to":36.09},
+    {"key":"ص","glyph":"صُ","name":"ṣu","slug":"sad","item":22,"from":36.65,"to":37.52},
+    {"key":"ض","glyph":"ضُ","name":"ḍu","slug":"dad","item":22,"from":37.86,"to":38.89},
+    {"key":"ط","glyph":"طُ","name":"ṭu","slug":"tta","item":22,"from":39.56,"to":40.21},
+    {"key":"ظ","glyph":"ظُ","name":"ẓu","slug":"zza","item":23,"from":40.79,"to":41.64,"hold":"The vowel lasts about 0.54 s, long for a paish."},
+    {"key":"ع","glyph":"عُ","name":"ʿu","slug":"ayn","item":24,"from":42.81,"to":43.63},
+    {"key":"غ","glyph":"غُ","name":"ghu","slug":"ghayn","item":25,"from":44.02,"to":44.97,"fadeOut":0.06},
+    {"key":"ف","glyph":"فُ","name":"fu","slug":"fa","item":26,"from":45.71,"to":46.65},
+    {"key":"ق","glyph":"قُ","name":"qu","slug":"qaf","item":27,"from":47.21,"to":47.83},
+    {"key":"ك","glyph":"کُ","name":"ku","slug":"kaf","item":28,"from":48.63,"to":49.1},
+    {"key":"ل","glyph":"لُ","name":"lu","slug":"lam","item":29,"from":50.02,"to":50.8,"hold":"Held about 0.6 s: check it does not sound like \"loo\" (Lesson 11)."},
+    {"key":"م","glyph":"مُ","name":"mu","slug":"meem","item":30,"from":51.48,"to":52.25},
+    {"key":"ن","glyph":"نُ","name":"nu","slug":"noon","item":31,"from":52.91,"to":53.75,"hold":"Held about 0.6 s: check it does not sound like \"noo\"."},
+    {"key":"و","glyph":"وُ","name":"wu","slug":"waw","item":32,"from":54.34,"to":55.15},
+    {"key":"ه","glyph":"ہُ","name":"hu","slug":"ha","item":33,"from":55.75,"to":56.59},
+    {"key":"ء","glyph":"ءُ","name":"ʾu","slug":"hamza","item":34,"from":57.39,"to":57.84},
+    {"key":"ي","glyph":"یُ","name":"yu","slug":"ya","item":35,"from":58.57,"to":59.41}
+  ],
+  "alternates": [
+    {"key":"ي","glyph":"یُ","name":"yu (second take)","slug":"ya-take2","item":36,"from":59.84,"to":60.57,"note":"Yu, second take."}
+  ],
+  "missing": []
+}
