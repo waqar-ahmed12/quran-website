@@ -22,9 +22,12 @@
 
   const SKIP = [39, 40]; // identical to f038, a hold in the source video
   const ext = new URLSearchParams(window.location.search).has('png') ? 'png' : 'webp';
+  // Browsers keep the frames for a year without asking again (site/_headers), so a changed frame needs a new address:
+  // bump this, and the matching '?v=' in index.html's preload, whenever any frame file changes.
+  const FRAMES_V = '?v=1';
   const urls = [];
   for (let i = 0; i <= 88; i++) {
-    if (!SKIP.includes(i)) urls.push(`assets/hero/frames/f${String(i).padStart(3, '0')}.${ext}`);
+    if (!SKIP.includes(i)) urls.push(`assets/hero/frames/f${String(i).padStart(3, '0')}.${ext}${FRAMES_V}`);
   }
   const LAST = urls.length - 1; // 87 frames, indices 0..86
 
@@ -57,7 +60,7 @@
   ];
 
   // One frame file per measurement, so the two can't fall out of step.
-  const urlsLight = rightsLight.map((_, i) => `assets/hero/light-frames/f${String(i).padStart(3, '0')}.${ext}`);
+  const urlsLight = rightsLight.map((_, i) => `assets/hero/light-frames/f${String(i).padStart(3, '0')}.${ext}${FRAMES_V}`);
   const LAST_LIGHT = urlsLight.length - 1;
 
   // Timeline, in screen heights of scrolling on a computer -----------------------
@@ -206,7 +209,7 @@
         schedule();
       },
       () => {
-        if (f.urls[i].endsWith('.webp')) {
+        if (f.urls[i].includes('.webp')) {
           const fallback = new Image();
           if (priority) fallback.fetchPriority = priority;
           fallback.src = f.urls[i].replace('.webp', '.png');
@@ -396,6 +399,8 @@
     .then((data) => {
       for (const g of data.groups) groups.push(aayat.appendChild(renderGroup(g)));
       fit();
+      // fit() measured with whatever font was ready; the Arabic face may still be on its way, and is wider or narrower.
+      document.fonts.ready.then(fit);
       dirty = true;
       schedule();
     })

@@ -2952,6 +2952,15 @@ button.button:disabled:active {
   color: var(--color-muted-foreground);
 }
 
+/* "This is zabar." with the teacher saying it beside it; on a narrow screen the button drops under the line. */
+.alone-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem 0.75rem;
+}
+
 /* One letter twice, then the whole group as pairs. */
 .pair-feature {
   display: grid;

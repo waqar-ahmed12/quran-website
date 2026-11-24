@@ -32,10 +32,11 @@
       document.documentElement.dataset.theme = 'dark';
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- TRYOUT: Scheherazade New is only here for the lettering options; keep just the chosen Arabic fonts. -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&family=Scheherazade+New&display=swap">
+  <link rel="preload" href="../fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/cinzel-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/amiri-quran-arabic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <script src="../prefetch.js" defer></script>
   <link rel="stylesheet" href="qaida.css">
   <script src="shell.js" defer></script>
   <script src="audio.js" defer></script>

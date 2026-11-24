@@ -1,0 +1,27 @@
+filters:
+  and:
+    - file.inFolder("docs/architecture/decisions")
+    - file.hasTag("adr")
+views:
+  - type: table
+    name: Decisions
+    order:
+      - adr
+      - file.name
+      - status
+      - date
+    sort:
+      - property: adr
+        direction: ASC
+  - type: table
+    name: Waiting for a yes
+    filters:
+      and:
+        - status == "proposed"
+    order:
+      - adr
+      - file.name
+      - date
+    sort:
+      - property: adr
+        direction: ASC

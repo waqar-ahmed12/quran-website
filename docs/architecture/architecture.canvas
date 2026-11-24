@@ -1,0 +1,66 @@
+{
+  "nodes": [
+    { "id": "title", "type": "text", "x": 0, "y": -420, "width": 2580, "height": 130,
+      "text": "# Alif to Ayah: the architecture board\nRead it left to right, the way a request travels. **Green: built** · **Yellow: planned** · **Orange: needs your decision**. Click a link to open its note." },
+    { "id": "read", "type": "text", "x": 0, "y": -270, "width": 2580, "height": 190,
+      "text": "**Read in order:** [[docs/architecture/README|Hub]] · [[docs/architecture/01-system-overview|1 Overview]] · [[docs/architecture/02-frontend|2 Frontend]] · [[docs/architecture/03-backend|3 Backend]] · [[docs/architecture/04-data-model|4 Database]] · [[docs/architecture/05-api|5 API]] · [[docs/architecture/06-sync|6 Sync]] · [[docs/architecture/07-security-and-privacy|7 Security and privacy]] · [[docs/architecture/08-deployment-and-operations|8 Deployment]] · [[docs/architecture/09-testing|9 Testing]] · [[docs/architecture/10-roadmap|10 Roadmap]] · [[docs/architecture/11-glossary|11 Glossary]]\n\n**Why each choice was made:** [[docs/architecture/decisions/README|the decision log]]" },
+
+    { "id": "g-browser", "type": "group", "label": "1. In the browser", "x": 0, "y": 0, "width": 480, "height": 800 },
+    { "id": "landing", "type": "text", "color": "4", "x": 20, "y": 40, "width": 440, "height": 170,
+      "text": "### Landing page\nThe Qur'an opens as you scroll, then verses appear.\n`index.html` · `main.js` · `atmosphere.js`" },
+    { "id": "qaida", "type": "text", "color": "4", "x": 20, "y": 230, "width": 440, "height": 170,
+      "text": "### Free Qaida\n23 of 29 lessons, no sign-up.\n`practice.js` asks the questions, `shell.js` remembers." },
+    { "id": "device", "type": "text", "color": "4", "x": 20, "y": 420, "width": 440, "height": 170,
+      "text": "### On the device\nProgress in localStorage, recordings in IndexedDB.\nSync is planned: [[docs/architecture/06-sync|Sync note]]" },
+    { "id": "pages", "type": "text", "color": "3", "x": 20, "y": 610, "width": 440, "height": 170,
+      "text": "### New pages\nAccount · contact · teacher dashboard · privacy\n[[docs/architecture/02-frontend|Frontend note]]" },
+
+    { "id": "g-netlify", "type": "group", "label": "2. Netlify", "x": 700, "y": 0, "width": 480, "height": 705 },
+    { "id": "static", "type": "text", "color": "3", "x": 720, "y": 40, "width": 440, "height": 170,
+      "text": "### Static files\nEverything in `site/`, from servers near the visitor.\nHeaders and CSP ready in `site/_headers`. Not live yet." },
+    { "id": "rewrite", "type": "text", "color": "3", "x": 720, "y": 515, "width": 440, "height": 170,
+      "text": "### Rewrite `/api/*`\nPasses API calls on to the server, so the browser sees one site.\n[[docs/architecture/08-deployment-and-operations|Deployment note]]" },
+
+    { "id": "g-fly", "type": "group", "label": "3. Fly.io, one machine", "x": 1400, "y": 475, "width": 480, "height": 420 },
+    { "id": "api", "type": "text", "color": "3", "x": 1420, "y": 515, "width": 440, "height": 170,
+      "text": "### API server\nNode 24, nothing to install.\n[[docs/architecture/03-backend|Backend note]] · [[docs/architecture/05-api|API note]]" },
+    { "id": "modules", "type": "text", "color": "3", "x": 1420, "y": 705, "width": 440, "height": 170,
+      "text": "### Inside it\nauth · learners · progress · enquiries · teach · privacy\nroutes → services → SQL" },
+
+    { "id": "g-data", "type": "group", "label": "4. Data", "x": 2100, "y": 665, "width": 480, "height": 420 },
+    { "id": "sqlite", "type": "text", "color": "3", "x": 2120, "y": 705, "width": 440, "height": 170,
+      "text": "### SQLite database\nOne file on the server's disk. Schema tested: 20 of 20.\n[[docs/architecture/04-data-model|Database note]]" },
+    { "id": "backup", "type": "text", "color": "3", "x": 2120, "y": 895, "width": 440, "height": 170,
+      "text": "### Backups\nLitestream copies every change to a bucket within a second.\n30 days of history." },
+
+    { "id": "g-outside", "type": "group", "label": "Outside services", "x": 2100, "y": 0, "width": 480, "height": 450 },
+    { "id": "email", "type": "text", "color": "3", "x": 2120, "y": 40, "width": 440, "height": 170,
+      "text": "### Email\nSign-in links and enquiry alerts.\nThe provider is chosen with the domain." },
+    { "id": "voice", "type": "text", "color": "2", "x": 2120, "y": 230, "width": 440, "height": 200,
+      "text": "### Students' recordings\nThey stay on the device. Sending one to the teacher is your decision.\n[[docs/architecture/decisions/0011-voice-to-teacher-gated|ADR-0011]] · [[docs/architecture/07-security-and-privacy|Privacy note]]" },
+
+    { "id": "g-build", "type": "group", "label": "Build time and quality", "x": 0, "y": 1160, "width": 2580, "height": 250 },
+    { "id": "quran", "type": "text", "color": "4", "x": 20, "y": 1200, "width": 560, "height": 170,
+      "text": "### Quran.com\nThe source of every verse.\nOnly the copy tools ask it, never a visitor." },
+    { "id": "fetch", "type": "text", "color": "4", "x": 690, "y": 1200, "width": 560, "height": 170,
+      "text": "### Copy, never type\n`fetch-qaida-words.js` and `fetch-qaida-verses.js` save the words exactly as printed." },
+    { "id": "checks", "type": "text", "color": "4", "x": 1360, "y": 1200, "width": 560, "height": 170,
+      "text": "### 25 check scripts\nThey run the real lessons in Node, with no browser.\n[[docs/architecture/09-testing|Testing note]]" },
+    { "id": "ci", "type": "text", "color": "3", "x": 2000, "y": 1200, "width": 560, "height": 170,
+      "text": "### GitHub Actions\nRuns every check on every push, then deploys.\nPhase A of the [[docs/architecture/10-roadmap|roadmap]]" }
+  ],
+  "edges": [
+    { "id": "e-files", "fromNode": "landing", "fromSide": "right", "toNode": "static", "toSide": "left", "label": "files" },
+    { "id": "e-lessons", "fromNode": "qaida", "fromSide": "right", "toNode": "static", "toSide": "left" },
+    { "id": "e-save", "fromNode": "qaida", "fromSide": "bottom", "toNode": "device", "toSide": "top" },
+    { "id": "e-sync", "fromNode": "device", "fromSide": "right", "toNode": "rewrite", "toSide": "left", "label": "sync", "color": "3" },
+    { "id": "e-calls", "fromNode": "pages", "fromSide": "right", "toNode": "rewrite", "toSide": "left", "label": "API calls", "color": "3" },
+    { "id": "e-https", "fromNode": "rewrite", "fromSide": "right", "toNode": "api", "toSide": "left", "label": "HTTPS", "color": "3" },
+    { "id": "e-inside", "fromNode": "api", "fromSide": "bottom", "toNode": "modules", "toSide": "top", "color": "3" },
+    { "id": "e-sql", "fromNode": "modules", "fromSide": "right", "toNode": "sqlite", "toSide": "left", "label": "SQL", "color": "3" },
+    { "id": "e-backup", "fromNode": "sqlite", "fromSide": "bottom", "toNode": "backup", "toSide": "top", "color": "3" },
+    { "id": "e-mail", "fromNode": "api", "fromSide": "right", "toNode": "email", "toSide": "left", "label": "mail", "color": "3" },
+    { "id": "e-copy", "fromNode": "fetch", "fromSide": "left", "toNode": "quran", "toSide": "right" },
+    { "id": "e-ci", "fromNode": "ci", "fromSide": "left", "toNode": "checks", "toSide": "right", "color": "3" }
+  ]
+}

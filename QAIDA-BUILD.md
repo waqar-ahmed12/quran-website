@@ -336,7 +336,7 @@ is, and lessons 2–14 get built against it instead of being retrofitted.
 | 7 | **Say it and listen back:** the student records their own voice and plays it against the teacher's, **in every lesson** | `ui-ux-pro-max`, `minimalist-ui` | **Built 2026-09-24, awaiting the user's preview.** Specified in `docs/your-voice/`; the step log below lists where the build differs. *Was step 10;* moved here at the user's request — *"i want it in every lesson, because thats important"* — so lessons 6–14 are born with it instead of being retrofitted. Check: `node tools/qaida-voice-check.js` |
 | 8 | **Lessons 7–9: tanween, zabar + alif, standing harakaat** (the two scripts write some of these marks differently) | `ui-ux-pro-max`, `full-output-enforcement` | Was step 7. **Lesson 7 built 2026-09-27, awaiting the user's look** (`docs/lesson-7/`; see "Step 8 built — Lesson 7"). The scripts' tanween difference is **font-only**, so it cannot show until the Indo-Pak font blocker is fixed at step 13 (`docs/lesson-7/02` §5). **Lesson 8 built 2026-09-27, awaiting the user's look** — `docs/lesson-8/`, eight files; see "Step 8 built — Lesson 8" for where the build differs and the four pending fixes it was built after. Checks: `node tools/qaida-check.js`, `qaida-lesson8-check.js`, `qaida-words-check.js` (new). **Lesson 9 built 2026-09-28, awaiting the user's look** — `docs/lesson-9/`, eight files; see "Step 8 built — Lesson 9" for where the build differs. **Step 8 is now built in full** (lessons 7, 8 and 9). Checks: `node tools/qaida-check.js`, `qaida-lesson9-check.js` (new), `qaida-words-check.js` |
 | 9 | **Lessons 10–14: wow and yaa (leen and madd), jazam** | `ui-ux-pro-max`, `full-output-enforcement` | Was step 8. Answered 2026-09-20: **jazam stays last**, after leen. **Planned 2026-09-28:** `docs/step-9/README.md` (the phase, and a step 0 of five loose ends), `docs/lesson-10/` (Lesson 10's full spec). **Step 0 landed and Lesson 10 built 2026-09-28, awaiting the user's look** — see "Step 9 built — step 0 and Lesson 10". Checks: `node tools/qaida-lesson10-check.js` (new), and every other one. **Lesson 11 built 2026-09-29, awaiting the user's look** — see "Step 9 built — Lesson 11"; `node tools/qaida-lesson11-check.js` (new). **Lesson 12 built 2026-09-29, awaiting the user's look** — see "Step 9 built — Lesson 12"; `node tools/qaida-lesson12-check.js` (new). **Lesson 13 built 2026-09-29, awaiting the user's look** — see "Step 9 built — Lesson 13"; `node tools/qaida-lesson13-check.js` (new). **Lessons 11–14 planned 2026-09-28, one folder each** (`docs/lesson-11/` to `docs/lesson-14/`), see "Step 9 planned — lessons 11 to 14". **Lesson 14 built 2026-09-29, awaiting the user's look — step 9 is now built in full** (built on `07` §1's recommendation, one lead, without a separate sign-off: see "Step 9 built — Lesson 14"); `node tools/qaida-lesson14-check.js` (new) |
-| 10 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Was step 9. Each lesson adds its rows to the recording list as it's built |
+| 10 | **The rest of the recordings:** the marks in every lesson, and 3–4 example words per exercise | `ui-ux-pro-max`, `full-output-enforcement` | Was step 9. Each lesson adds its rows to the recording list as it's built. **Letter names recorded 2026-11-19: Lessons 1–3 speak** (see "Step 10 begun"); **the sounds with zabar, zair and paish the same day: Lessons 4–6 speak**, 77 of 87, the rest held or to re-take |
 | 11 | **Finish screen:** a mark for each finished lesson, and a last screen pointing to one-to-one lessons | `minimalist-ui` | |
 | 12 | **Polish:** spacing, lettering, motion | `high-end-visual-design` | |
 | 13 | **Audit and connect:** keyboard, screen readers, phones, MASTER.md's checklist; options panels and `recordings.html` removed; a licensed Indo-Pak font in place of the Noto Naskh stand-in | `web-design-guidelines` | The landing page's three Free Qaida links were pointed at `qaida/` early, 2026-09-18 |
@@ -1365,6 +1365,70 @@ recommendations, and to building without a separate look at lessons 7–9 first 
 **Still the user's** (`docs/lesson-10/06` §4): does the jazam read as a mark on the wow, and is it the shape your
 mushaf prints; does the halo sit on the wow (it behaves as Lesson 8's does, and at this size wraps most of the item);
 دَوْ standing apart; the walkthrough; the reading page. And the words — every one is Claude's candidate.
+
+### Step 10, 2026-11-19 (last) — the marks' names spoken, and letters spelled the teacher's way (hijje)
+
+*The user: "Yes, add it" (a ▶ beside each mark's name), then, on how they teach: "we spell like kaaf zabar ka, taa zair ti,
+kati … lets go with your plan".* Full record in `docs/recordings/sounds-build-record.md`. In short:
+- **The six names are recorded** (`audio/mark-names/`: zabar, fatha, zair, kasra, paish, damma; 201 KB), a new manifest
+  group keyed by the word itself. The clearest take of each was chosen by measurement; the other 27 are on the compare page.
+- **"This is zabar." has a Hear it button** in Lessons 4–6 (`.alone-hear`, the quiet speaker button the answer strip uses):
+  it says the word the student chose, zabar or fatha. It shows only when that word is recorded, so Lessons 7–15 have none.
+- **A marked tile on the board is spelled, hijje style:** tapping بَ plays the letter's name, the mark's name and the sound
+  in a row, "Baa, zabar, ba" ("Baa, fatha, ba" with the other naming), from the three separate recordings. A bare tile
+  still says the name; the drill still asks with the sound alone, since that is what it tests; a tile whose sound is not
+  recorded yet behaves as before. Lesson 5's and 6's boards spell the comparison marks too ("Alif, fatha, a").
+- **Code:** `audio.js` gains `hasName`, `playName` and `spell` (a short chain player; any tap cancels a spelling under way);
+  `mark-lesson.js` paints the button and spells on `peekTile`; one block of markup in `lesson-4/5/6.html`; `.alone-name` in
+  `qaida.css`. `tools/cut-letters.js` can take each entry from its own recording (`"source"`). New check:
+  `tools/qaida-hijje-check.js` (17 checks: order, cancelling, muting, missing pieces, Indo-Pak letters).
+- **Checked:** in the browser, both namings, Lessons 4–7, phone width (one row, no sideways scroll, 44px button), no console
+  errors; all 25 earlier check scripts and the new one pass.
+
+**Still the user's:** whether hijje on tap is right (a separate button is the alternative), and the takes. **Words** like
+katiba spell the same way letter by letter from these recordings, but the joined parts ("kati", "katiba") need the teacher
+to record each word once.
+
+### Step 10, 2026-11-19 (later) — the sounds with zabar, zair and paish: Lessons 4–6 speak
+
+*The user: "please continue".* Full record in `docs/recordings/sounds-build-record.md`. In short:
+- **77 of the 87 sounds are on the site** (`audio/fatha/` 24, `kasra/` 27, `damma/` 26, 2.5 MB) and in the three
+  `manifest.json` lists; the recordings page says 106 of 447. Lesson 4 plays `fatha/ba.wav`; a sound with no file still
+  plays the stand-in. No lesson code changed.
+- **Held back until listened to:** zabar's dha, ra, za and ʾa; zair's mi and ni; paish's ẓu, lu and nu (long vowels, a
+  whispered one, a pair run together). **No usable take:** zabar's ʿa. The cut lists mark them, and the compare page shows them in red.
+- **New in the tooling:** items with two or three sounds run together are split at the quietest point between them; a
+  short vowel's end follows its creaky tail instead of stopping where the pitch tracker gives up (nine zabar sounds had
+  ended inside the vowel); `tools/cut-letters.js` takes a manifest group, holds, and missing sounds.
+- **Checked:** every edge in quiet, no clicks, peaks ≤ −4.7 dBFS, loudness within ~1.5 dB (the "s" sounds lower by
+  design); `qaida-check`, `qaida-marks-check`, `qaida-lesson5-check`, `qaida-lesson6-check` and four more pass.
+
+**Still the user's:** the listen, and the held sounds kept or re-taken (with ʿa and za); where the marks' own spoken names
+go in Lessons 4–6.
+
+### Step 10 begun, 2026-11-19 — the 29 letter names are recorded, and Lessons 1–3 speak
+
+*The user: "Yes, cut them".* The teacher re-recorded the letter names on a phone (`docs/recordings/how-to-record.md`), and
+zabar, zair and paish in the same sitting. Full record in `docs/recordings/letters-build-record.md`. In short:
+- **The 29 names are in** `site/qaida/audio/letters/` (`alif.wav` … `ya.wav`, the slugs `audio.js` already had) and in the
+  `letters` list of `audio/manifest.json`, keyed by the Madani letter, so one file serves both scripts. Lessons 1–3, the
+  recordings page (29 of 447) and "Say it and listen back" pick them up; no lesson code changed.
+- **Made with nothing unsafe:** `tools/m4a-to-wav.ps1` decodes the phone's .m4a with Windows' own decoder (no ffmpeg);
+  `tools/cut-letters.js` cuts each letter where a cut list in `recordings-inbox/` says, filters the rumble below 75 Hz,
+  softens the hiss only where it is louder than a typical letter's (the October compare page's de-esser), sets every letter
+  to one loudness, and writes mono 16-bit WAV at 22.05 kHz: 29 files, 1.9 MB, 35–101 KB each.
+- **Softening: Gentle.** It touches only Seen, Sheen and Ṣaad (4–5 dB) and Hamzah's z (3 dB), so the "s" stays crisp
+  enough to tell س from ث. This recording has 3–20 dB less "s" against the voice than the October one.
+- **Takes:** the second Laam (the first came before Kaaf by mistake) and the second Yaa (the last take, as the script
+  asks); the first Yaa is kept as an alternate.
+- **Checked:** all 29 within 0.7 dB of one loudness, highest peak −3.9 dBFS, silent edges; tapping a tile in Lesson 1 fetches
+  its file with no CSP or console error; ک ہ ی fold to the same files; `qaida-check`, `qaida-rules-check`,
+  `qaida-voice-check`, `qaida-page-check` and `qaida-lesson3-check` pass.
+
+**Still the user's:** a listen on `recordings-inbox/compare-19-nov.html` (before, after and what was removed, at five
+levels), then Gentle kept or another level and Yaa named (one command, on that page); the zabar, zair and paish files,
+labelled on `recordings-inbox/check-19-nov.html`, with two zabar sounds to re-take; and where the marks' own spoken names
+(recorded in those files) go in Lessons 4–6.
 
 ### UI audit, 2026-10-07 — eight fixes across every Qaida page
 

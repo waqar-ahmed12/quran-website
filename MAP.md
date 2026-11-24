@@ -12,6 +12,16 @@ Open **Graph view** (Ctrl+G) to see how these notes connect. Add a `[[link]]` in
 - [[QAIDA-CONTENT]] - what the Qaida teaches
 - [[docs/step-9/README|Step 9 map]]
 - [[docs/your-voice/README|Say it and listen back]]
+- [[docs/recordings/README|Recordings: openly licensed sources]] - what was found, its licence, and what is still to ask
+- [[docs/recordings/how-to-record|How to record on a phone]] - the setup for every recording sitting
+- [[docs/recordings/letters-build-record|The letter names, recorded]] (built 2026-11-19) - the 29 names on the site, how they were cut and cleaned, Lessons 1-3 speak
+- [[docs/recordings/sounds-build-record|The sounds with zabar, zair and paish, recorded]] (built 2026-11-19) - 77 of 87 on the site, the rest held to be listened to, Lessons 4-6 speak; the marks' names, and letters spelled hijje style ("Baa, zabar, ba")
+
+## Architecture (how the whole system is built)
+- [[docs/architecture/README|Architecture hub]] - the system, frontend, backend, database, API, sync, security, deployment, testing and roadmap
+- [[docs/architecture/decisions/README|Decision log]] - why each big choice was made (ADRs)
+- [[docs/architecture/architecture.canvas|Architecture board]] - the whole system as boxes and arrows
+- [[README|Project README]] - the front door on GitHub
 
 ## Second pass (lessons 15-29)
 - [[docs/pass-2/README|Pass 2 map]] - [[docs/pass-2/01-what-the-two-scripts-print|what the scripts print]] - [[docs/pass-2/02-page-types-and-questions|page types]] - [[docs/pass-2/03-open-questions|open questions]]

@@ -6,6 +6,18 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["serve.js", "8777"],
       "port": 8777
+    },
+    {
+      "name": "site-2",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["serve.js", "8778"],
+      "port": 8778
+    },
+    {
+      "name": "site-phone",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["serve.js", "--phone", "8779"],
+      "port": 8779
     }
   ]
 }

@@ -538,7 +538,18 @@ wifi and prints the address to open (Windows asks to allow Node: Private network
      and description, still no og:image; the name has `translate="no"`; the email field has `spellcheck="false"`. New: on
      phones, where only the star shows, it has a 44px touch area (it was 20px). The Qaida's fixes are in `QAIDA-BUILD.md`
      ("UI audit, 2026-10-07").
-   WebP conversion needs a tool; do it after the PC is cleaned (e.g. `sharp` in Node), aiming for a few MB total.
+   - **Security and speed pass, 2026-10-08** (the user: "everything optimized, no wait on loading"). *Fonts* are served
+     from the site (`site/fonts/`, written by `tools/self-host-fonts.js`; SIL OFL licences in `LICENCES.txt`), with the
+     faces the first screen draws preloaded. Google Fonts had cost about 1 s on each first visit (two new connections,
+     measured 1.0–1.1 s here), 0.7 s of it with the page unable to draw, and sent visitors' addresses to Google.
+     *Page changes:* `site/prefetch.js` fetches a page when its link is hovered, pressed or tabbed to. *Headers* live in
+     `site/_headers` (moved from netlify.toml), which `serve.js` also applies: a strict Content-Security-Policy (inline
+     scripts allowed by hash, `tools/csp-hashes.js`), nosniff, no framing, microphone for this site only, and
+     `X-Robots-Tag: noindex` **until launch**. *Frames* are still cached for a year but now have a version (`FRAMES_V`),
+     so a re-export reaches returning visitors. `serve.js` refuses requests not addressed to this machine. The aayat are
+     sized again once their font arrives. Checked: all 45 pages load with no policy violations or font errors, and all
+     26 check scripts pass (the Lesson 21 check's random 1-in-8 failure is fixed).
+   The frames are WebP (2.6 MB for both takes); the PNGs beside them are the masters and the fallback, never sent to visitors.
    **Before launch, check the free Qaida is live.** The line under the headline promises it. If it isn't ready, change
    the line so visitors aren't sent looking for something that doesn't exist yet. The site name also needs adding.
 

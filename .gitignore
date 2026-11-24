@@ -1,3 +1,8 @@
+# Exported AI sessions: whole transcripts, private, and the repository is public (2026-10-08).
+chats/
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 .obsidian/cache
+
+# Raw recordings dropped in for Claude to sort. Only finished clips go into site/qaida/audio/ (the repository is public).
+recordings-inbox/

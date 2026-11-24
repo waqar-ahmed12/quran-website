@@ -20,6 +20,7 @@ const types = {
   '.js': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.md': 'text/plain; charset=utf-8',
+  '.txt': 'text/plain; charset=utf-8',
   '.png': 'image/png',
   '.webp': 'image/webp',
   '.avif': 'image/avif',
@@ -37,7 +38,46 @@ const types = {
   '.webm': 'audio/webm',
 };
 
+// Only requests addressed to this machine are answered. Any web page open in a browser here could point a name it owns
+// at 127.0.0.1 ("DNS rebinding") and read whatever this server shares; such a request carries that name in its Host.
+const hosts = new Set(['localhost', '127.0.0.1', '[::1]']);
+if (phone) {
+  for (const nets of Object.values(os.networkInterfaces())) {
+    for (const net of nets) if (net.family === 'IPv4' || net.family === 4) hosts.add(net.address);
+  }
+}
+
+// The response headers Netlify sends (site/_headers), so the preview enforces the same Content-Security-Policy:
+// anything it would block online is blocked here too, with the reason in the console. Read on every request, so an
+// edit applies at once. Cache-Control is left out: the preview always wants the newest file.
+function siteHeaders(sitePath) {
+  const found = {};
+  let applies = false;
+  let text = '';
+  try {
+    text = fs.readFileSync(path.join(root, 'site', '_headers'), 'utf8');
+  } catch {
+    return found;
+  }
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim() || line.trim().startsWith('#')) continue;
+    if (!/^\s/.test(line)) {
+      const rule = line.trim();
+      applies = rule.endsWith('*') ? sitePath.startsWith(rule.slice(0, -1)) : sitePath === rule;
+    } else if (applies) {
+      const colon = line.indexOf(':');
+      const name = line.slice(0, colon).trim();
+      if (name.toLowerCase() !== 'cache-control') found[name] = line.slice(colon + 1).trim();
+    }
+  }
+  return found;
+}
+
 http.createServer((req, res) => {
+  if (!hosts.has((req.headers.host || '').replace(/:\d+$/, ''))) {
+    res.writeHead(403);
+    return res.end('Forbidden');
+  }
   let urlPath;
   try {
     urlPath = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
@@ -63,6 +103,7 @@ http.createServer((req, res) => {
       return res.end('Not found');
     }
     res.writeHead(200, {
+      ...(urlPath.startsWith('/site/') ? siteHeaders(urlPath.slice('/site'.length)) : {}),
       'Content-Type': types[path.extname(file).toLowerCase()] || 'application/octet-stream',
       'Cache-Control': 'no-cache',
     });
