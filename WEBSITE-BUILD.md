@@ -5,22 +5,17 @@ or `design-system/quran-landing/MASTER.md`, this file wins.** Read those two for
 
 ---
 
-## 0. Safety first — this PC is infected
+## 0. Setup — new, clean PC (2026-11-26)
 
-A file-infecting worm (**Grenam / Renamer**, confirmed on VirusTotal) has replaced hundreds of `.exe` files with
-533,504-byte copies of itself. Running an infected program spreads it further.
+The old PC had a file-infecting worm (Grenam/Renamer, 2026-09-13), which is why earlier notes ban Python, ffmpeg and
+Git Bash and blame "broken ffmpeg" / "Python blocked by the sandbox". **The project moved to a new, clean PC — those
+bans no longer apply.**
 
-- **Never run:** `python`, `py`, `pip` (Python 3.11's `python.exe` *is* the worm; 3.12 has no `python.exe` left),
-  `ffmpeg`/`ffprobe`, Git Bash, or anything under `C:\ffmpeg-8.1.2-essentials_build\` or `%LOCALAPPDATA%\Programs\`.
-- The **Bash tool is broken** (Git's `bash.exe` is infected) — use PowerShell. Grep/Glob may fail — use
-  `Get-ChildItem` / `Select-String`.
+- Install the tools once: in PowerShell, from this folder, run
+  `powershell -ExecutionPolicy Bypass -File .\setup-pc.ps1`. It installs Git, Node.js LTS and Python 3 with
+  `winget`, then checks each one.
 - **Never** use `dangerouslyDisableSandbox`.
-- **Safe:** PowerShell cmdlets, `node` (`C:\Program Files\nodejs\node.exe`, validly signed), Opera GX (signed, the
-  default browser). Before running any other `.exe`, check `Get-AuthenticodeSignature` is `Valid` and the size is
-  not 533,504 bytes.
-- Save images as **PNG or WebP, never `.jpg`** — `.jpg` files in this project have been silently rewritten.
-- `PLAN.md` blames a "broken ffmpeg install" and "Python blocked by the sandbox" — both were the worm.
-- The user will clean the PC (rescue USB) before launch. Don't install new software until then.
+- Keep saving images as **PNG or WebP** (the existing assets are, and the pipeline expects it).
 
 **Working style:** the user prefers to run scripts themselves and paste the output. When a script is needed, save
 it and give one copy-paste command. Keep updates short.
@@ -164,7 +159,7 @@ site/
 
 **Preview:** `node serve.js` in this folder, then open `http://localhost:8777/site/`. `serve.js` has no dependencies
 and binds to localhost only. The `.claude/launch.json` config **"site"** runs it for Claude's Browser pane.
-**Don't use `python -m http.server`.** To test on a real phone, `node serve.js --phone` shares only `site/` on the
+To test on a real phone, `node serve.js --phone` shares only `site/` on the
 wifi and prints the address to open (Windows asks to allow Node: Private networks only; Ctrl+C when done).
 
 ---
@@ -515,8 +510,8 @@ and shown as on-page buttons. Their only design reference is Apple's product pag
 `ui-ux-pro-max`, `taste-skill:minimalist-skill` · 3 aayat: `ui-ux-pro-max`, `taste-skill:soft-skill` · 4 dust and
 sway: `taste-skill:soft-skill`, `agent-skills:performance-optimization` · 5 closing line and button:
 `taste-skill:minimalist-skill`, `ui-ux-pro-max` · 6 light mode: `ui-ux-pro-max` · 7 launch: `web-design-guidelines`,
-`agent-skills:webperf`, `agent-skills:ship`. `ui-ux-pro-max`'s search script needs Python, so don't run it. Read
-`references/` and the CSVs in `data/` directly instead.
+`agent-skills:webperf`, `agent-skills:ship`. `ui-ux-pro-max`'s search script needs Python 3 (installed by `setup-pc.ps1`); its
+`references/` and the CSVs in `data/` can also be read directly.
 
 ---
 
@@ -531,7 +526,7 @@ sway: `taste-skill:soft-skill`, `agent-skills:performance-optimization` · 5 clo
 | `design-taste-frontend` | Alternative taste guide; avoid templated-looking output |
 | `full-output-enforcement` | When writing complete files, to avoid placeholders |
 | `web-design-guidelines` | Audit once a draft exists (phase 7) |
-| `ui-ux-pro-max` | Design system — **already generated into `MASTER.md`**. Its search tool can't run right now (see below). Its `references/quick-reference.md` and `references/pro-rules.md` can still be read directly |
+| `ui-ux-pro-max` | Design system — **already generated into `MASTER.md`**. Its search tool needs Python 3 and the direct path below. Its `references/quick-reference.md` and `references/pro-rules.md` can still be read directly |
 | `image-to-code`, `imagegen-frontend-web` | Not needed — the assets exist |
 
 **User-level plugins:** `agent-skills` (useful: `frontend-ui-engineering`, `performance-optimization`, `review`),
@@ -539,16 +534,15 @@ sway: `taste-skill:soft-skill`, `agent-skills:performance-optimization` · 5 clo
 `frontend-design`, `awesome-design-md`, `codeburn`, `graphify`, `claude-memory-compiler`, `claude-code-setup`.
 The last five aren't needed for this build.
 
-### `ui-ux-pro-max` — why the search tool doesn't work, and how to fix it
+### `ui-ux-pro-max` — running the search tool
 
-1. **No working Python.** The tool runs `scripts/search.py`, which needs Python 3. On this PC `python` resolves to
-   the infected 3.11. **Do not run it** until the PC is cleaned and Python is reinstalled from python.org.
+1. **Python 3.** The tool runs `scripts/search.py`. Install Python with `setup-pc.ps1`.
 2. **Path variable.** Its SKILL.md calls
    `python "${CLAUDE_PLUGIN_ROOT}/.claude/skills/ui-ux-pro-max/scripts/search.py"`. `CLAUDE_PLUGIN_ROOT` is only set
    when it's installed as a **plugin**. As a project skill, use the direct path instead:
    `python ".claude/skills/ui-ux-pro-max/scripts/search.py" "<query>" --domain <domain>`.
 
-**After the cleanup**, either use that direct path with a fresh Python, or reinstall it as a plugin from an
+Either use that direct path, or reinstall it as a plugin from an
 interactive `claude` terminal:
 
 ```

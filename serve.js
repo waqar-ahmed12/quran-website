@@ -1,5 +1,5 @@
 // Zero-dependency static file server for local preview.
-// Python's http.server is unsafe on this PC (python.exe is infected), so use Node instead.
+// No dependencies: needs only Node.
 //
 //   node serve.js [port]      then open http://localhost:8777/site/
 //   node serve.js --phone     also lets a phone on the same wifi open the site; prints the address

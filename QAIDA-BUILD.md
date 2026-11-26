@@ -48,9 +48,8 @@ One step at a time, with the user's sign-off before the next.
 
 Only the project skills in `.claude/skills/` are installed here. The user-level plugins earlier chats used
 (`taste-skill`, `agent-skills`, `ponytail`) are not. Two project skills are the same files under other names:
-`minimalist-ui` is `taste-skill:minimalist-skill`, and `high-end-visual-design` is `taste-skill:soft-skill`. Don't run
-`ui-ux-pro-max`'s search script (it needs Python, see `WEBSITE-BUILD.md` §0); read its `references/` and `data/*.csv`
-directly.
+`minimalist-ui` is `taste-skill:minimalist-skill`, and `high-end-visual-design` is `taste-skill:soft-skill`. `ui-ux-pro-max`'s
+search script needs Python 3 (see `WEBSITE-BUILD.md` §8); its `references/` and `data/*.csv` can also be read directly.
 
 ## Step log
 
