@@ -52,11 +52,59 @@
 
   // One sound at a time. Tapping a second letter stops the first, the way a teacher wouldn't say two at once.
   let player = null;
+  let chain = 0; // bumped by every stop(), so a spelling still on its way gives up when something else is tapped
 
   function stop() {
+    chain += 1;
     if (!player) return;
+    player.onended = null;
     player.pause();
     player.currentTime = 0;
+  }
+
+  // A mark's own name said aloud ("zabar", "fatha"): keyed by the word itself, since a name is not a letter.
+  const nameFile = (word) => {
+    const group = manifest['mark-names'];
+    return (group && group[word]) || null;
+  };
+
+  // Several recordings one after another, with the short breath a teacher leaves between them.
+  const GAP_MS = 180;
+  function playFiles(files) {
+    stop();
+    if (!player) player = new Audio();
+    const id = chain;
+    let i = 0;
+    const next = () => {
+      if (id !== chain || i >= files.length) return;
+      player.onended = () => {
+        player.onended = null;
+        if (id === chain) setTimeout(next, GAP_MS);
+      };
+      player.src = BASE + files[i];
+      i += 1;
+      player.play().catch(() => {});
+    };
+    next();
+  }
+
+  // The mark's name, in the teacher's voice: 'recording', 'muted', or 'none' when that name has no recording.
+  function playName(word) {
+    if (shell.state.muted) return 'muted';
+    const file = nameFile(word);
+    if (!file) return 'none';
+    playFiles([file]);
+    return 'recording';
+  }
+
+  // A letter with its mark, read the Indo-Pak way (hijje): the letter's name, the mark's name, then the sound, "Baa, zabar,
+  // ba". Only when all three are recorded: otherwise null, and the caller plays what it always did. 'muted' when muted.
+  function spell(kind, glyph, word) {
+    const files = [fileFor('letters', glyph), nameFile(word), fileFor(kind, glyph)];
+    if (files.some((file) => !file)) return null;
+    if (shell.state.muted) return 'muted';
+    playFiles(files);
+    return 'spelled';
   }
 
   // Returns what actually played: 'recording', 'standin', or 'muted'.
@@ -169,6 +217,9 @@
     slugFor,
     wanted,
     has: (kind, glyph) => Boolean(fileFor(kind, glyph)),
+    hasName: (word) => Boolean(nameFile(word)),
+    playName,
+    spell,
     // The teacher's file for this item, for voice.js to play beside the student's own recording. Null exactly when
     // has() is false — never the stand-in: matching your pronunciation against a wordless hum isn't a thing.
     urlFor: (kind, glyph) => {

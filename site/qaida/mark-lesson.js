@@ -49,6 +49,7 @@
   const boardTitle = $('.board-title');
   const aloneGlyph = $('.alone-glyph');
   const aloneLabel = $('.alone-label');
+  const aloneHear = $('.alone-hear'); // only on a page whose mark's name is recorded (Lessons 4-6)
   const aloneSits = $('.alone-sits');
   const featureBox = $('.pair-feature');
   const pairsBox = $('.pairs');
@@ -465,7 +466,14 @@
     clearTimeout(tile.timer);
     tile.classList.add('peek');
     tile.timer = setTimeout(() => tile.classList.remove('peek'), 700);
-    if (audio() && tile.dataset.base) audio().play(tile.dataset.audio || 'letters', tile.dataset.base);
+    if (!audio() || !tile.dataset.base) return;
+    const kind = tile.dataset.audio || 'letters';
+    // A letter with its mark is spelled the way an Indo-Pak teacher reads it (hijje): "Baa, zabar, ba", in the student's own
+    // word for the mark, once the letter's name, the mark's name and the sound are all recorded. Until then the sound alone,
+    // or the stand-in, as before. The drill below still asks with the sound alone: that is what it tests.
+    const tileMark = kind === 'letters' ? null : marks.markOf(kind);
+    if (tileMark && audio().spell && audio().spell(kind, tile.dataset.base, marks.nameOf(tileMark, shell))) return;
+    audio().play(kind, tile.dataset.base);
   }
 
   // A letter as a tile. Its container carries the name and the letter itself is hidden from a screen reader: a combining
@@ -743,6 +751,16 @@
     return pair;
   }
 
+  // The mark's own name in the teacher's voice, beside "This is zabar.": the word the student chose for it (zabar or fatha),
+  // and only once that word is recorded. A later lesson's mark has no recording, and its page no button.
+  function paintAloneHear() {
+    if (!aloneHear) return;
+    const word = marks.nameOf(mark, shell);
+    aloneHear.dataset.word = word;
+    aloneHear.hidden = !(audio() && audio().hasName && audio().hasName(word));
+  }
+  if (aloneHear) aloneHear.addEventListener('click', () => { if (audio() && audio().playName) audio().playName(aloneHear.dataset.word); });
+
   function renderBoard() {
     const words = boardBox.dataset;
     const rows = marks.boardRows(shell, mark, currentPart(), { others: others() });
@@ -755,6 +773,7 @@
     // other mark simply has none to find.
     aloneGlyph.textContent = marks.aloneOf(mark);
     aloneLabel.textContent = say(words.markAlone);
+    paintAloneHear();
     aloneSits.textContent = say(words[`markSits${pascalOf(mark.id)}`] || words.markSits, { where });
 
     // The featured pair: one letter twice, bare and marked, the two ways of saying it under each.
@@ -1460,6 +1479,7 @@
   // The manifest arrives a moment later; hearing practice opens for the letters that have a recording when it does.
   if (audio()) audio().ready.then(() => {
     paintSound();
+    paintAloneHear();
     if (drill) drill.set({ formats: formatsFor(mode) });
   });
 

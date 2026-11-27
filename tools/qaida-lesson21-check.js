@@ -827,6 +827,8 @@ async function pageHalf() {
   const lines = new Set();
   let askOff = 0;
   let verdictOff = 0;
+  let nones = 0;   // tap questions on a word with no letter left unread, so far
+  let letters = 0; // tap questions on a word with one, so far
   for (let i = 0; i < 90; i += 1) {
     item = shown();
     if (!item) { verdictOff += 1; break; }
@@ -838,8 +840,10 @@ async function pageHalf() {
       else askOff += 1;
       if (item.kind === 'none') seen.none += 1;
     }
-    // Rotate the four things that can be done to a tap question, so every verdict line is read once.
-    const how = i % 4;
+    // Rotate the four things that can be done to a tap question, so every verdict line is read once. Each kind of word
+    // keeps its own count: on the loop's count, a run whose words of none never fell on turn 2 never read that line, and
+    // the check failed about 1 run in 8 with the page working (2026-10-08).
+    const how = !t ? 0 : item.kind === 'none' ? nones++ % 4 : letters++ % 4;
     if (t && how === 2) {
       // "none" on a word that has a letter not read, and a letter on a word that has none: the two crossed answers.
       if (item.kind === 'none') { click(wordUnits()[0]); if ($('.verdict').textContent !== 'Every letter in this word is read.') verdictOff += 1; lines.add('none-tapped'); }

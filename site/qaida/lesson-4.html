@@ -33,10 +33,11 @@
       document.documentElement.dataset.theme = 'dark';
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- TRYOUT: Scheherazade New is only here for the lettering options; keep just the chosen Arabic fonts. -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Cinzel:wght@500&family=Jost:wght@300;400;500&family=Noto+Naskh+Arabic:wght@400;500&family=Scheherazade+New&display=swap">
+  <link rel="preload" href="../fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/cinzel-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/amiri-quran-arabic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../fonts/fonts.css">
+  <script src="../prefetch.js" defer></script>
   <link rel="stylesheet" href="qaida.css">
   <script src="shell.js" defer></script>
   <script src="audio.js" defer></script>
@@ -190,7 +191,8 @@
     </div>
 
     <!-- The teaching half: the mark, then the letter with and without it. The drill below is the testing half. Every tile is
-         a button: tapping it says the letter (and, once recorded, the sound). -->
+         a button: tapping a bare one says the letter's name; a marked one is spelled the teacher's way once all three pieces are
+         recorded (hijje: "Baa, zabar, ba", mark-lesson.js peekTile), and until then says its sound. -->
     <section class="marks-board" aria-labelledby="board-title"
              data-mark-alone="This is {mark}." data-mark-sits="{Mark} sits above the letter."
              data-pair-bare="The letter on its own" data-pair-marked="The letter with {mark}"
@@ -206,7 +208,17 @@
       <!-- The mark alone, on the dotted circle that a combining mark expects to sit on. -->
       <div class="mark-alone">
         <span class="alone-glyph" lang="ar" dir="rtl" aria-hidden="true"></span>
-        <p class="alone-label"></p>
+        <!-- The mark's name, and the teacher saying it: mark-lesson.js shows the button once that name is recorded. -->
+        <div class="alone-name">
+          <p class="alone-label"></p>
+          <button class="button quiet alone-hear" type="button" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M4.5 9.5h3.5L12.5 6v12L8 14.5H4.5z" />
+              <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5" />
+            </svg>
+            <span data-words="Board: hear the mark's name button">Hear it</span>
+          </button>
+        </div>
         <p class="alone-sits"></p>
       </div>
 

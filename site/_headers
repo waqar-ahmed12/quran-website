@@ -1,0 +1,26 @@
+# Response headers, read by Netlify when it publishes site/, and by serve.js, so the local preview enforces the same
+# rules (anything blocked online is blocked, and reported in the console, here too). Added 2026-10-08.
+#
+# Content-Security-Policy: the site loads nothing from anywhere else. Its script-src hashes allow the pages' inline
+# <script>s (the theme, set before the page draws): after editing one, run  node tools/csp-hashes.js
+# When the contact form is connected, add the form service's address to connect-src and form-action.
+#
+# X-Robots-Tag: noindex keeps search engines away while the site is unfinished. Delete that line at launch.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-7fMYHwPjENwaaYWT6WL5hJDGPd+F0yzaKlYZLN1MN5A=' 'sha256-NuSUzFxqfZauDS6lJgVYrOMbkNuRnlKibm1Gk0FlOV4=' 'sha256-TcvnALDTR1VUygVLBNHG5k0049yHgN1qYWuJ2FcIFCk=' 'sha256-wJm0UYGSpUYe4PU2oGHxWjpD6KnUjUzFXPQwbjdKPQc='; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: microphone=(self), camera=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  X-Robots-Tag: noindex
+
+# The hero's frames are kept for a year without asking again. Their names never change, so main.js gives them a new
+# address instead (FRAMES_V, and the '?v=' in index.html's preload): bump it whenever a frame file changes.
+/assets/hero/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts: a week without asking, then the copy in hand is used while a fresh one is fetched behind it.
+/fonts/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
